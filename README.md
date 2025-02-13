@@ -1,4 +1,6 @@
-# MiMa aka Minion Manager - your helper to organize your helpers
+# Gameday Helperplan - your helper to organize your helpers
+
+a small web app to organize a helper plan for home turf gamedays
 
 ## Why? What? Huh?
 
