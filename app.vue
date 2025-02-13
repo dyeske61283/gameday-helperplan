@@ -1,11 +1,10 @@
 <template>
   <div class="min-h-screen bg-base-200 flex flex-col">
     <div class="navbar bg-base-100 shadow-lg">
-      <div class="flex-1">
-        <a class="btn btn-ghost text-xl mr-auto">Helferplan</a>
-      </div>
-      <div class="flex-none">
-        <RotateCcw :size="32" @click="confirmRestart()"/>
+      <div class="flex-1 flex gap-1 justify-center items-center">
+        <span class="btn btn-ghost text-xl disabled">Helferplan</span>
+        <button class="btn btn-accent btn-sm ml-auto">Plan anzeigen</button>
+        <button class="btn btn-accent btn-sm"><Share :size="18"></Share></button>
       </div>
     </div>
     <NuxtPage />
@@ -14,9 +13,5 @@
 </template>
 
 <script setup lang="ts">
-  import {RotateCcw} from 'lucide-vue-next'
-
-  function confirmRestart() {
-
-  }
+  import { Share } from 'lucide-vue-next';
 </script>

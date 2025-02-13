@@ -6,4 +6,8 @@
 </template>
 <script setup lang="ts">
 
+    setTimeout(() => {
+        navigateTo('./helper');
+    }, 400)
+
 </script>
