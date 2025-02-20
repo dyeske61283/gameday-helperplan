@@ -31,7 +31,7 @@
         </div>        
         <div class="divider mt-0.5"></div>
         <ul class="card-actions items-center bg-base-100">
-          <button class="btn">Helfer-Listen erstellen</button>
+          <NuxtLink class="btn" to="./helper">Helfer-Listen erstellen</NuxtLink>
           <button class="btn">Helfer-Listen bearbeiten</button>
           <button class="btn">Helfer-Lehrgänge bearbeiten</button>
         </ul>
