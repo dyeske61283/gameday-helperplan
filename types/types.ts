@@ -1,3 +1,5 @@
+
+
 export type Helper = {
   id: number;
   name: string;
@@ -14,4 +16,10 @@ export type Event = {
   timestamp?: Date | undefined;
   name: string;
   helpers: Array<Helper>;
+};
+
+export type Plan = {
+  events: Event[];
+  availableHelpers: Helper[];
+
 };

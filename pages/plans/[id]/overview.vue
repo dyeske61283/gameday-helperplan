@@ -2,9 +2,6 @@
   <div class="min-h-screen bg-base-200">
     <!-- Top Navigation -->
     <div class="navbar bg-base-100 shadow-lg sticky top-0 z-10">
-      <div class="flex-1">
-        <a class="btn btn-ghost text-xl">Helper Plan</a>
-      </div>
       <div class="flex-none">
         <button 
           @click="view = view === 'events' ? 'helpers' : 'events'"
@@ -18,18 +15,13 @@
     <!-- Search Bar -->
     <div class="p-4 sticky top-16 bg-base-200 z-10">
       <div class="form-control">
-        <div class="input-group">
+        <div class="input w-full">
+          <Search :size="12"></Search>
           <input 
-            type="text" 
-            v-model="searchQuery" 
-            placeholder="Search..." 
-            class="input input-bordered w-full"
-          />
-          <button class="btn btn-square">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-          </button>
+            v-model="searchQuery"
+            placeholder="Search..."
+            type="search"
+            class="grow"/>
         </div>
       </div>
       
@@ -39,7 +31,7 @@
           v-for="skill in uniqueSkills" 
           :key="skill"
           @click="toggleSkillFilter(skill)"
-          :class="['btn btn-sm', selectedSkills.includes(skill) ? 'btn-primary' : 'btn-ghost']"
+          :class="['btn btn-sm', selectedSkills.includes(skill) ? 'btn-primary' : 'btn-soft']"
         >
           {{ skill }}
         </button>
@@ -99,35 +91,40 @@
 </template>
 
 <script setup>
+import {SetDummyData} from "~/utils/SetDummyData.js";
+import { Search } from "lucide-vue-next";
+
 const route = useRoute();
-const sessionId = route.params.id;
+const planId = route.params.id;
 const view = ref('events');
 const searchQuery = ref('');
 const selectedSkills = ref([]);
 
 // Load session data
-const sessionData = ref(null);
+const planData = ref(null);
 const loadError = ref(null);
 
-onMounted(async () => {
-  const storedData = localStorage.getItem(`plan_${sessionId}`);
-  if (!storedData) {
-    loadError.value = 'Session not found';
-    return;
-  }
-
-  try {
-    sessionData.value = JSON.parse(storedData);
-  } catch (error) {
-    loadError.value = 'Invalid session data';
-    return;
-  }
-});
+// onMounted(async () => {
+//   const storedData = localStorage.getItem(`plan_${sessionId}`);
+//   if (!storedData) {
+//     loadError.value = 'Session not found';
+//     return;
+//   }
+//
+//   try {
+//     sessionData.value = JSON.parse(storedData);
+//   } catch (error) {
+//     loadError.value = 'Invalid session data';
+//     return;
+//   }
+// });
+// Set dummy data
+planData.value = SetDummyData();
 
 // Computed properties
-const events = computed(() => sessionData.value?.events || []);
+const events = computed(() => planData.value?.events || []);
 const allHelpers = computed(() => {
-  const available = sessionData.value?.availableHelpers || [];
+  const available = planData.value?.availableHelpers || [];
   const assigned = events.value.flatMap(event => event.helpers);
   return [...available, ...assigned];
 });
