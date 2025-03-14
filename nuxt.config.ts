@@ -10,20 +10,36 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
   nitro: {
+    // Production
+    storage: {
+      db: {
+        driver: "fs",
+        base: "./data/db",
+      },
+    },
+    // Development
+    devStorage: {
+      db: {
+        driver: "fs",
+        base: "./data/db",
+      },
+    },
     experimental: {
-      openAPI: true
+      openAPI: true,
     },
     openAPI: {
       production: false,
       meta: {
-        title: 'Gameday Helperplan',
-        description: 'A little tool to create, manage and distribute helper plans for sports teams.',
-        version: '0.1'
+        title: "Gameday Helperplan",
+        description:
+          "A little tool to create, manage and distribute helper plans for sports teams.",
+        version: "0.1",
       },
       route: "/_docs/openapi.json",
       ui: {
         scalar: {
           route: "/_docs/scalar",
+          theme: "alternate",
         },
         swagger: {
           route: "/_docs/swagger",
