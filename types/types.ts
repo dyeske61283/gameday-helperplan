@@ -13,8 +13,9 @@ export type HelperInput = {
 
 export type Event = {
   id: number;
-  timestamp?: Date | undefined;
+  timestamp: Date;
   name: string;
+  location?: string;
   helpers: Array<Helper>;
 };
 

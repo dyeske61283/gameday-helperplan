@@ -31,6 +31,22 @@ export function SetDummyData(): Plan {
             },
             {
                 id: 2,
+                name: "W7 gg. Lampukistan",
+                timestamp: new Date(),
+                helpers: [
+                    {
+                        id: 2,
+                        name: "Iron Heart",
+                        skills: [
+                            "Looking",
+                            "Teaching",
+                            "Engineering"
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 4,
                 name: "Neuer Spieltag",
                 timestamp: new Date(),
                 helpers: []
