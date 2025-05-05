@@ -34,11 +34,11 @@
     </div>
 
     <!-- Event List - Scrollable container -->
-    <div class="flex-1 max-h-[82vh] px-4 overflow-auto">
+    <div class="flex-1 max-h-[82vh] px-4 overflow-auto" v-auto-animate>
       <template v-for="(events, date) in filteredAndSortedEvents" :key="date">
-        <div id="event-date" class="sticky bg-base-200 font-bold top-0 z-10 m-1"> {{ formatDate(date) }}
+        <div id="event-date" class="sticky bg-base-200 font-bold top-0 z-10 m-1"> {{ formatDate(date as string) }}
         </div>
-        <div class="p-4">
+        <div class="p-4" v-auto-animate>
           <NuxtLink v-for="event in events" :key="event.id" :to="`/plans/${route.params.id}/events/${event.id}`" @click.native="selected = event.id"
             class="card bg-base-100 shadow-xl mb-4 hover:shadow-2xl transition-shadow cursor-pointer">
             <div class="card-body">
