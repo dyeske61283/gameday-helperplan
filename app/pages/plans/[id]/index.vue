@@ -15,14 +15,11 @@
             </button>
           </div>
         </div>
-        <button class="btn btn-ghost btn-circle" @click="toggleSortDirection">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" :class="{ 'rotate-180': sortDirection === 'desc' }"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M3 4h13M3 8h9M3 12h5m0 0v8m0-8h14" />
-          </svg>
+        <button class="btn btn-ghost" @click="toggleSortDirection">
+          <CalendarArrowDown v-if="sortDirection === 'desc'"></CalendarArrowDown>
+          <CalendarArrowUp v-if="sortDirection === 'asc'"></CalendarArrowUp>
         </button>
-        <button class="btn btn-ghost btn-circle" @click="openFilters">
+        <button class="btn btn-ghost" @click="openFilters">
           <div class="indicator">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
               stroke="currentColor">
@@ -118,6 +115,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { format } from 'date-fns'
+import {CalendarArrowDown, CalendarArrowUp} from 'lucide-vue-next';
 
 const route = useRoute();
 const selected = useState();
