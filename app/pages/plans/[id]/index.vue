@@ -2,7 +2,7 @@
   <div class="h-full flex flex-col">
     <!-- Top Controls - Now properly sticky -->
     <div class="bg-base-100">
-      <div class="flex items-center gap-4 px-4 pb-4">
+      <div class="flex items-center gap-1 px-2 pb-2 mt-1">
         <div class="flex-1">
           <div class="join w-full">
             <input type="text" placeholder="Search events..." class="input input-bordered join-item w-full"
