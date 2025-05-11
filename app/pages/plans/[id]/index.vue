@@ -113,8 +113,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
-import { format } from 'date-fns'
+import { ref, computed } from 'vue';
+import { format } from 'date-fns';
+import { de } from 'date-fns/locale';
 import {CalendarArrowDown, CalendarArrowUp} from 'lucide-vue-next';
 
 const route = useRoute();
@@ -247,7 +248,7 @@ const filteredAndSortedEvents = computed(() => {
 
 // Format date for display
 const formatDate = (dateString: string) => {
-  return format(new Date(dateString), 'EEEE, MMMM d, yyyy');
+  return format(new Date(dateString), 'PP', { locale: de} );
 };
 
 // Status badge styling
