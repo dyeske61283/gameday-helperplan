@@ -47,6 +47,7 @@ export type PlanForStorage = {
 
 export type PlanMetaData = {
   createdAt?: Date;
+  deletedAt?: Date;
   updatedAt?: Date;
   active?: boolean;
   name?: string;
