@@ -33,7 +33,7 @@
             </li>
             <li>
               <NuxtLink to="https://github.com/dyeske61283/gameday-helperplan" target="_blank">
-                Open Source auf <GitHubIcon></GitHubIcon>
+                Open Source auf <GitHubIcon class="ml-auto"></GitHubIcon>
               </NuxtLink>
             </li>
           </ul>
