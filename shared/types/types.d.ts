@@ -1,15 +1,13 @@
-
-
 export type Helper = {
   id: number;
   name: string;
+  labels: Array<string>;
+  description: string;
+  helperLists: Array<string>;
   skills: Array<string>;
 };
 
-export type HelperInput = {
-  name: string;
-  skillsInput: string;
-}
+export type HelperInput = Omit<Helper, "id">;
 
 export type Event = {
   id: number;
@@ -22,7 +20,11 @@ export type Event = {
 export type Plan = {
   events: Event[];
   availableHelpers: Helper[];
-
+  helperLists: [];
+  neededSkills: string[];
+  name?: string;
+  description?: string;
+  active?: boolean;
 };
 
 export type EncryptedPlanForStorage = {
@@ -30,26 +32,13 @@ export type EncryptedPlanForStorage = {
   encryptedBlob: string;
 };
 
-export type UnencryptedPlanForStorage = {
-  isEncrypted: false;
-  unencryptedBlob: {
-    events: Event[];
-    availableHelpers: Helper[];
-    neededSkills: string[];
-  }
-};
-
-
-export type PlanForStorage = {
+export interface PlanForStorage extends EncryptedPlanForStorage {
   id: string;
   metaData: PlanMetaData;
-} & (EncryptedPlanForStorage | UnencryptedPlanForStorage);
+}
 
 export type PlanMetaData = {
   createdAt?: Date;
   deletedAt?: Date;
   updatedAt?: Date;
-  active?: boolean;
-  name?: string;
-  description?: string;
 };
