@@ -12,6 +12,7 @@
   "dependencies": {
     "@formkit/auto-animate": "^0.8.2",
     "@tailwindcss/vite": "^4.1.6",
+    "@vueuse/nuxt": "^13.1.0",
     "daisyui": "^5.0.35",
     "date-fns": "^4.1.0",
     "lucide-vue-next": "^0.509.0",

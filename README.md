@@ -14,7 +14,7 @@ I hate every single thing about that excel file...
 
 All of this is pain.
 
-So I though.. let's change that and go as simple as possible.
+So I thought.. let's change that and go as simple as possible.
 
 1. press Start
 2. create permalink 

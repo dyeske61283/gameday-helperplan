@@ -11,9 +11,7 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: true },
   plugins: [],
-  modules: [
-    "@formkit/auto-animate/nuxt"
-  ],
+  modules: ["@formkit/auto-animate/nuxt", "@vueuse/nuxt"],
   css: ["~/assets/css/main.css"],
   vite: {
     plugins: [tailwindcss()],
