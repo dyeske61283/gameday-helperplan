@@ -11,28 +11,21 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: true },
   plugins: [],
-  modules: ["@formkit/auto-animate/nuxt", "@vueuse/nuxt"],
+  modules: ["@formkit/auto-animate/nuxt", "@vueuse/nuxt", "@pinia/nuxt"],
   css: ["~/assets/css/main.css"],
   vite: {
     plugins: [tailwindcss()],
   },
   nitro: {
     // Production
-    storage: {
-      db: {
-        driver: "fs",
-        base: "./data/db",
-      },
-    },
-    // Development
-    devStorage: {
-      db: {
-        driver: "fs",
-        base: "./data/db",
-      },
-    },
     experimental: {
       openAPI: true,
+    },
+    devStorage: {
+      "plans": {
+        driver: 'fs',
+        base: "storage/plans"
+      }
     },
     openAPI: {
       production: false,

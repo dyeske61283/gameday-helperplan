@@ -5,13 +5,12 @@
     </div>
 </template>
 <script setup lang="ts">
-    const planId = usePlanId();
-    if(!planId.value) {
-        planId.value = crypto.randomUUID();
-    }
+    const planStore = usePlanStore();
+
+    await planStore.createPlan();
+
     setTimeout(async () => {
-        const planId = usePlanId();
-        await navigateTo('/plans/'+planId.value);
+        await navigateTo('/plans/'+planStore.planId);
     }, 400)
 
 </script>
