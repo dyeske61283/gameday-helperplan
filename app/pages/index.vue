@@ -29,8 +29,8 @@ const loadPlan = async () => {
             errorMessage.value = 'Bitte geben Sie eine Plan-ID oder einen Link ein.';
             return;
         }
-        await planStore.fetchPlan(id);
-        if (planStore.plan) {
+        const response = await planStore.fetchPlan(id);
+        if (response) {
             navigateTo(`/plans/${id}`);
         } else {
             errorMessage.value = 'Plan nicht gefunden oder ungültige Eingabe.';

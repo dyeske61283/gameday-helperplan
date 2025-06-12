@@ -1,4 +1,4 @@
-import { defineStore } from "pinia";
+import { defineStore, skipHydrate } from "pinia";
 import { useLocalStorage } from "@vueuse/core";
 
 export const usePlanStore = defineStore("Plan", () => {
@@ -8,39 +8,39 @@ export const usePlanStore = defineStore("Plan", () => {
   });
 
   async function fetchPlan(id: MaybeRefOrGetter<string>) {
-    // Logic to fetch the plan
-    const { data, error } = await useFetch(`/api/plan/${id}`, {
-      method: "GET",
-      onResponse: ({ response }) => {
-        if (response.status === 200) {
-          planId.value = toValue(id);
-        }
-      },
-    });
-    if (error.value) {
-      console.error("Error fetching plan:", error.value);
+    try {
+      const data = await $fetch(`/api/plan/${id}`, {
+        method: "GET",
+        onResponse: ({ response }) => {
+          if (response.status === 200) {
+            planId.value = toValue(id);
+          }
+        },
+      });
+
+      return data;
+    } catch (error) {
+      console.error("Error fetching plan:", error);
       return null;
     }
-    return data.value;
   }
 
   async function deletePlan(id: MaybeRefOrGetter<string>) {
-    // Logic to delete the plan
-    const { data, error } = await useFetch(`/api/plan/${id}`, {
-      method: "DELETE",
-      onResponse: ({ response }) => {
-        if (response.status === 204) {
-          planId.value = null;
-        }
-      },
-    });
-    if (error.value) {
-      console.error("Error deleting plan:", error.value);
-      return null;
-    }
-    if (data.value) {
+    try {
+      const data = await $fetch(`/api/plan/${id}`, {
+        method: "DELETE",
+        onResponse: ({ response }) => {
+          if (response.status === 204) {
+            planId.value = null;
+          }
+        },
+      });
+
       planId.value = null;
-      return data.value;
+      return data;
+    } catch (error) {
+      console.error("Error deleting plan:", error);
+      return null;
     }
   }
 
@@ -48,48 +48,50 @@ export const usePlanStore = defineStore("Plan", () => {
     id: MaybeRefOrGetter<string>,
     data: MaybeRefOrGetter<string>
   ) {
-    // Logic to update the plan
-    const { data: responseData, error } = await useFetch(`/api/plan/${id}`, {
-      method: "PUT",
-      body: data,
-      onResponse: ({ response }) => {
-        if (response.status === 200) {
-          planId.value = toValue(id);
-        }
-      },
-    });
-    if (error.value) {
-      console.error("Error updating plan:", error.value);
+    try {
+      const responseData = await $fetch(`/api/plan/${id}`, {
+        method: "PUT",
+        body: data,
+        onResponse: ({ response }) => {
+          if (response.status === 200) {
+            planId.value = toValue(id);
+          }
+        },
+      });
+      // Logic to update the plan
+      return responseData;
+    } catch (error) {
+      console.error("Error updating plan:", error);
       return null;
     }
-    return responseData.value;
   }
+
   async function createPlan(
     name?: MaybeRefOrGetter<string>,
     description?: MaybeRefOrGetter<string>,
     initialPlanData?: MaybeRefOrGetter<string>
   ) {
-    const { data, error } = await useFetch("/api/plan", {
-      method: "POST",
-      onResponse: ({ response }) => {
-        if (response.status === 201 && response.headers.has("location")) {
-          const location = response.headers.get("location");
-          const id = location!.split("/").pop();
-          planId.value = id;
-        }
-      },
-      body: {
-        name,
-        description,
-        data: initialPlanData,
-      },
-    });
-
-    if (error.value) {
-      console.error("Error creating plan:", error.value);
+    try {
+      const data = await $fetch("/api/plan", {
+        method: "POST",
+        onResponse: ({ response }) => {
+          if (response.status === 201 && response.headers.has("location")) {
+            const location = response.headers.get("location");
+            const id = location!.split("/").pop();
+            planId.value = id;
+          }
+        },
+        body: {
+          name,
+          description,
+          data: initialPlanData,
+        },
+      });
+    } catch (error) {
+      console.error("Error creating plan:", error);
       return null;
     }
   }
 
-  return { planId, createPlan, fetchPlan, deletePlan, updatePlan };
+  return { planId: skipHydrate(planId), createPlan, fetchPlan, deletePlan, updatePlan };
 });
