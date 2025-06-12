@@ -1,7 +1,11 @@
 import { defineStore } from "pinia";
+import { useLocalStorage } from "@vueuse/core";
 
 export const usePlanStore = defineStore("Plan", () => {
-  const planId = useState<string | undefined>("current_plan");
+  const planId = useLocalStorage<string>("planId", "", {
+    writeDefaults: false,
+    initOnMounted: true,
+  });
 
   async function fetchPlan(id: MaybeRefOrGetter<string>) {
     // Logic to fetch the plan
@@ -26,7 +30,7 @@ export const usePlanStore = defineStore("Plan", () => {
       method: "DELETE",
       onResponse: ({ response }) => {
         if (response.status === 204) {
-          planId.value = undefined;
+          planId.value = null;
         }
       },
     });
@@ -35,12 +39,15 @@ export const usePlanStore = defineStore("Plan", () => {
       return null;
     }
     if (data.value) {
-      planId.value = undefined;
+      planId.value = null;
       return data.value;
     }
   }
 
-  async function updatePlan(id: MaybeRefOrGetter<string>, data: MaybeRefOrGetter<string>) {
+  async function updatePlan(
+    id: MaybeRefOrGetter<string>,
+    data: MaybeRefOrGetter<string>
+  ) {
     // Logic to update the plan
     const { data: responseData, error } = await useFetch(`/api/plan/${id}`, {
       method: "PUT",

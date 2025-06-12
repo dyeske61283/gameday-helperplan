@@ -7,7 +7,7 @@
 <script setup lang="ts">
     const planStore = usePlanStore();
 
-    await planStore.createPlan();
+    await callOnce(() => planStore.createPlan());
 
     setTimeout(async () => {
         await navigateTo('/plans/'+planStore.planId);

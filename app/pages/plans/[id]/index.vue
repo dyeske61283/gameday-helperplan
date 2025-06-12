@@ -117,8 +117,9 @@ import { ref, computed } from 'vue';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import {CalendarArrowDown, CalendarArrowUp} from 'lucide-vue-next';
-
+const planStore = usePlanStore();
 const route = useRoute();
+await callOnce(() => planStore.fetchPlan(route.params.id as string));
 const selected = useState();
 
 // Sample data - replace with your actual data source
