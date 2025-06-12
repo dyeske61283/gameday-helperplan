@@ -11,19 +11,19 @@
   },
   "dependencies": {
     "@formkit/auto-animate": "^0.8.2",
-    "@pinia/nuxt": "^0.11.0",
-    "@tailwindcss/vite": "^4.1.7",
-    "@vueuse/nuxt": "^13.2.0",
-    "daisyui": "^5.0.35",
+    "@pinia/nuxt": "^0.11.1",
+    "@tailwindcss/vite": "^4.1.8",
+    "@vueuse/nuxt": "^13.3.0",
+    "daisyui": "^5.0.43",
     "date-fns": "^4.1.0",
-    "lucide-vue-next": "^0.510.0",
-    "nuxt": "^3.17.3",
-    "pinia": "^3.0.2",
-    "tailwindcss": "^4.1.7",
+    "lucide-vue-next": "^0.514.0",
+    "nuxt": "^3.17.5",
+    "pinia": "^3.0.3",
+    "tailwindcss": "^4.1.8",
     "uuid": "^11.1.0",
-    "vue": "^3.5.14",
+    "vue": "^3.5.16",
     "vue-router": "^4.5.1",
-    "vue3-simple-icons": "^13.2.0",
-    "zod": "^3.24.4"
+    "vue3-simple-icons": "^15.0.0",
+    "zod": "^3.25.57"
   }
 }
