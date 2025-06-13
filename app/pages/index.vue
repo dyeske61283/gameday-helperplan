@@ -2,18 +2,19 @@
     <div class="container mx-auto p-4 flex flex-col items-center justify-center flex-1">
         <NuxtLink class="btn btn-primary btn-xl mt-24" to="/setup">Plan erstellen</NuxtLink>
         <div class="divider my-4">oder</div>
-        <div class="flex items-center">
-            <input type="text" placeholder="Link oder Code eingeben" class="input" v-model="planIdInput" @input="errorMessage = ''" />
-            <button @click="loadPlan" class="btn btn-secondary ml-2">Laden</button>
-        </div>
+        <form @submit.prevent="loadPlan" class="flex justify-center flex-grow w-full">
+            <input id="plan-link-input" name="PlanLinkInput" type="text" placeholder="Link oder Code eingeben" class="input" v-model="planIdInput" @input="errorMessage = ''" />
+            <button type="submit" class="btn btn-soft btn-primary ml-2"><ArrowRight></ArrowRight></button>
+        </form>
         <p v-if="errorMessage" class="text-error text-sm mt-1">{{ errorMessage }}</p>
         <div class="divider my-4" v-if="planStore.planId">oder</div>
-        <NuxtLink :to='{ name: "plans-id", params: { id: planStore.planId }}' v-if="planStore.planId">Letzten Plan anschauen</NuxtLink>
+        <NuxtLink class="link" :to='{ name: "plans-id", params: { id: planStore.planId }}' v-if="planStore.planId">Letzten Plan aufrufen</NuxtLink>
     </div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
 import { navigateTo } from '#app';
+import { ArrowRight } from 'lucide-vue-next';
 
 const planStore = usePlanStore();
 const planIdInput = ref('');
