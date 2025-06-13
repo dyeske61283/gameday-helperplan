@@ -146,6 +146,7 @@ export default defineEventHandler(async (event) => {
         name: body?.name,
         description: body?.description,
       },
+      nonce: '',
       isEncrypted: true,
       encryptedBlob: body?.planData ?? "",
     });

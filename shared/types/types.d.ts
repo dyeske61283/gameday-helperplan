@@ -30,6 +30,7 @@ export type Plan = {
 export type EncryptedPlanForStorage = {
   isEncrypted: true;
   encryptedBlob: string;
+  nonce: string;
 };
 
 export interface PlanForStorage extends EncryptedPlanForStorage {
