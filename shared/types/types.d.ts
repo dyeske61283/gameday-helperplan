@@ -13,8 +13,19 @@ export type Event = {
   id: number;
   timestamp: Date;
   name: string;
-  location?: string;
+  location?: Location;
   helpers: Array<Helper>;
+};
+
+export type Location = {
+  name: string;
+  address: string;
+  description?: string;
+  identifier?: string;
+  mapsUrl?: string;
+  bhvId?: string;
+  bhvUrl?: string;
+  isDefaultLocation?: boolean;
 };
 
 export type Plan = {
@@ -22,6 +33,7 @@ export type Plan = {
   availableHelpers: Helper[];
   helperLists: [];
   neededSkills: string[];
+  locations: Location[]; 
   name?: string;
   description?: string;
   active?: boolean;
