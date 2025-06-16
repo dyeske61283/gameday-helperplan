@@ -4,16 +4,9 @@
     <div class="bg-base-100">
       <div class="flex items-center gap-1 px-2 pb-2 mt-1">
         <div class="flex-1">
-          <div class="join w-full">
-            <input type="text" placeholder="Search events..." class="input input-bordered join-item w-full"
-              v-model="searchQuery" />
-            <button class="btn join-item" @click="clearSearch">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
+          <label class="input input-bordered w-full">
+            <input type="search" placeholder="Suche Events..." class="grow" v-model="searchQuery" />
+          </label>
         </div>
         <button class="btn btn-ghost" @click="toggleSortDirection">
           <CalendarArrowDown v-if="sortDirection === 'desc'"></CalendarArrowDown>
@@ -30,6 +23,12 @@
             }}</span>
           </div>
         </button>
+        <label class="btn btn-soft swap" v-if="planStore.planId">
+          <!-- this hidden checkbox controls the state -->
+          <input type="checkbox" />
+          <Calendar class="swap-off"></Calendar>
+          <Users class="swap-on"></Users>
+        </label>
       </div>
     </div>
 
@@ -129,7 +128,7 @@
 import { ref, computed } from 'vue';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
-import { CalendarArrowDown, CalendarArrowUp, ArrowRight } from 'lucide-vue-next';
+import { CalendarArrowDown, CalendarArrowUp, ArrowRight, Users, Calendar } from 'lucide-vue-next';
 const planStore = usePlanStore();
 const route = useRoute();
 await callOnce(() => planStore.fetchPlan(route.params.id as string));
@@ -300,7 +299,7 @@ const getStatusText = (status: 'complete' | 'partial' | 'missing') => {
 
 const addNewEvent = () => {
   // Implement add new event logic
-  console.log('Adding new event')
+  navigateTo(`/plans/${route.params.id}/events/new`);
 }
 
 const importEvents = () => {

@@ -5,12 +5,6 @@
         <span class="text-xl font-bold">Helferplan</span>
       </div>
       <div class="flex-none">
-        <label class="btn btn-soft swap mr-2" v-if="planStore.planId">
-          <!-- this hidden checkbox controls the state -->
-          <input type="checkbox" />
-          <Calendar class="swap-off"></Calendar>
-          <Users class="swap-on"></Users>
-        </label>
         <div class="dropdown dropdown-bottom dropdown-end">
           <button tabindex="0" class="btn btn-primary btn-soft">
             <Menu></Menu>
@@ -48,7 +42,6 @@
 
 <script setup lang="ts">
 import { GitHubIcon } from 'vue3-simple-icons';
-import { Calendar, Menu, Users } from 'lucide-vue-next';
+import { Menu } from 'lucide-vue-next';
 
-const planStore = usePlanStore();
 </script>
