@@ -33,16 +33,25 @@
       </div>
     </div>
 
+    <div class="flex flex-1 px-4 py-2 bg-base-200 flex-col items-center gap-4 mt-2" v-if="events.length === 0">
+      <p class="text-center text-xl mb-4">Keine Events im Plan.</p>
+      <p>
+        Füge neue Events hinzu, um sie hier anzuzeigen. Du kannst auch eine Kalenderdatei importieren.
+      </p>
+    </div>
     <!-- Event List - Scrollable container -->
-    <div class="flex-1 max-h-[82vh] px-4 overflow-auto" v-auto-animate>
+    <div class="flex-1 max-h-[82vh] px-4 overflow-auto" v-auto-animate v-if="events.length > 0">
       <template v-for="(events, date) in filteredAndSortedEvents" :key="date">
-        <div id="event-date" class="sticky bg-base-200 font-bold top-0 z-10 m-1"> {{ formatDate(date as string) }}
+        <div id="event-date" class="sticky bg-base-200 font-bold top-0 z-10 m-1">
+          {{ formatDate(date as string) }}
         </div>
         <div class="p-4" v-auto-animate>
-          <NuxtLink v-for="event in events" :key="event.id" :to="`/plans/${route.params.id}/events/${event.id}`" @click.native="selected = event.id"
+          <NuxtLink v-for="event in events" :key="event.id" :to="`/plans/${route.params.id}/events/${event.id}`"
+            @click.native="selected = event.id"
             class="card bg-base-100 shadow-xl mb-4 hover:shadow-2xl transition-shadow cursor-pointer">
             <div class="card-body">
-              <h2 :id="'event-title-' + event.id" :class="{ active: selected === event.id }" class="card-title">{{ event.name }}</h2>
+              <h2 :id="'event-title-' + event.id" :class="{ active: selected === event.id }" class="card-title">{{
+                event.name }}</h2>
               <div class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
                   stroke="currentColor">
@@ -65,6 +74,10 @@
       </template>
     </div>
 
+    <div class="fixed bottom-6 right-18" v-if="events.length === 0">
+      <ArrowRight :size="40"></ArrowRight>
+    </div>
+
     <!-- Floating Action Button -->
     <div class="fixed bottom-6 right-6 z-50">
       <div class="dropdown dropdown-top dropdown-end">
@@ -74,9 +87,9 @@
           </svg>
         </button>
         <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-52">
-          <li><a @click="addNewEvent">Add New Event</a></li>
-          <li><a @click="importEvents">Import Events</a></li>
-          <li><a @click="addHelpers">Add Helpers</a></li>
+          <li><a @click="addNewEvent">Neues Event</a></li>
+          <li><a @click="importEvents">Events importieren</a></li>
+          <li><a @click="addHelpers">Helfer hinzufügen</a></li>
         </ul>
       </div>
     </div>
@@ -116,87 +129,91 @@
 import { ref, computed } from 'vue';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
-import {CalendarArrowDown, CalendarArrowUp} from 'lucide-vue-next';
+import { CalendarArrowDown, CalendarArrowUp, ArrowRight } from 'lucide-vue-next';
 const planStore = usePlanStore();
 const route = useRoute();
 await callOnce(() => planStore.fetchPlan(route.params.id as string));
-const selected = useState();
+const selected = ref<number | undefined>();
 
+const loadDummyData = !!route.query.load_dummy;
+let events: Ref<{ date: string, id: number, name: string, location: string, time: string, status: 'complete' | 'missing' | 'partial' }[]> = ref([]);
 // Sample data - replace with your actual data source
-const events = ref<{date: string, id: number, name: string, location: string, time: string, status: 'complete' | 'missing' | 'partial'}[]>([
-  {
-    id: 1,
-    name: 'Summer Festival',
-    date: '2024-04-15',
-    time: '14:00',
-    location: 'Central Park',
-    status: 'complete'
-  },
-  {
-    id: 2,
-    name: 'Charity Run',
-    date: '2024-04-15',
-    time: '08:00',
-    location: 'City Stadium',
-    status: 'partial'
-  },
-  {
-    id: 3,
-    name: 'Food Drive',
-    date: '2024-04-16',
-    time: '10:00',
-    location: 'Community Center',
-    status: 'missing'
-  },
-  {
-    id: 4,
-    name: 'Food Drive',
-    date: '2024-04-16',
-    time: '10:00',
-    location: 'Community Center',
-    status: 'missing'
-  },
-  {
-    id: 5,
-    name: 'Food Drive',
-    date: '2024-04-16',
-    time: '10:00',
-    location: 'Community Center',
-    status: 'missing'
-  },
-  {
-    id: 6,
-    name: 'Food Drive',
-    date: '2024-04-16',
-    time: '10:00',
-    location: 'Community Center',
-    status: 'missing'
-  },
-  {
-    id: 7,
-    name: 'Food Drive',
-    date: '2024-04-16',
-    time: '10:00',
-    location: 'Community Center',
-    status: 'missing'
-  },
-  {
-    id: 8,
-    name: 'Food Drive',
-    date: '2024-04-16',
-    time: '10:00',
-    location: 'Community Center',
-    status: 'missing'
-  },
-  {
-    id: 9,
-    name: 'Food Drive',
-    date: '2024-04-16',
-    time: '10:00',
-    location: 'Community Center',
-    status: 'missing'
-  }
-]);
+if (loadDummyData) {
+  events = ref<{ date: string, id: number, name: string, location: string, time: string, status: 'complete' | 'missing' | 'partial' }[]>([
+    {
+      id: 1,
+      name: 'Summer Festival',
+      date: '2024-04-15',
+      time: '14:00',
+      location: 'Central Park',
+      status: 'complete'
+    },
+    {
+      id: 2,
+      name: 'Charity Run',
+      date: '2024-04-15',
+      time: '08:00',
+      location: 'City Stadium',
+      status: 'partial'
+    },
+    {
+      id: 3,
+      name: 'Food Drive',
+      date: '2024-04-16',
+      time: '10:00',
+      location: 'Community Center',
+      status: 'missing'
+    },
+    {
+      id: 4,
+      name: 'Food Drive',
+      date: '2024-04-16',
+      time: '10:00',
+      location: 'Community Center',
+      status: 'missing'
+    },
+    {
+      id: 5,
+      name: 'Food Drive',
+      date: '2024-04-16',
+      time: '10:00',
+      location: 'Community Center',
+      status: 'missing'
+    },
+    {
+      id: 6,
+      name: 'Food Drive',
+      date: '2024-04-16',
+      time: '10:00',
+      location: 'Community Center',
+      status: 'missing'
+    },
+    {
+      id: 7,
+      name: 'Food Drive',
+      date: '2024-04-16',
+      time: '10:00',
+      location: 'Community Center',
+      status: 'missing'
+    },
+    {
+      id: 8,
+      name: 'Food Drive',
+      date: '2024-04-16',
+      time: '10:00',
+      location: 'Community Center',
+      status: 'missing'
+    },
+    {
+      id: 9,
+      name: 'Food Drive',
+      date: '2024-04-16',
+      time: '10:00',
+      location: 'Community Center',
+      status: 'missing'
+    }
+  ]);
+}
 
 // Search and filter state
 const searchQuery = ref('')
@@ -237,7 +254,7 @@ const filteredAndSortedEvents = computed(() => {
   })
 
   // Group by date
-  return filteredEvents.reduce((groups: {[key: string]: {date: string, id: number, name: string, location: string, time: string, status: 'missing' | 'partial' | 'complete'}[]}, event) => {
+  return filteredEvents.reduce((groups: { [key: string]: { date: string, id: number, name: string, location: string, time: string, status: 'missing' | 'partial' | 'complete' }[] }, event) => {
     const date = event.date
     if (!groups[date]) {
       groups[date] = []
@@ -249,7 +266,7 @@ const filteredAndSortedEvents = computed(() => {
 
 // Format date for display
 const formatDate = (dateString: string) => {
-  return format(new Date(dateString), 'PP', { locale: de} );
+  return format(new Date(dateString), 'PP', { locale: de });
 };
 
 // Status badge styling
@@ -311,7 +328,7 @@ const openFilters = () => {
 </script>
 
 <style scoped>
-  h2.active {
-    view-transition-name: event-title;
-  }
+h2.active {
+  view-transition-name: event-title;
+}
 </style>
