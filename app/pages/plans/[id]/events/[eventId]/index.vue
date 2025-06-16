@@ -14,6 +14,11 @@
   <h2>
     Hello from eventId: {{ eventId }}
   </h2>
+  <ul>
+    <li>Duplizieren</li>
+    <li>Editieren</li>
+    <li>Löschen</li>
+  </ul>
 </template>
 
 <style scoped>
