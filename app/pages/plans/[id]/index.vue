@@ -23,9 +23,9 @@
             }}</span>
           </div>
         </button>
-        <label class="btn btn-soft swap" v-if="planStore.planId">
+        <label class="btn btn-soft swap" @click="navigateToHelperLists">
           <!-- this hidden checkbox controls the state -->
-          <input type="checkbox" />
+          <input type="checkbox" /> <!-- This checkbox should remain unchecked by default for the Events page -->
           <Calendar class="swap-off"></Calendar>
           <Users class="swap-on"></Users>
         </label>
@@ -129,8 +129,10 @@ import { ref, computed } from 'vue';
 import { format } from 'date-fns';
 import { de } from 'date-fns/locale';
 import { CalendarArrowDown, CalendarArrowUp, ArrowRight, Users, Calendar } from 'lucide-vue-next';
+import { useRouter } from 'vue-router'; // Added import
 const planStore = usePlanStore();
 const route = useRoute();
+const router = useRouter(); // Added router instance
 await callOnce(() => planStore.fetchPlan(route.params.id as string));
 const selected = ref<number | undefined>();
 
@@ -324,6 +326,10 @@ const openFilters = () => {
   const filterModal = document.getElementById('filter_modal') as HTMLDialogElement;
   filterModal.showModal();
 };
+
+function navigateToHelperLists() {
+  router.push(`/plans/${route.params.id}/helpers`);
+}
 </script>
 
 <style scoped>

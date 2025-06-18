@@ -31,13 +31,18 @@ export type Location = {
 export type Plan = {
   events: Event[];
   availableHelpers: Helper[];
-  helperLists: [];
+  helperLists: HelperList[];
   neededSkills: string[];
   locations: Location[]; 
   name?: string;
   description?: string;
   active?: boolean;
 };
+
+export interface HelperList {
+  name: string;
+  helpers: Helper[];
+}
 
 export type EncryptedPlanForStorage = {
   isEncrypted: true;
