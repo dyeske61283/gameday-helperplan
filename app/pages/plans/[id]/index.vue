@@ -23,7 +23,7 @@
             }}</span>
           </div>
         </button>
-        <label class="btn btn-soft swap" v-if="planStore.planId" @click="navigateToHelperLists">
+        <label class="btn btn-soft swap" @click="navigateToHelperLists">
           <!-- this hidden checkbox controls the state -->
           <input type="checkbox" /> <!-- This checkbox should remain unchecked by default for the Events page -->
           <Calendar class="swap-off"></Calendar>
@@ -328,7 +328,7 @@ const openFilters = () => {
 };
 
 function navigateToHelperLists() {
-  router.push(`/plans/${route.params.id}/helpers/`);
+  router.push(`/plans/${route.params.id}/helpers`);
 }
 </script>
 

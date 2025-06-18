@@ -120,8 +120,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { usePlanStore } from '~/app/stores/Plan';
-import type { Plan, HelperList } from '~/shared/types/types';
 import { Users, Calendar, CalendarArrowDown, CalendarArrowUp } from 'lucide-vue-next';
 import { vAutoAnimate } from '@formkit/auto-animate/vue';
 
@@ -158,7 +156,16 @@ onMounted(async () => {
   if (planId) {
     const fetchedPlan = await planStore.fetchPlan(planId);
     if (fetchedPlan) {
-      plan.value = fetchedPlan as Plan;
+      plan.value = {
+        availableHelpers: [],
+        helperLists: [],
+        neededSkills: [],
+        events: [],
+        locations: [],
+        active: true,
+        description: '',
+        name: '',
+      };
       if (plan.value && plan.value.neededSkills) {
         // Ensure unique skills
         availableSkillsForFiltering.value = [...new Set(plan.value.neededSkills)];
@@ -280,7 +287,7 @@ function openFilters() {
 }
 
 function navigateToEvents() {
-  router.push(`/plans/${route.params.id}/`);
+  router.push(`/plans/${route.params.id}`);
 }
 
 function navigateToHelperListDetail(listName: string) {
