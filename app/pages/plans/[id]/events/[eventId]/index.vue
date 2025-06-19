@@ -79,7 +79,7 @@
 import { ref, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { usePlanStore } from '~/stores/Plan';
-import type { Plan, Event, Helper, Location, HelperSlot } from '~/shared/types/types'; // Adjusted path
+import type { Plan, Event, Helper, Location, HelperSlot } from '#shared/types/types'; // Adjusted path
 
 const route = useRoute();
 const planStore = usePlanStore();
@@ -92,7 +92,7 @@ onMounted(async () => {
   const planId = route.params.id as string;
   const eventId = Number(route.params.eventId); // Ensure eventId is a number
 
-  if (planStore.planId !== planId || !planStore.plan) { // Check if plan is already loaded
+  if (planStore.planId !== planId) { // Check if plan is already loaded
     // @ts-ignore // TODO: Fix type for planStore.plan
     plan.value = await planStore.fetchPlan(planId);
   } else {
@@ -121,7 +121,7 @@ const assignedAndMissingHelpers = computed(() => {
   const availableAssignedHelpers = event.value.helpers ? [...event.value.helpers] : [];
 
   return event.value.neededHelpers.map(slot => {
-    let foundHelper: Helper | null = null;
+    let foundHelper: Helper | undefined = undefined;
 
     // Attempt to find an available helper from event.helpers whose skills match the slot's neededSkills
     // A helper is suitable if they possess all skills required by the slot.
@@ -183,26 +183,26 @@ const handleSwapHelper = (slotName: string, currentHelperName: string) => {
 };
 
 // Dummy data for now, will be replaced by actual data fetched from the store
-// const dummyEvent = ref<Event>({
-//   id: 1,
-//   timestamp: new Date(),
-//   name: 'Dummy Event Name',
-//   location: {
-//     name: 'Dummy Location',
-//     address: '123 Dummy Street',
-//     mapsUrl: 'https://maps.google.com'
-//   },
-//   neededHelpers: [
-//     { name: 'Sound Engineer', neededSkills: ['Audio Mixing', 'Live Sound'] },
-//     { name: 'Lighting Technician', neededSkills: ['DMX Control', 'Stage Lighting'] }
-//   ],
-//   helpers: [
-//     { id: 101, name: 'John Doe', skills: ['Audio Mixing'], description: '', labels: [], helperLists: [] }
-//   ]
-// });
+const dummyEvent = ref<Event>({
+  id: 1,
+  timestamp: new Date(),
+  name: 'Dummy Event Name',
+  location: {
+    name: 'Dummy Location',
+    address: '123 Dummy Street',
+    mapsUrl: 'https://maps.google.com'
+  },
+  neededHelpers: [
+    { name: 'Sound Engineer', neededSkills: ['Audio Mixing', 'Live Sound'] },
+    { name: 'Lighting Technician', neededSkills: ['DMX Control', 'Stage Lighting'] }
+  ],
+  helpers: [
+    { id: 101, name: 'John Doe', skills: ['Audio Mixing'], description: '', labels: [], helperLists: [] }
+  ]
+});
 
 // Use dummy data if event is not found for now
-// event.value = event.value || dummyEvent.value;
+event.value = event.value || dummyEvent.value;
 
 </script>
 
