@@ -9,11 +9,18 @@ export type Helper = {
 
 export type HelperInput = Omit<Helper, "id">;
 
+export type HelperSlot = {
+  name: string;
+  neededSkills: string[];
+}
+
 export type Event = {
   id: number;
   timestamp: Date;
   name: string;
   location?: Location;
+  takeHelpersFromThisHelperListId?: string;
+  neededHelpers: Array<HelperSlot>;
   helpers: Array<Helper>;
 };
 
@@ -40,6 +47,7 @@ export type Plan = {
 };
 
 export interface HelperList {
+  id: string;
   name: string;
   helpers: Helper[];
 }
