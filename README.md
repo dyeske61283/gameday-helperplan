@@ -36,7 +36,7 @@ Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduct
 Make sure to install dependencies:
 
 ```bash
-npm install
+deno install
 ```
 
 ## Development Server
@@ -44,7 +44,7 @@ npm install
 Start the development server on `http://localhost:3000`:
 
 ```bash
-npm run dev
+deno task dev
 ```
 
 ## Production
@@ -52,13 +52,13 @@ npm run dev
 Build the application for production:
 
 ```bash
-npm run build
+deno task build
 ```
 
 Locally preview production build:
 
 ```bash
-npm run preview
+deno task preview
 ```
 
 Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.

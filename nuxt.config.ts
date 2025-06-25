@@ -17,15 +17,22 @@ export default defineNuxtConfig({
     plugins: [tailwindcss()],
   },
   nitro: {
+    preset: "deno",
     // Production
     experimental: {
       openAPI: true,
     },
+    storage: {
+      plans: {
+        driver: "deno-kv",
+        base: "storage/plans",
+      },
+    },
     devStorage: {
-      "plans": {
-        driver: 'fs',
-        base: "storage/plans"
-      }
+      plans: {
+        driver: "fs",
+        base: "storage/plans",
+      },
     },
     openAPI: {
       production: false,
