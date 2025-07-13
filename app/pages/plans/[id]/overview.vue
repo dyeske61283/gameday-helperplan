@@ -90,39 +90,21 @@
   </div>
 </template>
 
-<script setup>
-import {SetDummyData} from "~/utils/SetDummyData.js";
+<script setup lang="ts">
 import { Search } from "lucide-vue-next";
+import type { Ref } from "vue";
+import type { Event, Helper, Plan } from "~/shared/types/types";
 
 const route = useRoute();
 const planId = route.params.id;
-const view = ref('events');
-const searchQuery = ref('');
-const selectedSkills = ref([]);
+const view: Ref<'events' | 'helpers'> = ref('events');
+const searchQuery: Ref<string> = ref('');
+const selectedSkills: Ref<string[]> = ref([]);
 
-// Load session data
-const planData = ref(null);
-const loadError = ref(null);
-
-// onMounted(async () => {
-//   const storedData = localStorage.getItem(`plan_${sessionId}`);
-//   if (!storedData) {
-//     loadError.value = 'Session not found';
-//     return;
-//   }
-//
-//   try {
-//     sessionData.value = JSON.parse(storedData);
-//   } catch (error) {
-//     loadError.value = 'Invalid session data';
-//     return;
-//   }
-// });
-// Set dummy data
-planData.value = SetDummyData();
+const { data: planData, error: loadError } = await useFetch<Plan>(`/api/plan/${planId}`);
 
 // Computed properties
-const events = computed(() => planData.value?.events || []);
+const events: Ref<Event[]> = computed(() => planData.value?.events || []);
 const allHelpers = computed(() => {
   const available = planData.value?.availableHelpers || [];
   const assigned = events.value.flatMap(event => event.helpers);
@@ -130,7 +112,7 @@ const allHelpers = computed(() => {
 });
 
 const uniqueSkills = computed(() => {
-  const skills = new Set();
+  const skills = new Set<string>();
   allHelpers.value.forEach(helper => {
     helper.skills.forEach(skill => skills.add(skill));
   });
@@ -168,7 +150,7 @@ const filteredHelpers = computed(() => {
 });
 
 // Helper functions
-const toggleSkillFilter = (skill) => {
+const toggleSkillFilter = (skill: string) => {
   const index = selectedSkills.value.indexOf(skill);
   if (index === -1) {
     selectedSkills.value.push(skill);
@@ -177,7 +159,7 @@ const toggleSkillFilter = (skill) => {
   }
 };
 
-const getHelperEventAssignment = (helper) => {
+const getHelperEventAssignment = (helper: Helper) => {
   const assignedEvent = events.value.find(event => 
     event.helpers.some(h => h.id === helper.id)
   );
