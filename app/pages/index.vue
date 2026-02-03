@@ -1,44 +1,49 @@
-<template>
-    <div class="container mx-auto p-4 flex flex-col items-center justify-center flex-1">
-        <NuxtLink class="btn btn-primary btn-xl mt-24" to="/setup">Plan erstellen</NuxtLink>
-        <div class="divider my-4">oder</div>
-        <form @submit.prevent="loadPlan" class="flex justify-center flex-grow w-full">
-            <input id="plan-link-input" name="PlanLinkInput" type="text" placeholder="Link oder Code eingeben" class="input" v-model="planIdInput" @input="errorMessage = ''" />
-            <button type="submit" class="btn btn-soft btn-primary ml-2"><ArrowRight></ArrowRight></button>
-        </form>
-        <p v-if="errorMessage" class="text-error text-sm mt-1">{{ errorMessage }}</p>
-        <div class="divider my-4" v-if="planStore.planId">oder</div>
-        <NuxtLink class="link" :to='{ name: "plans-id", params: { id: planStore.planId }}' v-if="planStore.planId">Letzten Plan aufrufen</NuxtLink>
-    </div>
-</template>
-<script setup lang="ts">
-import { ref } from 'vue';
-import { navigateTo } from '#app';
-import { ArrowRight } from 'lucide-vue-next';
+<script lang="ts" setup>
 
-const planStore = usePlanStore();
-const planIdInput = ref('');
-const errorMessage = ref('');
+import provideGameData from '@/utils/provideGameData';
+const gameData = await provideGameData();
 
-const loadPlan = async () => {
-    try {
-        let id = planIdInput.value;
-        if (id.includes('/')) {
-            id = id.substring(id.lastIndexOf('/') + 1);
-        }
-        if (!id) {
-            errorMessage.value = 'Bitte geben Sie eine Plan-ID oder einen Link ein.';
-            return;
-        }
-        const response = await planStore.fetchPlan(id);
-        if (response) {
-            navigateTo(`/plans/${id}`);
-        } else {
-            errorMessage.value = 'Plan nicht gefunden oder ungültige Eingabe.';
-        }
-    } catch (error) {
-        errorMessage.value = 'Fehler beim Laden des Plans.';
-        console.error(error);
-    }
-};
+const q = ref('');
 </script>
+
+<template>
+  <UInput
+    v-model="q"
+    id ="search-bar-input"
+    icon="i-lucide-search"
+    placeholder="Suchen.."
+    autofocus
+    class="w-full fixed top-0 z-10 mt-2"
+  />
+  <UScrollArea
+    v-slot="{ item, index }"
+    :items="gameData"
+    class="w-full h-[98vh] pt-12"
+    :ui="{viewport: 'gap-2'}"
+  >
+    <UPageCard
+      v-bind="item"
+      :variant="index % 2 === 0 ? 'soft' : 'outline'"
+      :key="index"
+      :title="item.homeTeam"
+      :description="item.locationName"
+      class=""
+    >
+    <template #header>
+      <div class="text-lg font-semibold">
+        {{ item.homeTeam }}
+      </div>
+    </template>
+    <template #body>
+      <div class="text-base">
+        Helfer: {{ item.helpingTeam }}
+      </div>
+    </template>
+    <template #footer>
+      <div class="text-sm text-secondary">
+        {{ new Date(item.dateAndTime).toLocaleString() }}
+      </div>
+    </template>
+    </UPageCard>
+  </UScrollArea>
+</template>
