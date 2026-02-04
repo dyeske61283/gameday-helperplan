@@ -5,6 +5,7 @@ export default (): Promise<GamedayEvent[]> => {
       locationName: 'Sports Hall Central',
       locationLink: 'https://maps.example.com/sports-hall-central',
       homeTeam: 'Team A',
+      awayTeam: 'Team Z',
       annotations: ['Important match', 'Championship qualifier'],
       helperAdmission: 'John Doe',
       helpingTeam: 'Team B',
@@ -18,6 +19,7 @@ export default (): Promise<GamedayEvent[]> => {
       locationName: 'East Arena',
       locationLink: 'https://maps.example.com/east-arena',
       homeTeam: 'Team B',
+      awayTeam: 'Team Y',
       annotations: ['Friendly match'],
       helperAdmission: 'Eve Martinez',
       helpingTeam: 'Team C',
@@ -31,6 +33,7 @@ export default (): Promise<GamedayEvent[]> => {
       locationName: 'West Court',
       locationLink: 'https://maps.example.com/west-court',
       homeTeam: 'Team C',
+      awayTeam: 'Team X',
       annotations: ['Division final'],
       helperAdmission: 'Karen White',
       helpingTeam: 'Team A',
@@ -44,6 +47,7 @@ export default (): Promise<GamedayEvent[]> => {
       locationName: 'North Gym',
       locationLink: 'https://maps.example.com/north-gym',
       homeTeam: 'Team D',
+      awayTeam: 'Team W',
       annotations: ['Regular match'],
       helperAdmission: 'Quinn Martinez',
       helpingTeam: 'Team E',
@@ -57,6 +61,7 @@ export default (): Promise<GamedayEvent[]> => {
       locationName: 'South Stadium',
       locationLink: 'https://maps.example.com/south-stadium',
       homeTeam: 'Team E',
+      awayTeam: 'Team V',
       annotations: ['Youth championship', 'High priority'],
       helperAdmission: 'Victor Young',
       helpingTeam: 'Team F',
@@ -70,6 +75,7 @@ export default (): Promise<GamedayEvent[]> => {
       locationName: 'Central Hall',
       locationLink: 'https://maps.example.com/central-hall',
       homeTeam: 'Team F',
+      awayTeam: 'Team V',
       annotations: ['Friendly match', 'Exhibition'],
       helperAdmission: 'Adam Cooper',
       helpingTeam: 'Team G',
@@ -83,6 +89,7 @@ export default (): Promise<GamedayEvent[]> => {
       locationName: 'East Athletic Complex',
       locationLink: 'https://maps.example.com/east-athletic',
       homeTeam: 'Team G',
+      awayTeam: 'Team H',
       annotations: ['League match'],
       helperAdmission: 'Fiona Blake',
       helpingTeam: 'Team H',
@@ -96,6 +103,7 @@ export default (): Promise<GamedayEvent[]> => {
       locationName: 'West Premier Arena',
       locationLink: 'https://maps.example.com/west-premier',
       homeTeam: 'Team H',
+      awayTeam: 'Team U',
       annotations: ['Semi-final', 'Important match'],
       helperAdmission: 'Kevin Murphy',
       helpingTeam: 'Team I',
@@ -109,6 +117,7 @@ export default (): Promise<GamedayEvent[]> => {
       locationName: 'North Training Center',
       locationLink: 'https://maps.example.com/north-training',
       homeTeam: 'Team I',
+      awayTeam: 'Team T',
       annotations: ['Regular season'],
       helperAdmission: 'Pam Stewart',
       helpingTeam: 'Team J',
@@ -122,6 +131,7 @@ export default (): Promise<GamedayEvent[]> => {
       locationName: 'South Convention Center',
       locationLink: 'https://maps.example.com/south-convention',
       homeTeam: 'Team J',
+      awayTeam: 'Team S',
       annotations: ['Conference match', 'Away game'],
       helperAdmission: 'Ulysses Cooper',
       helpingTeam: 'Team A',
@@ -135,6 +145,7 @@ export default (): Promise<GamedayEvent[]> => {
       locationName: 'Central Sports Complex',
       locationLink: 'https://maps.example.com/central-sports',
       homeTeam: 'Team A',
+      awayTeam: 'Team R',
       annotations: ['Final match', 'Championship contender'],
       helperAdmission: 'Zara Cox',
       helpingTeam: 'Team D',
@@ -148,6 +159,7 @@ export default (): Promise<GamedayEvent[]> => {
       locationName: 'East Recreation Hall',
       locationLink: 'https://maps.example.com/east-recreation',
       homeTeam: 'Team B',
+      awayTeam: 'Team Q',
       annotations: ['Playoff round'],
       helperAdmission: 'Evan Ross',
       helpingTeam: 'Team E',
@@ -165,6 +177,7 @@ type GamedayEvent = {
   locationName: string;
   locationLink: string;
   homeTeam: string;
+  awayTeam: string;
   annotations: string[];
   helpingTeam: string;
   helperAdmission: string;

@@ -19,31 +19,8 @@ const q = ref('');
     v-slot="{ item, index }"
     :items="gameData"
     class="w-full h-[98vh] pt-12"
-    :ui="{viewport: 'gap-2'}"
+    :ui="{viewport: 'gap-2 space-y-8'}"
   >
-    <UPageCard
-      v-bind="item"
-      :variant="index % 2 === 0 ? 'soft' : 'outline'"
-      :key="index"
-      :title="item.homeTeam"
-      :description="item.locationName"
-      class=""
-    >
-    <template #header>
-      <div class="text-lg font-semibold">
-        {{ item.homeTeam }}
-      </div>
-    </template>
-    <template #body>
-      <div class="text-base">
-        Helfer: {{ item.helpingTeam }}
-      </div>
-    </template>
-    <template #footer>
-      <div class="text-sm text-secondary">
-        {{ new Date(item.dateAndTime).toLocaleString() }}
-      </div>
-    </template>
-    </UPageCard>
+    <GamedayEventCard :event="item" />
   </UScrollArea>
 </template>
