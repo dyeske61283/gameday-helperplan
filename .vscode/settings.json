@@ -2,7 +2,6 @@
   "files.associations": {
     "*.css": "tailwindcss"
   },
-  "deno.enablePaths": ["./deno.json"],
   "editor.quickSuggestions": {
     "strings": "on"
   },
