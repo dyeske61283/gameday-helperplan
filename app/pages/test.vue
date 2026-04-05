@@ -19,18 +19,18 @@
 
 <script setup lang="ts">
 type GamedayEvent = {
-  dateAndTime: Date;
-  locationName: string;
-  locationLink: string;
-  homeTeam: string;
-  awayTeam: string;
-  annotations: string[];
-  helpingTeam: string;
-  helperAdmission: string;
-  helperSteward: string;
-  helperTimekeeper: string;
-  helperSecretary: string;
-  helperWipe: string;
+  dateAndTime: Date
+  locationName: string
+  locationLink: string
+  homeTeam: string
+  awayTeam: string
+  annotations: string[]
+  helpingTeam: string
+  helperAdmission: string
+  helperSteward: string
+  helperTimekeeper: string
+  helperSecretary: string
+  helperWipe: string
 }
 
 const sampleEvent1: GamedayEvent = {
@@ -41,15 +41,15 @@ const sampleEvent1: GamedayEvent = {
   awayTeam: 'Team Thunder',
   annotations: [
     'Derby match - expect high attendance',
-    'Parking available at North entrance'
+    'Parking available at North entrance',
   ],
   helpingTeam: 'Youth Team A',
   helperAdmission: 'John Smith',
   helperSteward: 'Sarah Johnson',
   helperTimekeeper: 'Mike Davis',
   helperSecretary: 'Emma Wilson',
-  helperWipe: 'Tom Brown'
-};
+  helperWipe: 'Tom Brown',
+}
 
 const sampleEvent2: GamedayEvent = {
   dateAndTime: new Date('2026-02-22T16:00:00'),
@@ -63,6 +63,6 @@ const sampleEvent2: GamedayEvent = {
   helperSteward: 'Chris Lee',
   helperTimekeeper: 'David Kim',
   helperSecretary: 'Lisa Chen',
-  helperWipe: 'Mark Taylor'
-};
+  helperWipe: 'Mark Taylor',
+}
 </script>

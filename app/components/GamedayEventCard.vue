@@ -2,14 +2,17 @@
   <UCard
     class="max-w-2xl hover:shadow-lg transition-shadow duration-300 group bg-muted"
     :ui="{
-      body: 'p-0' ,
-      header: 'px-6 py-4' 
+      body: 'p-0',
+      header: 'px-6 py-4',
     }"
   >
     <template #header>
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <UIcon name="i-lucide-calendar" class="text-2xl text-primary" />
+          <UIcon
+            name="i-lucide-calendar"
+            class="text-2xl text-primary"
+          />
           <div>
             <p class="text-sm font-medium text-muted">
               {{ formatDate(event.dateAndTime) }}
@@ -29,7 +32,10 @@
           :label="event.locationName"
           trailing
         />
-        <div v-else class="flex items-center gap-2 text-info">
+        <div
+          v-else
+          class="flex items-center gap-2 text-info"
+        >
           <UIcon name="i-lucide-map-pin" />
           <span class="text-sm text-muted">{{ event.locationName }}</span>
         </div>
@@ -56,11 +62,21 @@
       </div>
     </div>
 
-    <div v-if="event.annotations && event.annotations.length > 0" class="px-6 py-3 bg-warning/10 dark:bg-warning/20 border-y border-warning/30">
+    <div
+      v-if="event.annotations && event.annotations.length > 0"
+      class="px-6 py-3 bg-warning/10 dark:bg-warning/20 border-y border-warning/30"
+    >
       <div class="flex items-start gap-2">
-        <UIcon name="i-lucide-info" class="text-warning shrink-0 self-center" />
+        <UIcon
+          name="i-lucide-info"
+          class="text-warning shrink-0 self-center"
+        />
         <div class="flex-1">
-          <p v-for="(annotation, index) in event.annotations" :key="index" class="text-sm text-warning-foreground">
+          <p
+            v-for="(annotation, index) in event.annotations"
+            :key="index"
+            class="text-sm text-warning-foreground"
+          >
             {{ annotation }}
           </p>
         </div>
@@ -69,7 +85,10 @@
 
     <div class="px-6 py-4 space-y-3">
       <div class="flex items-center gap-2 text-muted">
-        <UIcon name="i-lucide-users" class="text-primary" />
+        <UIcon
+          name="i-lucide-users"
+          class="text-primary"
+        />
         <span class="text-sm font-medium">Helping Team:</span>
         <span class="text-sm font-semibold text-foreground">{{ event.helpingTeam }}</span>
       </div>
@@ -107,37 +126,37 @@
 
 <script setup lang="ts">
 type GamedayEvent = {
-  dateAndTime: Date;
-  locationName: string;
-  locationLink: string;
-  homeTeam: string;
-  awayTeam: string;
-  annotations: string[];
-  helpingTeam: string;
-  helperAdmission: string;
-  helperSteward: string;
-  helperTimekeeper: string;
-  helperSecretary: string;
-  helperWipe: string;
+  dateAndTime: Date
+  locationName: string
+  locationLink: string
+  homeTeam: string
+  awayTeam: string
+  annotations: string[]
+  helpingTeam: string
+  helperAdmission: string
+  helperSteward: string
+  helperTimekeeper: string
+  helperSecretary: string
+  helperWipe: string
 }
 
-const props = defineProps<{
-  event: GamedayEvent;
-}>();
+defineProps<{
+  event: GamedayEvent
+}>()
 
 const formatDate = (date: Date) => {
   return new Intl.DateTimeFormat('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
-    day: 'numeric'
-  }).format(date);
-};
+    day: 'numeric',
+  }).format(date)
+}
 
 const formatTime = (date: Date) => {
   return new Intl.DateTimeFormat('en-US', {
     hour: '2-digit',
-    minute: '2-digit'
-  }).format(date);
-};
+    minute: '2-digit',
+  }).format(date)
+}
 </script>

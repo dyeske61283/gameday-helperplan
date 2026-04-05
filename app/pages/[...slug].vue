@@ -1,10 +1,7 @@
 <script lang="ts" setup>
-
-await navigateTo('/');
+await navigateTo('/')
 </script>
 
 <template>
-  <div>
-    
-  </div>
+  <div />
 </template>

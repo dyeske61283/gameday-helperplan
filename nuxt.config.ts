@@ -1,7 +1,12 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: "2025-07-15",
+  modules: ['@nuxt/ui', '@formkit/auto-animate', '@nuxt/eslint'],
   devtools: { enabled: true },
-  modules: ["@nuxt/ui", "@formkit/auto-animate"],
-  css: ["~/assets/css/main.css"],
-});
+  css: ['~/assets/css/main.css'],
+  compatibilityDate: '2025-07-15',
+  eslint: {
+    config: {
+      stylistic: true,
+    },
+  },
+})
