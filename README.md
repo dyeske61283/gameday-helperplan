@@ -68,6 +68,28 @@ Locally preview production build:
 deno task preview
 ```
 
+## Toolchain
+
+This project uses ESLint for linting and formatting.
+
+### Linting & Formatting
+
+To check for linting issues:
+
+```bash
+pnpm lint
+```
+
+To automatically fix linting and formatting issues:
+
+```bash
+pnpm lint:fix
+```
+
+### Pre-commit Hooks
+
+Husky and lint-staged are configured to run ESLint on staged files before each commit. This ensures that only lint-free code is committed to the repository.
+
 Check out the
 [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for
 more information.
