@@ -1,15 +1,15 @@
-import z from 'zod'
+import z from "zod";
 
 export default defineEventHandler(async (event) => {
   const { id: planId } = await getValidatedRouterParams(event, z.object({
     id: z.string().length(36),
-  }).parse)
+  }).parse);
   const plan = await readValidatedBody(event, z.object({
     blob: z.string(),
-  }).parse)
+  }).parse);
 
-  const storage = useStorage('plans')
-  storage.set <string> (planId, plan.blob)
+  const storage = useStorage("plans");
+  storage.set <string> (planId, plan.blob);
 
-  return plan
-})
+  return plan;
+});

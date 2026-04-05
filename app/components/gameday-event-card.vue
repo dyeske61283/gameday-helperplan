@@ -1,3 +1,40 @@
+<script setup lang="ts">
+type GamedayEvent = {
+  dateAndTime: Date;
+  locationName: string;
+  locationLink: string;
+  homeTeam: string;
+  awayTeam: string;
+  annotations: string[];
+  helpingTeam: string;
+  helperAdmission: string;
+  helperSteward: string;
+  helperTimekeeper: string;
+  helperSecretary: string;
+  helperWipe: string;
+};
+
+defineProps<{
+  event: GamedayEvent;
+}>();
+
+function formatDate(date: Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  }).format(date);
+}
+
+function formatTime(date: Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+</script>
+
 <template>
   <UCard
     class="max-w-2xl hover:shadow-lg transition-shadow duration-300 group bg-muted"
@@ -123,40 +160,3 @@
     </div>
   </UCard>
 </template>
-
-<script setup lang="ts">
-type GamedayEvent = {
-  dateAndTime: Date
-  locationName: string
-  locationLink: string
-  homeTeam: string
-  awayTeam: string
-  annotations: string[]
-  helpingTeam: string
-  helperAdmission: string
-  helperSteward: string
-  helperTimekeeper: string
-  helperSecretary: string
-  helperWipe: string
-}
-
-defineProps<{
-  event: GamedayEvent
-}>()
-
-const formatDate = (date: Date) => {
-  return new Intl.DateTimeFormat('en-US', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  }).format(date)
-}
-
-const formatTime = (date: Date) => {
-  return new Intl.DateTimeFormat('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date)
-}
-</script>

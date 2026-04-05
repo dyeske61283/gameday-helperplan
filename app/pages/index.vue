@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import provideGameData from '@/utils/provideGameData'
+import provideGameData from "~/utils/provide-game-data";
 
-const gameData = await provideGameData()
+const gameData = await provideGameData();
 
-const q = ref('')
+const q = ref("");
 </script>
 
 <template>

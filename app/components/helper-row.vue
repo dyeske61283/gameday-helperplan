@@ -1,3 +1,11 @@
+<script setup lang="ts">
+defineProps<{
+  icon: string;
+  label: string;
+  name: string;
+}>();
+</script>
+
 <template>
   <div class="flex items-center gap-2 group">
     <UIcon
@@ -12,11 +20,3 @@
     </span>
   </div>
 </template>
-
-<script setup lang="ts">
-defineProps<{
-  icon: string
-  label: string
-  name: string
-}>()
-</script>
