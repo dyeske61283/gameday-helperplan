@@ -1,6 +1,9 @@
+<script setup>
+</script>
+
 <template>
-  <UApp>
+  <NuxtLayout>
     <NuxtRouteAnnouncer />
     <NuxtPage />
-  </UApp>
+  </NuxtLayout>
 </template>
