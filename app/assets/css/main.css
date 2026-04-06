@@ -1,2 +1,50 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary: #0052cc;
+  --color-primary-container: #0052cc;
+  --color-primary-fixed: #dae2ff;
+  --color-primary-fixed-variant: #0040a2;
+  --color-on-primary-fixed: #001848;
+  --color-secondary: #ff6b00;
+  --color-secondary-container: #ff6b00;
+  --color-secondary-fixed: #ffdbcc;
+  --color-tertiary: #7b2600;
+  --color-neutral: #454b54;
+  --color-surface: #f8f9ff;
+  --color-surface-container: #e9eef9;
+  --color-surface-container-low: #eef4ff;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #d4e0f7;
+  --color-surface-inverse: #2b3139;
+  --color-on-surface: #161c24;
+  --color-on-surface-variant: #434654;
+  --color-outline-variant: #c3c6d6;
+
+  --font-family-display: "Plus Jakarta Sans", sans-serif;
+  --font-family-body: "Inter", sans-serif;
+
+  --border-radius-lg: 1rem;
+  --border-radius-xl: 1.5rem;
+
+  --spacing-4: 1rem;
+  --spacing-12: 3rem;
+
+  --shadow-kinetic: 0px 12px 32px rgba(0, 61, 155, 0.08);
+}
+
+@layer base {
+  html {
+    font-family: var(--font-family-body);
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-family-display);
+  }
+}
+
 @import "@nuxt/ui";

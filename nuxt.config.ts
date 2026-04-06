@@ -9,4 +9,21 @@ export default defineNuxtConfig({
       standalone: false,
     },
   },
+  routeRules: {
+    "/": { prerender: true },
+  },
+  ui: {
+    theme: {
+      colors: [
+        "primary",
+        "secondary",
+        "tertiary",
+        "info",
+        "success",
+        "warning",
+        "error",
+        "neutral",
+      ],
+    },
+  },
 });
