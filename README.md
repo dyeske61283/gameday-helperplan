@@ -43,7 +43,7 @@ learn more.
 Make sure to install dependencies:
 
 ```bash
-deno install
+pnpm install
 ```
 
 ## Development Server
@@ -51,7 +51,7 @@ deno install
 Start the development server on `http://localhost:3000`:
 
 ```bash
-deno task dev
+pnpm run dev
 ```
 
 ## Production
@@ -59,13 +59,13 @@ deno task dev
 Build the application for production:
 
 ```bash
-deno task build
+pnpm run build
 ```
 
 Locally preview production build:
 
 ```bash
-deno task preview
+pnpm run preview
 ```
 
 ## Toolchain
