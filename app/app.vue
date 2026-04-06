@@ -1,9 +1,17 @@
 <script setup>
+useHead({
+  title: "Handball Helper - Kinetic Coordination",
+  htmlAttrs: {
+    lang: "en",
+  },
+});
 </script>
 
 <template>
-  <NuxtLayout>
-    <NuxtRouteAnnouncer />
-    <NuxtPage />
-  </NuxtLayout>
+  <UApp>
+    <NuxtLayout>
+      <NuxtRouteAnnouncer />
+      <NuxtPage />
+    </NuxtLayout>
+  </UApp>
 </template>

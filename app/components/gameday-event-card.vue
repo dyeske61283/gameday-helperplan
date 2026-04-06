@@ -38,9 +38,10 @@ function formatTime(date: Date) {
 <template>
   <UContainer>
     <UCard
-      class="hover:shadow-lg transition-shadow duration-300 group bg-muted" :ui="{
+      class="hover:kinetic-shadow transition-shadow duration-300 group bg-surface-container-lowest rounded-lg overflow-hidden" :ui="{
         body: 'p-0',
-        header: 'px-6 py-4',
+        header: 'px-6 py-4 bg-surface-container-low border-none',
+        footer: 'px-6 py-4 border-none',
       }"
     >
       <template #header>
@@ -48,39 +49,39 @@ function formatTime(date: Date) {
           <div class="flex items-center gap-3">
             <UIcon name="i-lucide-calendar" class="text-2xl text-primary" />
             <div>
-              <p class="text-sm font-medium text-muted">
+              <p class="text-sm font-medium text-on-surface-variant label-md">
                 {{ formatDate(event.dateAndTime) }}
               </p>
-              <p class="text-lg font-bold text-foreground">
+              <p class="text-lg font-bold text-on-surface title-md">
                 {{ formatTime(event.dateAndTime) }}
               </p>
             </div>
           </div>
           <UButton
-            v-if="event.locationLink" :to="event.locationLink" target="_blank" color="info" variant="ghost"
-            icon="i-lucide-map-pin" :label="event.locationName" trailing
+            v-if="event.locationLink" :to="event.locationLink" target="_blank" color="neutral" variant="subtle"
+            icon="i-lucide-map-pin" :label="event.locationName" trailing class="rounded-full label-md uppercase"
           />
-          <div v-else class="flex items-center gap-2 text-info">
+          <div v-else class="flex items-center gap-2 text-on-surface-variant">
             <UIcon name="i-lucide-map-pin" />
-            <span class="text-sm text-muted">{{ event.locationName }}</span>
+            <span class="text-sm label-md">{{ event.locationName }}</span>
           </div>
         </div>
       </template>
 
-      <div class="px-6 py-5 bg-accent/5 dark:bg-surface">
-        <div class="flex items-center justify-center gap-4">
+      <div class="px-6 py-8 bg-surface-container-lowest">
+        <div class="flex items-center justify-center gap-8">
           <div class="flex-1 text-right">
-            <p class="text-2xl font-bold text-foreground">
+            <p class="text-2xl font-bold text-on-surface headline-lg">
               {{ event.homeTeam }}
             </p>
           </div>
 
-          <div class="flex items-center justify-center px-4 py-2 bg-white dark:bg-gray-900 rounded-lg shadow-sm">
-            <span class="text-xl font-bold text-muted">VS</span>
+          <div class="flex items-center justify-center px-4 py-2 bg-surface-inverse rounded-lg shadow-sm">
+            <span class="text-xl font-bold text-white display-md !text-2xl">VS</span>
           </div>
 
           <div class="flex-1 text-left">
-            <p class="text-2xl font-bold text-foreground">
+            <p class="text-2xl font-bold text-on-surface headline-lg">
               {{ event.awayTeam }}
             </p>
           </div>
@@ -89,26 +90,26 @@ function formatTime(date: Date) {
 
       <div
         v-if="event.annotations && event.annotations.length > 0"
-        class="px-6 py-3 bg-warning/10 dark:bg-warning/20 border-y border-warning/30"
+        class="px-6 py-3 bg-secondary-fixed text-on-surface"
       >
         <div class="flex items-start gap-2">
-          <UIcon name="i-lucide-info" class="text-warning shrink-0 self-center" />
+          <UIcon name="i-lucide-info" class="text-secondary-fixed-variant shrink-0 self-center" />
           <div class="flex-1">
-            <p v-for="(annotation, index) in event.annotations" :key="index" class="text-sm text-warning-foreground">
+            <p v-for="(annotation, index) in event.annotations" :key="index" class="text-sm label-md">
               {{ annotation }}
             </p>
           </div>
         </div>
       </div>
 
-      <div class="px-6 py-4 space-y-3">
-        <div class="flex items-center gap-2 text-muted">
+      <div class="px-6 py-6 space-y-4 bg-surface-container-lowest">
+        <div class="flex items-center gap-2">
           <UIcon name="i-lucide-users" class="text-primary" />
-          <span class="text-sm font-medium">Helping Team:</span>
-          <span class="text-sm font-semibold text-foreground">{{ event.helpingTeam }}</span>
+          <span class="text-sm font-medium text-on-surface-variant label-md">Helping Team:</span>
+          <span class="text-sm font-semibold text-on-surface label-md">{{ event.helpingTeam }}</span>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-muted">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4">
           <HelperRow icon="i-lucide-ticket" label="Admission" :name="event.helperAdmission" />
           <HelperRow icon="i-lucide-shield-check" label="Steward" :name="event.helperSteward" />
           <HelperRow icon="i-lucide-clock" label="Timekeeper" :name="event.helperTimekeeper" />
