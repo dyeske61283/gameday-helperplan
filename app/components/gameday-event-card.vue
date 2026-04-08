@@ -38,9 +38,9 @@ function formatTime(date: Date) {
 <template>
   <UContainer>
     <UCard
-      class="hover:kinetic-shadow transition-shadow duration-300 group bg-surface-container-lowest rounded-lg overflow-hidden" :ui="{
+      class="hover:kinetic-shadow transition-shadow duration-300 group bg-surface-container-lowest dark:bg-surface-container-high rounded-lg overflow-hidden" :ui="{
         body: 'p-0',
-        header: 'px-6 py-4 bg-surface-container-low border-none',
+        header: 'px-6 py-4 bg-surface-container-low dark:bg-surface-container-highest border-none',
         footer: 'px-6 py-4 border-none',
       }"
     >
@@ -68,7 +68,7 @@ function formatTime(date: Date) {
         </div>
       </template>
 
-      <div class="px-6 py-8 bg-surface-container-lowest">
+      <div class="px-6 py-8 bg-surface-container-lowest dark:bg-surface-container-high">
         <div class="flex items-center justify-center gap-8">
           <div class="flex-1 text-right">
             <p class="text-2xl font-bold text-on-surface headline-lg">
@@ -76,8 +76,8 @@ function formatTime(date: Date) {
             </p>
           </div>
 
-          <div class="flex items-center justify-center px-4 py-2 bg-surface-inverse rounded-lg shadow-sm">
-            <span class="text-xl font-bold text-white display-md !text-2xl">VS</span>
+          <div class="flex items-center justify-center px-4 py-2 bg-surface-inverse dark:bg-surface-container-lowest rounded-lg shadow-sm">
+            <span class="text-2xl font-bold text-white display-md">VS</span>
           </div>
 
           <div class="flex-1 text-left">
@@ -90,19 +90,19 @@ function formatTime(date: Date) {
 
       <div
         v-if="event.annotations && event.annotations.length > 0"
-        class="px-6 py-3 bg-secondary-fixed text-on-surface"
+        class="px-6 py-3 bg-secondary-fixed text-on-secondary-fixed"
       >
         <div class="flex items-start gap-2">
-          <UIcon name="i-lucide-info" class="text-secondary-fixed-variant shrink-0 self-center" />
+          <UIcon name="i-lucide-info" class="text-on-secondary-fixed shrink-0 self-center" />
           <div class="flex-1">
-            <p v-for="(annotation, index) in event.annotations" :key="index" class="text-sm label-md">
+            <p v-for="(annotation, index) in event.annotations" :key="index" class="text-sm label-md text-on-secondary-fixed">
               {{ annotation }}
             </p>
           </div>
         </div>
       </div>
 
-      <div class="px-6 py-6 space-y-4 bg-surface-container-lowest">
+      <div class="px-6 py-6 space-y-4 bg-surface-container-lowest dark:bg-surface-container-high">
         <div class="flex items-center gap-2">
           <UIcon name="i-lucide-users" class="text-primary" />
           <span class="text-sm font-medium text-on-surface-variant label-md">Helping Team:</span>

@@ -11,7 +11,7 @@ const items = [
 </script>
 
 <template>
-  <UApp>
+  <div>
     <UHeader title="Helperplan" :toggle="false">
       <template #right>
         <UInput
@@ -35,5 +35,5 @@ const items = [
         }" class="w-full"
       />
     </UFooter>
-  </UApp>
+  </div>
 </template>

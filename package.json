@@ -12,6 +12,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
+    "test:a11y": "node accessibility-test.js",
     "prepare": "husky"
   },
   "dependencies": {
@@ -25,12 +26,14 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^8.0.0",
+    "@axe-core/playwright": "^4.11.1",
     "@nuxt/eslint": "^1.15.2",
     "@nuxt/test-utils": "^4.0.0",
     "eslint": "^10.2.0",
     "eslint-plugin-format": "^2.0.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
+    "playwright": "^1.59.1",
     "typescript": "5.6.3",
     "vitest": "^4.1.2"
   },

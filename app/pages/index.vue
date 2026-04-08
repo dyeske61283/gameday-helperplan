@@ -24,23 +24,29 @@ definePageMeta({
           class="rounded-full"
           aria-label="Share Dashboard"
         />
+        <UColorModeButton />
       </div>
     </nav>
     <main class="relative isolate">
       <!-- Hero Section -->
-      <section class="relative min-h-[870px] flex flex-col items-center justify-center px-6 overflow-hidden">
+      <section class="relative min-h-217.5 flex flex-col items-center justify-center px-6 overflow-hidden">
         <!-- Asymmetric Background Elements -->
-        <div class="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl -z-10" />
-        <div class="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-secondary/5 rounded-full blur-3xl -z-10" />
+        <div class="absolute top-[-10%] right-[-5%] w-125 h-125 bg-primary/5 dark:bg-primary/10 rounded-full blur-3xl -z-10" />
+        <div class="absolute bottom-[-10%] left-[-5%] w-100 h-100 bg-secondary/5 dark:bg-secondary/10 rounded-full blur-3xl -z-10" />
+
+        <!-- Dark Mode Match Glints -->
+        <div class="hidden dark:block absolute top-[20%] left-[10%] w-75 h-75 bg-secondary/10 rounded-full blur-[100px] -z-10" />
+        <div class="hidden dark:block absolute bottom-[20%] right-[10%] w-87.5 h-87.5 bg-primary/10 rounded-full blur-[120px] -z-10" />
+
         <div class="max-w-4xl w-full text-center space-y-8">
           <div
             class="inline-flex items-center px-4 py-2 mt-2 rounded-full bg-surface-container-high text-on-primary-fixed-variant text-sm font-semibold tracking-wide uppercase"
           >
             Focus on the Game, Not the Admin
           </div>
-          <h1 class="display-lg text-on-surface">
+          <h1 class="display-lg text-on-surface dark:tracking-tight dark:scale-105 transition-transform duration-700">
             Effortless Match-Day <br>
-            <span class="text-primary">Volunteer Coordination</span>
+            <span class="text-primary dark:text-primary-container">Volunteer Coordination</span>
           </h1>
           <p class="text-xl text-on-surface-variant max-w-2xl mx-auto leading-relaxed body-md">
             A streamlined tool for local handball clubs to organize officials, timekeepers, and court assistants. No
@@ -66,11 +72,11 @@ definePageMeta({
         <div class="mt-20 w-full max-w-6xl relative">
           <div class="rounded-xl overflow-hidden kinetic-shadow">
             <img
-              alt="Handball Action" class="w-full h-[400px] object-cover"
+              alt="Handball Action" class="w-full h-100 object-cover"
               data-alt="Cinematic wide shot of a handball match in progress, dynamic movement, indoor arena lighting, vibrant team jerseys"
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0PI81AoJd8CGYPk48gTBQdATKhLbfpVSHiHHsfxIMESPqqAx4KFBQitDD-u7ZrjsshdZGMFma6ET6XmfttFPLb6k7Tr_bBSpiS7iKMWPCHAbv-wMfIfP3Z4hx_ddNFyzae1FTZ3VLZBKaK0Io0Q1s_NPr-__k2KHv_HK8xb972EbbHchUM3zOWRFVtYMLMjVKLcpNwMBY6LSb7jQKagMxYh_sw5fQIzWrjMqXRJtVuAnFtpvoGtgM9XRCvglXXDsRf5lOVAtGupVY"
             >
-            <div class="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+            <div class="absolute inset-0 bg-linear-to-t from-background via-transparent to-transparent" />
           </div>
         </div>
       </section>
@@ -96,22 +102,30 @@ definePageMeta({
             </div>
           </div>
           <!-- Secondary Feature -->
-          <div class="md:col-span-5 bg-surface-inverse p-10 rounded-xl text-white flex flex-col justify-between">
-            <div class="space-y-4">
+          <div class="md:col-span-5 bg-surface-inverse dark:bg-surface-container-highest p-10 rounded-xl text-white flex flex-col justify-between relative overflow-hidden">
+            <div class="relative z-10 space-y-4">
               <h2 class="headline-lg text-white">
                 Real-time Sharing
               </h2>
-              <p class="text-surface-container-low body-md">
+              <p class="text-surface-container-low dark:text-on-surface-variant body-md">
                 Generate a unique link to share assignments with your team instantly. Works on any device, anywhere.
               </p>
+              <div class="pt-4 dark:block hidden">
+                <div class="text-xs uppercase tracking-widest text-secondary mb-2 font-bold">
+                  Velocity Tracker
+                </div>
+                <div class="velocity-tracker w-full opacity-80" />
+              </div>
             </div>
-            <div class="flex items-center gap-2 mt-8">
-              <UIcon name="i-lucide-share" :size="24" class="text-secondary-container" />
+            <div class="flex items-center gap-2 mt-8 relative z-10">
+              <UIcon name="i-lucide-share" :size="24" class="text-secondary-container dark:text-secondary" />
             </div>
+            <!-- Match Glint in Bento -->
+            <div class="hidden dark:block absolute -right-20 -top-20 w-64 h-64 bg-secondary/10 rounded-full blur-3xl" />
           </div>
           <!-- Small Grid Items -->
           <div
-            class="md:col-span-4 bg-surface-container-lowest border border-outline-variant/20 p-8 rounded-xl flex flex-col items-center text-center"
+            class="md:col-span-4 bg-surface-container-lowest dark:bg-surface-container-high p-8 rounded-xl flex flex-col items-center text-center"
           >
             <UIcon name="i-lucide-cloud-off" class="text-primary mb-4 text-4xl" />
             <h2 class="font-bold text-xl mb-2 text-on-surface">
@@ -122,7 +136,7 @@ definePageMeta({
             </p>
           </div>
           <div
-            class="md:col-span-4 bg-surface-container-lowest border border-outline-variant/20 p-8 rounded-xl flex flex-col items-center text-center"
+            class="md:col-span-4 bg-surface-container-lowest dark:bg-surface-container-high p-8 rounded-xl flex flex-col items-center text-center"
           >
             <UIcon name="i-lucide-dna" class="text-secondary mb-4 text-4xl" />
             <h2 class="font-bold text-xl mb-2 text-on-surface">
@@ -171,7 +185,7 @@ definePageMeta({
       </section>
     </main>
     <!-- Footer -->
-    <footer class="bg-surface py-12 px-6 border-t border-outline-variant/20">
+    <footer class="bg-surface-container-low py-12 px-6 relative z-10">
       <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
         <div class="flex flex-col items-center md:items-start gap-2">
           <div class="text-2xl font-black text-primary">
