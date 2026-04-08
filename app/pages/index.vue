@@ -7,7 +7,7 @@ definePageMeta({
 <template>
   <div>
     <nav class="hidden md:flex justify-between items-center w-full px-6 h-16 bg-surface-container-low sticky top-0 z-50">
-      <div class="text-xl font-bold text-primary">
+      <div class="text-xl font-bold">
         Handball Helper
       </div>
       <div class="flex items-center space-x-8">
@@ -19,7 +19,7 @@ definePageMeta({
       <div class="flex items-center space-x-4">
         <UButton
           variant="ghost"
-          color="primary"
+          color="neutral"
           icon="i-lucide-share-2"
           class="rounded-full"
           aria-label="Share Dashboard"
@@ -40,13 +40,13 @@ definePageMeta({
 
         <div class="max-w-4xl w-full text-center space-y-8">
           <div
-            class="inline-flex items-center px-4 py-2 mt-2 rounded-full bg-surface-container-high text-on-primary-fixed-variant text-sm font-semibold tracking-wide uppercase"
+            class="inline-flex items-center px-4 py-2 shadow mt-4 rounded-full bg-surface-container-high text-on-primary-fixed-variant text-sm font-semibold tracking-wide uppercase"
           >
             Focus on the Game, Not the Admin
           </div>
-          <h1 class="display-lg text-on-surface dark:tracking-tight dark:scale-105 transition-transform duration-700">
+          <h1 class="font-family-body text-6xl display-lg text-on-surface dark:tracking-tight">
             Effortless Match-Day <br>
-            <span class="text-primary dark:text-primary-container">Volunteer Coordination</span>
+            <span class="text-primary font-family-body dark:text-primary-container display-lg text-5xl">Volunteer Coordination</span>
           </h1>
           <p class="text-xl text-on-surface-variant max-w-2xl mx-auto leading-relaxed body-md">
             A streamlined tool for local handball clubs to organize officials, timekeepers, and court assistants. No
@@ -110,12 +110,6 @@ definePageMeta({
               <p class="text-surface-container-low dark:text-on-surface-variant body-md">
                 Generate a unique link to share assignments with your team instantly. Works on any device, anywhere.
               </p>
-              <div class="pt-4 dark:block hidden">
-                <div class="text-xs uppercase tracking-widest text-secondary mb-2 font-bold">
-                  Velocity Tracker
-                </div>
-                <div class="velocity-tracker w-full opacity-80" />
-              </div>
             </div>
             <div class="flex items-center gap-2 mt-8 relative z-10">
               <UIcon name="i-lucide-share" :size="24" class="text-secondary-container dark:text-secondary" />
@@ -125,7 +119,7 @@ definePageMeta({
           </div>
           <!-- Small Grid Items -->
           <div
-            class="md:col-span-4 bg-surface-container-lowest dark:bg-surface-container-high p-8 rounded-xl flex flex-col items-center text-center"
+            class="md:col-span-4 bg-surface-container-low dark:bg-surface-container-high p-8 rounded-xl flex flex-col items-center text-center"
           >
             <UIcon name="i-lucide-cloud-off" class="text-primary mb-4 text-4xl" />
             <h2 class="font-bold text-xl mb-2 text-on-surface">
@@ -136,7 +130,7 @@ definePageMeta({
             </p>
           </div>
           <div
-            class="md:col-span-4 bg-surface-container-lowest dark:bg-surface-container-high p-8 rounded-xl flex flex-col items-center text-center"
+            class="md:col-span-4 bg-surface-container-low dark:bg-surface-container-high p-8 rounded-xl flex flex-col items-center text-center"
           >
             <UIcon name="i-lucide-dna" class="text-secondary mb-4 text-4xl" />
             <h2 class="font-bold text-xl mb-2 text-on-surface">
