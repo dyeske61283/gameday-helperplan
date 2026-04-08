@@ -67,7 +67,6 @@ describe("aPI endpoints", async () => {
       expect(res.headers.get("location")).toBe("/");
     }
     catch (error: any) {
-      console.log("Received error:", error);
       expect(error).toBeUndefined();
     }
   });
