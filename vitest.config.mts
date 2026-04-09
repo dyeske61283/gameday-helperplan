@@ -13,7 +13,7 @@ export default defineConfig({
       {
         test: {
           name: "app",
-          include: ["tests/composables/*.test.ts"],
+          include: ["app/**/*.{test,spec}.ts"],
           environment: "happy-dom",
         },
       },

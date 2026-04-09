@@ -3,13 +3,14 @@
  * Inspired by Excalidraw's end-to-end encryption.
  * @see https://plus.excalidraw.com/blog/end-to-end-encryption
  */
-export const useEncryption = () => {
+export function useEncryption() {
   /**
    * Generates a 128-bit AES-GCM key and returns its JWK 'k' parameter.
    * This 'k' value is base64url encoded and safe to use in URL fragments.
    */
   const generateKey = async (): Promise<string> => {
-    if (import.meta.server) return "";
+    if (import.meta.server)
+      return "";
 
     const key = await window.crypto.subtle.generateKey(
       { name: "AES-GCM", length: 128 },
@@ -59,12 +60,12 @@ export const useEncryption = () => {
     generateKey,
     encryptData,
   };
-};
+}
 
 /**
  * Composable for client-side decryption using the Web Crypto API.
  */
-export const useDecryption = () => {
+export function useDecryption() {
   /**
    * Decrypts a Blob using a JWK key string.
    * Returns the decrypted data as a string.
@@ -104,4 +105,4 @@ export const useDecryption = () => {
   return {
     decryptBlob,
   };
-};
+}
