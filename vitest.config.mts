@@ -10,6 +10,13 @@ export default defineConfig({
           environment: "node",
         },
       },
+      {
+        test: {
+          name: "app",
+          include: ["app/**/*.{test,spec}.ts"],
+          environment: "happy-dom",
+        },
+      },
     ],
   },
   plugins: [
