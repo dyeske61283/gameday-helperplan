@@ -1,6 +1,5 @@
-import { describe, it, expect, vi } from "vitest";
-import { useEncryption, useDecryption } from "../../app/composables/useCrypto";
-
+import { describe, expect, it, vi } from "vitest";
+import { useDecryption, useEncryption } from "./use-crypto";
 // Mock import.meta.server
 vi.stubGlobal("import", { meta: { server: false } });
 
@@ -14,7 +13,7 @@ describe("useCrypto", () => {
       expect(typeof key).toBe("string");
       expect(key.length).toBeGreaterThan(0);
       // JWK 'k' for 128-bit key is typically 22 characters base64url encoded
-      expect(key).toMatch(/^[a-zA-Z0-9_-]+$/);
+      expect(key).toMatch(/^[\w-]+$/);
     });
 
     it("should encrypt data and return an ArrayBuffer", async () => {
