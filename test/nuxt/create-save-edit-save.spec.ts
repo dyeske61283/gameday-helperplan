@@ -4,7 +4,7 @@ import { useDecryption, useEncryption } from "../../app/composables/use-crypto";
 
 await setup({
   build: false,
-  host: "http://localhost:3000",
+  host: process.env.TEST_HOST || "http://localhost:3000",
 });
 
 describe("create-save-edit-save workflow", async () => {

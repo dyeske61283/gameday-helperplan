@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 await setup({
   build: false,
-  host: "http://localhost:3000",
+  host: process.env.TEST_HOST || "http://localhost:3000",
 });
 
 describe("api endpoints", async () => {
