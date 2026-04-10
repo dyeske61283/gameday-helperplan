@@ -14,12 +14,15 @@ function getDateLabel(item: Awaited<ReturnType<typeof provideGameData>>[number])
 
 <template>
   <UScrollArea
-    v-slot="{ item }"
+    v-slot="{ item, index }"
     :items="gameData"
     class="w-full h-[80vh-(var(--ui-header-height))] pt-4 mb-8"
     :ui="{ viewport: 'gap-8 flex-1 items-center', item: 'container' }"
   >
     <div v-if="!dateSeen.has(item.dateAndTime.toDateString())" class="flex flex-col items-center mb-8">
+      <h1 v-if="index === 0" class="font-family-body text-4xl display-lg text-on-surface">
+        Example Season Plan
+      </h1>
       <div class="kinetic-divider w-full max-w-lg mb-4" />
       <span class="text-on-surface-variant label-md uppercase tracking-widest text-xs">{{ getDateLabel(item) }}</span>
     </div>

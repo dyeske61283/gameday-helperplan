@@ -214,28 +214,28 @@ definePageMeta({
             Built for the handball community.
           </p>
         </div>
-        <div class="flex gap-8 text-sm font-medium text-on-surface-variant">
+        <div class="flex gap-8 text-sm font-medium">
           <ULink
-            class="hover:text-primary transition-colors"
+            class="hover:text-primary transition-colors text-on-surface"
             to="/privacy"
           >
             Privacy
           </ULink>
           <ULink
-            class="hover:text-primary transition-colors"
+            class="hover:text-primary transition-colors text-on-surface"
             to="/imprint"
           >
             Imprint
           </ULink>
           <ULink
-            class="hover:text-primary transition-colors"
+            class="hover:text-primary transition-colors text-on-surface"
             to="https://github.com/dyeske61283/gameday-helperplan"
             target="_blank"
           >
             GitHub
           </ULink>
           <ULink
-            class="hover:text-primary transition-colors"
+            class="hover:text-primary transition-colors text-on-surface"
             to="/support"
           >
             Support
