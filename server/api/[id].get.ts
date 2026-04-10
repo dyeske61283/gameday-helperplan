@@ -61,5 +61,5 @@ export default eventHandler(async (event) => {
     return eventStream.send();
   }
 
-  return plan;
+  return { blob: plan };
 });

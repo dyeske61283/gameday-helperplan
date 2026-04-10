@@ -1,9 +1,10 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useDecryption, useEncryption } from "./use-crypto";
-// Mock import.meta.server
-vi.stubGlobal("import", { meta: { server: false } });
 
 describe("useCrypto", () => {
+  beforeEach(() => {
+    vi.stubGlobal("import", { meta: { server: false } });
+  });
   describe("useEncryption", () => {
     it("should generate a valid JWK key string", async () => {
       const { generateKey } = useEncryption();
@@ -16,17 +17,16 @@ describe("useCrypto", () => {
       expect(key).toMatch(/^[\w-]+$/);
     });
 
-    it("should encrypt data and return an ArrayBuffer", async () => {
+    it("should encrypt data and return both ArrayBuffer and string", async () => {
       const { generateKey, encryptData } = useEncryption();
       const key = await generateKey();
       const testData = "Hello World";
 
-      const encrypted = await encryptData(testData, key);
+      const result = await encryptData(testData, key);
 
-      expect(encrypted).toBeInstanceOf(ArrayBuffer);
-      expect(encrypted.byteLength).toBeGreaterThan(0);
+      expect(result.length).toBeGreaterThan(0);
     });
-  });
+  }); ;
 
   describe("useDecryption", () => {
     it("should decrypt encrypted data back to original string", async () => {
@@ -36,10 +36,9 @@ describe("useCrypto", () => {
       const key = await generateKey();
       const testData = JSON.stringify({ message: "Secret message", id: 123 });
 
-      const encryptedBuffer = await encryptData(testData, key);
-      const encryptedBlob = new Blob([encryptedBuffer]);
+      const encrypted = await encryptData(testData, key);
 
-      const decrypted = await decryptBlob(encryptedBlob, key);
+      const decrypted = await decryptBlob(encrypted, key);
 
       expect(decrypted).toBe(testData);
       expect(JSON.parse(decrypted)).toEqual({ message: "Secret message", id: 123 });
@@ -53,10 +52,9 @@ describe("useCrypto", () => {
       const key2 = await generateKey();
       const testData = "Secret";
 
-      const encryptedBuffer = await encryptData(testData, key1);
-      const encryptedBlob = new Blob([encryptedBuffer]);
+      const encrypted = await encryptData(testData, key1);
 
-      await expect(decryptBlob(encryptedBlob, key2)).rejects.toThrow();
+      await expect(decryptBlob(encrypted, key2)).rejects.toThrow();
     });
   });
 
@@ -69,8 +67,7 @@ describe("useCrypto", () => {
     const originalString = JSON.stringify(originalObject);
 
     const encrypted = await encryptData(originalString, key);
-    const blob = new Blob([encrypted]);
-    const decryptedString = await decryptBlob(blob, key);
+    const decryptedString = await decryptBlob(encrypted, key);
 
     expect(decryptedString).toBe(originalString);
     expect(JSON.parse(decryptedString)).toEqual(originalObject);

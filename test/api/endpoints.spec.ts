@@ -6,12 +6,12 @@ await setup({
   host: "http://localhost:3000",
 });
 
-describe("aPI endpoints", async () => {
+describe("api endpoints", async () => {
   const validId = "12345678-1234-1234-1234-123456789012";
   const invalidId = "too-short";
   const nonExistentId = "00000000-0000-0000-0000-000000000001";
 
-  it("pOST /api/[id] should store a plan", async () => {
+  it("post /api/[id] stores a plan", async () => {
     const res = await $fetch(`/api/${validId}`, {
       method: "POST",
       body: { blob: "test-plan-content" },
@@ -21,10 +21,10 @@ describe("aPI endpoints", async () => {
 
   it("gET /api/[id] should retrieve a stored plan", async () => {
     const res = await $fetch(`/api/${validId}`);
-    expect(res).toBe("test-plan-content");
+    expect(res).toEqual({ blob: "test-plan-content" });
   });
 
-  it("gET /api/[id] should return 404 for non-existent plan", async () => {
+  it("get /api/[id] returns 404 for non-existent plan", async () => {
     try {
       await $fetch(`/api/${nonExistentId}`);
       expect(true, "Should have thrown a 404 error").toBe(false);
@@ -35,7 +35,7 @@ describe("aPI endpoints", async () => {
     }
   });
 
-  it("pOST /api/[id] should return 400 (or validation error) for invalid ID length", async () => {
+  it("post /api/[id] returns 400 (or validation error) for invalid ID length", async () => {
     try {
       await $fetch(`/api/${invalidId}`, {
         method: "POST",
@@ -48,7 +48,7 @@ describe("aPI endpoints", async () => {
     }
   });
 
-  it("gET /api/[id] should return 400 (or validation error) for invalid ID length", async () => {
+  it("get /api/[id] returns 400 (or validation error) for invalid ID length", async () => {
     try {
       await $fetch(`/api/${invalidId}`);
       expect(true, "Should have thrown a validation error").toBe(false);
@@ -58,7 +58,7 @@ describe("aPI endpoints", async () => {
     }
   });
 
-  it("should return 302 to root route for non-existent API endpoints", async () => {
+  it("returns 302 to root route for non-existent API endpoints", async () => {
     try {
       const res = await fetch("/api/non/existent/endpoint", {
         redirect: "manual", // Prevent automatic following of redirects

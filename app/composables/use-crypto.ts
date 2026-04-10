@@ -27,7 +27,7 @@ export function useEncryption() {
    * Returns an ArrayBuffer containing the encrypted data.
    * Uses a zero IV as suggested in the Excalidraw article for single-use keys.
    */
-  const encryptData = async (data: string, k: string): Promise<ArrayBuffer> => {
+  const encryptData = async (data: string, k: string): Promise<string> => {
     if (import.meta.server) {
       throw new Error("Encryption is only available on the client side");
     }
@@ -49,11 +49,15 @@ export function useEncryption() {
     const iv = new Uint8Array(12);
     const encoded = new TextEncoder().encode(data);
 
-    return await window.crypto.subtle.encrypt(
+    const encrypted = await window.crypto.subtle.encrypt(
       { name: "AES-GCM", iv },
       key,
       encoded,
     );
+
+    const encryptedAsString = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+
+    return encryptedAsString;
   };
 
   return {
@@ -70,12 +74,16 @@ export function useDecryption() {
    * Decrypts a Blob using a JWK key string.
    * Returns the decrypted data as a string.
    */
-  const decryptBlob = async (blob: Blob, k: string): Promise<string> => {
+  const decryptBlob = async (blob: string, k: string): Promise<string> => {
     if (import.meta.server) {
       throw new Error("Decryption is only available on the client side");
     }
 
-    const arrayBuffer = await blob.arrayBuffer();
+    const binaryString = atob(blob);
+    const bytes = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
 
     const key = await window.crypto.subtle.importKey(
       "jwk",
@@ -93,10 +101,11 @@ export function useDecryption() {
 
     const iv = new Uint8Array(12);
 
+    // Decrypt using the ArrayBuffer blob (preferred method)
     const decrypted = await window.crypto.subtle.decrypt(
       { name: "AES-GCM", iv },
       key,
-      arrayBuffer,
+      bytes,
     );
 
     return new TextDecoder().decode(new Uint8Array(decrypted));

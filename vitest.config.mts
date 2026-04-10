@@ -6,7 +6,7 @@ export default defineConfig({
       {
         test: {
           name: "api",
-          include: ["tests/api/*.{test,spec}.ts"],
+          include: ["test/api/*.{test,spec}.ts"],
           environment: "node",
         },
       },
@@ -14,6 +14,13 @@ export default defineConfig({
         test: {
           name: "app",
           include: ["app/**/*.{test,spec}.ts"],
+          environment: "happy-dom",
+        },
+      },
+      {
+        test: {
+          name: "workflow",
+          include: ["test/nuxt/*.{test,spec}.ts"],
           environment: "happy-dom",
         },
       },
