@@ -11,10 +11,30 @@ definePageMeta({
         Handball Helper
       </div>
       <div class="flex items-center space-x-8">
-        <a class="text-primary title-md" href="#">Dashboard</a>
-        <a class="text-on-surface-variant hover:text-primary transition-colors label-md" href="#">Assignments</a>
-        <a class="text-on-surface-variant hover:text-primary transition-colors label-md" href="#">Setup</a>
-        <a class="text-on-surface-variant hover:text-primary transition-colors label-md" href="#">Guide</a>
+        <ULink
+          class="text-primary title-md"
+          to="/dashboard"
+        >
+          Dashboard
+        </ULink>
+        <ULink
+          class="text-on-surface-variant hover:text-primary transition-colors label-md"
+          to="/assignments"
+        >
+          Assignments
+        </ULink>
+        <ULink
+          class="text-on-surface-variant hover:text-primary transition-colors label-md"
+          to="/setup"
+        >
+          Setup
+        </ULink>
+        <ULink
+          class="text-on-surface-variant hover:text-primary transition-colors label-md"
+          to="/guide"
+        >
+          Guide
+        </ULink>
       </div>
       <div class="flex items-center space-x-4">
         <UButton
@@ -53,19 +73,19 @@ definePageMeta({
             accounts, no hassle—just high-performance management.
           </p>
           <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <a
+            <ULink
               class="kinetic-gradient text-white px-8 py-4 rounded-full font-bold text-lg kinetic-shadow hover:opacity-90 transition-all active:scale-95 flex items-center gap-2 label-md uppercase"
-              href="#"
+              to="/dashboard"
             >
               Go to Dashboard
               <UIcon name="i-lucide-arrow-right" :size="24" />
-            </a>
-            <a
+            </ULink>
+            <ULink
               class="bg-surface-container-lowest text-primary px-8 py-4 rounded-full font-bold text-lg hover:bg-surface-container-low transition-all active:scale-95 label-md uppercase"
-              href="#"
+              to="/setup"
             >
               Admin Setup
-            </a>
+            </ULink>
           </div>
         </div>
         <!-- Kinetic Court Visual Mockup -->
@@ -164,15 +184,20 @@ definePageMeta({
               Join over 50 local clubs streamlining their match-day logistics with Handball Helper.
             </p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
-              <button
+              <UButton
                 class="kinetic-gradient text-white px-10 py-4 rounded-full font-bold text-lg kinetic-shadow hover:opacity-90 transition-all label-md uppercase"
+                to="/dashboard"
               >
                 Start for Free
-              </button>
-              <button class="flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all label-md uppercase">
+              </UButton>
+              <UButton
+                variant="ghost"
+                class="flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all label-md uppercase"
+                to="/guide"
+              >
                 Read the Guide
                 <UIcon name="i-lucide-arrow-right" :size="24" />
-              </button>
+              </UButton>
             </div>
           </div>
         </div>
@@ -189,11 +214,32 @@ definePageMeta({
             Built for the handball community.
           </p>
         </div>
-        <div class="flex gap-8 text-sm font-medium text-on-surface-variant">
-          <a class="hover:text-primary transition-colors" href="#">Privacy</a>
-          <a class="hover:text-primary transition-colors" href="#">Open Source</a>
-          <a class="hover:text-primary transition-colors" href="#">GitHub</a>
-          <a class="hover:text-primary transition-colors" href="#">Support</a>
+        <div class="flex gap-8 text-sm font-medium">
+          <ULink
+            class="hover:text-primary transition-colors text-on-surface"
+            to="/privacy"
+          >
+            Privacy
+          </ULink>
+          <ULink
+            class="hover:text-primary transition-colors text-on-surface"
+            to="/imprint"
+          >
+            Imprint
+          </ULink>
+          <ULink
+            class="hover:text-primary transition-colors text-on-surface"
+            to="https://github.com/dyeske61283/gameday-helperplan"
+            target="_blank"
+          >
+            GitHub
+          </ULink>
+          <ULink
+            class="hover:text-primary transition-colors text-on-surface"
+            to="/support"
+          >
+            Support
+          </ULink>
         </div>
         <p class="text-xs text-outline">
           © 2026 Handball Helper. All Rights Reserved.
@@ -204,25 +250,25 @@ definePageMeta({
     <nav
       class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-4 pt-2 glass-kinetic z-50 rounded-t-2xl kinetic-shadow"
     >
-      <a
+      <ULink
         class="flex flex-col items-center justify-center bg-surface-container-low text-primary rounded-xl px-3 py-1 scale-90"
-        href="#"
+        to="/dashboard"
       >
         <UIcon name="i-lucide-layout-dashboard" class="text-primary" :size="24" />
         <span class="text-[10px] font-medium mt-1">Dashboard</span>
-      </a>
-      <a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 active:bg-surface-container-low" href="#" aria-label="Tasks">
+      </ULink>
+      <ULink class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 active:bg-surface-container-low" to="/assignments" aria-label="Tasks">
         <UIcon name="i-lucide-id-card-lanyard" />
         <span class="text-[10px] font-medium mt-1">Tasks</span>
-      </a>
-      <a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 active:bg-surface-container-low" href="#" aria-label="Setup">
+      </ULink>
+      <ULink class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 active:bg-surface-container-low" to="/setup" aria-label="Setup">
         <UIcon name="i-lucide-settings" />
         <span class="text-[10px] font-medium mt-1">Setup</span>
-      </a>
-      <a class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 active:bg-surface-container-low" href="#" aria-label="Guide">
+      </ULink>
+      <ULink class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 active:bg-surface-container-low" to="/guide" aria-label="Guide">
         <UIcon name="i-lucide-circle-question-mark" />
         <span class="text-[10px] font-medium mt-1">Guide</span>
-      </a>
+      </ULink>
     </nav>
   </div>
 </template>
