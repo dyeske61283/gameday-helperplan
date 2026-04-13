@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import { AxeBuilder } from "@axe-core/playwright";
 import { chromium } from "playwright";
+import { expect } from "playwright/test";
 
 async function runAudit(page, name) {
   console.log(`--- Running accessibility audit for: ${page.url()} ${name} ---`);
@@ -47,12 +48,14 @@ async function runAuditDarkAndLight(page, url, totalViolations) {
   const browser = await chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
-  const url = "http://localhost:3000";
-  const host = "http://localhost:3000";
+  // eslint-disable-next-line node/no-process-env
+  const host = process.env.TEST_HOST || "http://localhost:3000";
+  const url = host;
   let totalViolations = 0;
 
   try {
-    totalViolations = await runAuditDarkAndLight(page, "http://localhost:3000/example", totalViolations);
+    totalViolations = await runAuditDarkAndLight(page, `${host}/example`, totalViolations);
+    await expect(page).toHaveURL(`${host}/example`);
 
     totalViolations = await runAuditDarkAndLight(page, url, totalViolations);
     // "crawl" all other pages by clicking on links
