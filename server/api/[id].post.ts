@@ -1,5 +1,5 @@
 import z from "zod";
-import { createdPlansCounter } from "../plugins/otel";
+import env from "~~/utils/env";
 
 export default defineEventHandler(async (event) => {
   const { id: planId } = await getValidatedRouterParams(event, z.object({
@@ -9,10 +9,25 @@ export default defineEventHandler(async (event) => {
     blob: z.string(),
   }).parse);
 
-  const storage = useStorage("plans");
-  storage.set <string> (planId, plan.blob);
-
-  createdPlansCounter.add(1);
+  const isDenoDeploy = !!env.DENO_DEPLOYMENT_ID;
+  let storage = useStorage(isDenoDeploy ? "plans" : "memory");
+  try {
+    await storage.setItem(planId, plan.blob);
+  }
+  catch (error) {
+    if (isDenoDeploy) {
+      console.error("Deno KV setItem failed, falling back to memory", error);
+      storage = useStorage("memory");
+      await storage.setItem(planId, plan.blob);
+    }
+    else {
+      console.error("Storage setItem failed on memory", error);
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Internal Server Error",
+      });
+    }
+  }
 
   return plan;
 });

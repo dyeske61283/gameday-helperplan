@@ -1,18 +1,37 @@
 import { z } from "zod";
-import { retrievedPlansCounter } from "../plugins/otel";
+import env from "~~/utils/env";
 
 export default eventHandler(async (event) => {
   const { id } = await getValidatedRouterParams(event, z.object({
     id: z.string().length(36),
   }).parse);
-  const storage = useStorage("plans");
 
-  const plan = await storage.getItem<string>(id);
+  const isDenoDeploy = !!env.DENO_DEPLOYMENT_ID;
+  let storage = useStorage(isDenoDeploy ? "plans" : "memory");
+  let storageName = isDenoDeploy ? "plans" : "memory";
+
+  let plan: string | null = null;
+  try {
+    plan = await storage.getItem<string>(id);
+  }
+  catch (error) {
+    if (isDenoDeploy) {
+      console.error("Deno KV getItem failed, falling back to memory", error);
+      storage = useStorage("memory");
+      storageName = "memory";
+      plan = await storage.getItem<string>(id);
+    }
+    else {
+      console.error("Storage getItem failed on memory", error);
+      throw createError({
+        statusCode: 500,
+        statusMessage: "Internal Server Error",
+      });
+    }
+  }
   if (!plan) {
     return Response.json({ error: "Plan not found" }, { status: 404 });
   }
-
-  retrievedPlansCounter.add(1);
 
   if (getHeader(event, "accept") === "text/event-stream") {
     let unwatch: Awaited<ReturnType<typeof storage.watch>> | undefined;
@@ -26,14 +45,17 @@ export default eventHandler(async (event) => {
         await unwatch();
     });
 
-    eventStream.push(plan);
+    if (plan) {
+      eventStream.push(plan);
+    }
 
-    unwatch = await storage.watch(async (planUpdateEvent, planIdIncludingPrefix) => {
+    try {
+      unwatch = await storage.watch(async (planUpdateEvent, planIdIncludingPrefix) => {
       if (isClosed)
         return;
       // this is a bit stupid, but the prefix is included in the
       // event key, so we need to check for it here
-      if (planIdIncludingPrefix !== `plans:${id}`)
+      if (planIdIncludingPrefix !== `${storageName}:${id}`)
         return;
       if (planUpdateEvent === "remove") {
         isClosed = true;
@@ -60,6 +82,10 @@ export default eventHandler(async (event) => {
         }
       }
     });
+  }
+    catch (error) {
+      console.error("Storage watch failed", error);
+    }
 
     return eventStream.send();
   }

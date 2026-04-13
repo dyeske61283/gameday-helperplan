@@ -12,6 +12,18 @@ export default defineNuxtConfig({
   routeRules: {
     "/": { prerender: true },
   },
+  nitro: {
+    storage: {
+      plans: {
+        driver: "deno-kv",
+      },
+    },
+    devStorage: {
+      plans: {
+        driver: "memory",
+      },
+    },
+  },
   ui: {
     theme: {
       colors: [
