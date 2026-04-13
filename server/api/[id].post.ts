@@ -1,5 +1,4 @@
 import z from "zod";
-import { createdPlansCounter } from "../plugins/otel";
 
 export default defineEventHandler(async (event) => {
   const { id: planId } = await getValidatedRouterParams(event, z.object({
@@ -11,8 +10,6 @@ export default defineEventHandler(async (event) => {
 
   const storage = useStorage("plans");
   storage.set <string> (planId, plan.blob);
-
-  createdPlansCounter.add(1);
 
   return plan;
 });

@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { retrievedPlansCounter } from "../plugins/otel";
 
 export default eventHandler(async (event) => {
   const { id } = await getValidatedRouterParams(event, z.object({
@@ -11,8 +10,6 @@ export default eventHandler(async (event) => {
   if (!plan) {
     return Response.json({ error: "Plan not found" }, { status: 404 });
   }
-
-  retrievedPlansCounter.add(1);
 
   if (getHeader(event, "accept") === "text/event-stream") {
     let unwatch: Awaited<ReturnType<typeof storage.watch>> | undefined;
