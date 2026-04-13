@@ -2,42 +2,43 @@ name: Test against Deno Deploy
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    environment: test
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@v5
       - name: Install pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
-          version: 9
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+          version: 10
+      - name: Use Node.js
+        uses: actions/setup-node@v5
         with:
-          node-version: 22
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: pnpm install
-
+          node-version: lts/*
+      - run: pnpm install
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Get Deno Deploy URL
         id: get-url
         env:
-          DENO_PROJECT_ID: ${{ secrets.DENO_PROJECT_ID }}
-          DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
+          DENO_PROJECT_NAME: ${{ secrets.DENO_PROJECT_NAME }}
+          DENO_ORG_NAME: ${{ secrets.DENO_ORG_NAME }}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
-          # Wait a bit for the deployment to start/finish if triggered by the same push
-          sleep 10
-          URL=$(node scripts/get-deno-url.js)
+          # fix the branch name to be cut to max 25 characters and replace slashes with dashes
+          # also if the 25th character is a dash, cut it to 26 characters to avoid ending with a dash
+          # also convert to lowercase
+          TRIMMED="${BRANCH_NAME:0:25}"
+          if [[ "${TRIMMED: -1}" == "-" ]]; then
+            BRANCH_NAME="${BRANCH_NAME:0:26}"
+          else
+            BRANCH_NAME="${BRANCH_NAME:0:25}"
+          fi
+          BRANCH_NAME=$(echo "${BRANCH_NAME}" | tr '/' '-' | tr '[:upper:]' '[:lower:]')
+          URL="https://${DENO_PROJECT_NAME}--${BRANCH_NAME}.${DENO_ORG_NAME}.deno.net"
           echo "TEST_HOST=$URL" >> $GITHUB_ENV
           echo "deployment_url=$URL" >> $GITHUB_OUTPUT
 

@@ -1,9 +1,10 @@
 import { $fetch, fetch, setup } from "@nuxt/test-utils/e2e";
 import { describe, expect, it } from "vitest";
+import env from "../../utils/env";
 
 await setup({
   build: false,
-  host: process.env.TEST_HOST || "http://localhost:3000",
+  host: env.TEST_HOST || "http://localhost:3000",
 });
 
 describe("api endpoints", async () => {

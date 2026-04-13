@@ -1,4 +1,5 @@
 import { defineConfig } from "vitest/config";
+import env from "./utils/env";
 
 export default defineConfig({
   test: {
@@ -15,6 +16,15 @@ export default defineConfig({
           name: "app",
           include: ["app/**/*.{test,spec}.ts"],
           environment: "happy-dom",
+          environmentOptions: {
+            happyDOM: {
+              settings: {
+                fetch: {
+                  disableSameOriginPolicy: !!env.TEST_HOST, // Disable same-origin policy if TEST_HOST is set (indicating tests are running against a deployed URL)
+                },
+              },
+            },
+          },
         },
       },
       {
@@ -22,6 +32,16 @@ export default defineConfig({
           name: "workflow",
           include: ["test/nuxt/*.{test,spec}.ts"],
           environment: "happy-dom",
+          testTimeout: 15000,
+          environmentOptions: {
+            happyDOM: {
+              settings: {
+                fetch: {
+                  disableSameOriginPolicy: !!env.TEST_HOST, // Disable same-origin policy if TEST_HOST is set (indicating tests are running against a deployed URL)
+                },
+              },
+            },
+          },
         },
       },
     ],
