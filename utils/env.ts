@@ -8,14 +8,9 @@ const EnvSchema = z.object({
 
 export type EnvSchemaType = z.infer<typeof EnvSchema>;
 
-// merge process.env and Deno.env (if available)
-const envValues = {
-  // eslint-disable-next-line node/no-process-env
-  ...(typeof process !== "undefined" ? process.env : {}),
-  // @ts-expect-error Deno is not defined in node types
-  ...(typeof Deno !== "undefined" ? Deno.env.toObject() : {}),
-};
+tryParseEnv(EnvSchema);
 
-tryParseEnv(EnvSchema, envValues);
-
-export default EnvSchema.parse(envValues);
+// disable lint error here, in order to make sure
+// this is the only location where we read process.env
+// eslint-disable-next-line node/no-process-env
+export default EnvSchema.parse(process.env);
