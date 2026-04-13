@@ -3,6 +3,7 @@ import tryParseEnv from "./try-parse-env";
 
 const EnvSchema = z.object({
   TEST_HOST: z.url().optional(),
+  DENO_DEPLOYMENT_ID: z.string().optional(),
 });
 
 export type EnvSchemaType = z.infer<typeof EnvSchema>;

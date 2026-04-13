@@ -1,4 +1,5 @@
 import z from "zod";
+import env from "~~/utils/env";
 import { createdPlansCounter } from "../plugins/otel";
 
 export default defineEventHandler(async (event) => {
@@ -9,14 +10,17 @@ export default defineEventHandler(async (event) => {
     blob: z.string(),
   }).parse);
 
-  let storage = useStorage("plans");
+  const isDenoDeploy = !!env.DENO_DEPLOYMENT_ID;
+  const storage = useStorage(isDenoDeploy ? "plans" : "memory");
   try {
     await storage.setItem(planId, plan.blob);
   }
   catch (error) {
-    console.error("Storage setItem failed, falling back to memory", error);
-    storage = useStorage("memory");
-    await storage.setItem(planId, plan.blob);
+    console.error(`Storage setItem failed on ${isDenoDeploy ? "Deno KV" : "memory"}`, error);
+    throw createError({
+      statusCode: 500,
+      statusMessage: "Internal Server Error",
+    });
   }
 
   createdPlansCounter.add(1);
