@@ -5,9 +5,17 @@ export default eventHandler(async (event) => {
   const { id } = await getValidatedRouterParams(event, z.object({
     id: z.string().length(36),
   }).parse);
-  const storage = useStorage("plans");
+  let storage = useStorage("plans");
 
-  const plan = await storage.getItem<string>(id);
+  let plan: string | null = null;
+  try {
+    plan = await storage.getItem<string>(id);
+  }
+  catch (error) {
+    console.error("Storage getItem failed, falling back to memory", error);
+    storage = useStorage("memory");
+    plan = await storage.getItem<string>(id);
+  }
   if (!plan) {
     return Response.json({ error: "Plan not found" }, { status: 404 });
   }
@@ -26,9 +34,12 @@ export default eventHandler(async (event) => {
         await unwatch();
     });
 
-    eventStream.push(plan);
+    if (plan) {
+      eventStream.push(plan);
+    }
 
-    unwatch = await storage.watch(async (planUpdateEvent, planIdIncludingPrefix) => {
+    try {
+      unwatch = await storage.watch(async (planUpdateEvent, planIdIncludingPrefix) => {
       if (isClosed)
         return;
       // this is a bit stupid, but the prefix is included in the
@@ -60,6 +71,10 @@ export default eventHandler(async (event) => {
         }
       }
     });
+  }
+    catch (error) {
+      console.error("Storage watch failed", error);
+    }
 
     return eventStream.send();
   }

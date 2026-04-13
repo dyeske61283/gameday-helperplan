@@ -9,8 +9,15 @@ export default defineEventHandler(async (event) => {
     blob: z.string(),
   }).parse);
 
-  const storage = useStorage("plans");
-  storage.set <string> (planId, plan.blob);
+  let storage = useStorage("plans");
+  try {
+    await storage.setItem(planId, plan.blob);
+  }
+  catch (error) {
+    console.error("Storage setItem failed, falling back to memory", error);
+    storage = useStorage("memory");
+    await storage.setItem(planId, plan.blob);
+  }
 
   createdPlansCounter.add(1);
 
