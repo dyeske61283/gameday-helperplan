@@ -8,32 +8,32 @@ definePageMeta({
   <div>
     <nav class="hidden md:flex justify-between items-center w-full px-6 h-16 bg-surface-container-low sticky top-0 z-50">
       <div class="text-xl font-bold">
-        Handball Helper
+        {{ $t('common.brand') }}
       </div>
       <div class="flex items-center space-x-8">
         <ULink
           class="text-primary title-md"
           to="/dashboard"
         >
-          Dashboard
+          {{ $t('nav.dashboard') }}
         </ULink>
         <ULink
           class="text-on-surface-variant hover:text-primary transition-colors label-md"
           to="/assignments"
         >
-          Assignments
+          {{ $t('nav.assignments') }}
         </ULink>
         <ULink
           class="text-on-surface-variant hover:text-primary transition-colors label-md"
           to="/setup"
         >
-          Setup
+          {{ $t('nav.setup') }}
         </ULink>
         <ULink
           class="text-on-surface-variant hover:text-primary transition-colors label-md"
           to="/guide"
         >
-          Guide
+          {{ $t('nav.guide') }}
         </ULink>
       </div>
       <div class="flex items-center space-x-4">
@@ -42,8 +42,9 @@ definePageMeta({
           color="neutral"
           icon="i-lucide-share-2"
           class="rounded-full"
-          aria-label="Share Dashboard"
+          :aria-label="$t('common.share')"
         />
+        <LanguageSwitcher />
         <UColorModeButton />
       </div>
     </nav>
@@ -62,29 +63,28 @@ definePageMeta({
           <div
             class="inline-flex items-center px-4 py-2 shadow mt-4 rounded-full bg-surface-container-high text-on-primary-fixed-variant text-sm font-semibold tracking-wide uppercase"
           >
-            Focus on the Game, Not the Admin
+            {{ $t('hero.badge') }}
           </div>
           <h1 class="font-family-body text-6xl display-lg text-on-surface dark:tracking-tight">
-            Effortless Match-Day <br>
-            <span class="text-primary font-family-body dark:text-primary-container display-lg text-5xl">Volunteer Coordination</span>
+            {{ $t('hero.title') }} <br>
+            <span class="text-primary font-family-body dark:text-primary-container display-lg text-5xl">{{ $t('hero.subtitle') }}</span>
           </h1>
           <p class="text-xl text-on-surface-variant max-w-2xl mx-auto leading-relaxed body-md">
-            A streamlined tool for local handball clubs to organize officials, timekeepers, and court assistants. No
-            accounts, no hassle—just high-performance management.
+            {{ $t('hero.description') }}
           </p>
           <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <ULink
               class="kinetic-gradient text-white px-8 py-4 rounded-full font-bold text-lg kinetic-shadow hover:opacity-90 transition-all active:scale-95 flex items-center gap-2 label-md uppercase"
               to="/dashboard"
             >
-              Go to Dashboard
+              {{ $t('hero.cta_dashboard') }}
               <UIcon name="i-lucide-arrow-right" :size="24" />
             </ULink>
             <ULink
               class="bg-surface-container-lowest text-primary px-8 py-4 rounded-full font-bold text-lg hover:bg-surface-container-low transition-all active:scale-95 label-md uppercase"
               to="/setup"
             >
-              Admin Setup
+              {{ $t('hero.cta_setup') }}
             </ULink>
           </div>
         </div>
@@ -110,11 +110,10 @@ definePageMeta({
                 <UIcon name="i-lucide-user-x" class="text-white" :size="24" />
               </div>
               <h2 class="text-3xl font-bold text-on-surface">
-                Zero Friction Signup
+                {{ $t('features.zero_friction.title') }}
               </h2>
               <p class="text-on-surface-variant text-lg leading-relaxed">
-                No logins, no passwords, no registration forms. Start managing your match-day immediately with local
-                browser storage.
+                {{ $t('features.zero_friction.description') }}
               </p>
             </div>
             <div class="absolute -bottom-10 -right-10 opacity-10 group-hover:opacity-20 transition-opacity">
@@ -125,10 +124,10 @@ definePageMeta({
           <div class="md:col-span-5 bg-surface-inverse dark:bg-surface-container-highest p-10 rounded-xl text-white flex flex-col justify-between relative overflow-hidden">
             <div class="relative z-10 space-y-4">
               <h2 class="headline-lg text-white">
-                Real-time Sharing
+                {{ $t('features.real_time.title') }}
               </h2>
               <p class="text-surface-container-low dark:text-on-surface-variant body-md">
-                Generate a unique link to share assignments with your team instantly. Works on any device, anywhere.
+                {{ $t('features.real_time.description') }}
               </p>
             </div>
             <div class="flex items-center gap-2 mt-8 relative z-10">
@@ -143,10 +142,10 @@ definePageMeta({
           >
             <UIcon name="i-lucide-cloud-off" class="text-primary mb-4 text-4xl" />
             <h2 class="font-bold text-xl mb-2 text-on-surface">
-              Local Priority
+              {{ $t('features.local_priority.title') }}
             </h2>
             <p class="text-on-surface-variant text-sm">
-              Your data stays in your browser. Private, secure, and fast.
+              {{ $t('features.local_priority.description') }}
             </p>
           </div>
           <div
@@ -154,19 +153,19 @@ definePageMeta({
           >
             <UIcon name="i-lucide-dna" class="text-secondary mb-4 text-4xl" />
             <h2 class="font-bold text-xl mb-2 text-on-surface">
-              Club Custom
+              {{ $t('features.club_custom.title') }}
             </h2>
             <p class="text-on-surface-variant text-sm">
-              Adapt roles for league matches, youth cups, or friendlies.
+              {{ $t('features.club_custom.description') }}
             </p>
           </div>
           <div class="md:col-span-4 kinetic-gradient p-8 rounded-xl flex flex-col items-center text-center text-white">
             <UIcon name="i-lucide-printer" class="mb-4 text-4xl" />
             <h2 class="font-bold text-xl mb-2 text-white">
-              Print Ready
+              {{ $t('features.print_ready.title') }}
             </h2>
             <p class="text-white/80 text-sm body-md">
-              Export clean PDFs for physical match records and table duties.
+              {{ $t('features.print_ready.description') }}
             </p>
           </div>
         </div>
@@ -177,25 +176,24 @@ definePageMeta({
           <div class="absolute inset-0 kinetic-gradient-soft" />
           <div class="relative z-10 space-y-8">
             <h2 class="text-4xl md:text-5xl font-bold font-display text-on-surface">
-              Ready to organize your next
-              home game?
+              {{ $t('cta_section.title') }}
             </h2>
             <p class="text-xl text-on-surface-variant max-w-xl mx-auto body-md">
-              Join over 50 local clubs streamlining their match-day logistics with Handball Helper.
+              {{ $t('cta_section.description') }}
             </p>
             <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
               <UButton
                 class="kinetic-gradient text-white px-10 py-4 rounded-full font-bold text-lg kinetic-shadow hover:opacity-90 transition-all label-md uppercase"
                 to="/dashboard"
               >
-                Start for Free
+                {{ $t('cta_section.start_free') }}
               </UButton>
               <UButton
                 variant="ghost"
                 class="flex items-center gap-2 text-primary font-bold hover:gap-4 transition-all label-md uppercase"
                 to="/guide"
               >
-                Read the Guide
+                {{ $t('cta_section.read_guide') }}
                 <UIcon name="i-lucide-arrow-right" :size="24" />
               </UButton>
             </div>
@@ -208,10 +206,10 @@ definePageMeta({
       <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
         <div class="flex flex-col items-center md:items-start gap-2">
           <div class="text-2xl font-black text-primary">
-            Handball Helper
+            {{ $t('common.brand') }}
           </div>
           <p class="text-sm text-on-surface-variant">
-            Built for the handball community.
+            {{ $t('footer.built_for') }}
           </p>
         </div>
         <div class="flex gap-8 text-sm font-medium">
@@ -219,30 +217,30 @@ definePageMeta({
             class="hover:text-primary transition-colors text-on-surface"
             to="/privacy"
           >
-            Privacy
+            {{ $t('footer.privacy') }}
           </ULink>
           <ULink
             class="hover:text-primary transition-colors text-on-surface"
             to="/imprint"
           >
-            Imprint
+            {{ $t('footer.imprint') }}
           </ULink>
           <ULink
             class="hover:text-primary transition-colors text-on-surface"
             to="https://github.com/dyeske61283/gameday-helperplan"
             target="_blank"
           >
-            GitHub
+            {{ $t('footer.github') }}
           </ULink>
           <ULink
             class="hover:text-primary transition-colors text-on-surface"
             to="/support"
           >
-            Support
+            {{ $t('footer.support') }}
           </ULink>
         </div>
         <p class="text-xs text-outline">
-          © 2026 Handball Helper. All Rights Reserved.
+          {{ $t('footer.rights') }}
         </p>
       </div>
     </footer>
@@ -255,19 +253,19 @@ definePageMeta({
         to="/dashboard"
       >
         <UIcon name="i-lucide-layout-dashboard" class="text-primary" :size="24" />
-        <span class="text-[10px] font-medium mt-1">Dashboard</span>
+        <span class="text-[10px] font-medium mt-1">{{ $t('nav.dashboard') }}</span>
       </ULink>
-      <ULink class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 active:bg-surface-container-low" to="/assignments" aria-label="Tasks">
+      <ULink class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 active:bg-surface-container-low" to="/assignments" :aria-label="$t('common.tasks')">
         <UIcon name="i-lucide-id-card-lanyard" />
-        <span class="text-[10px] font-medium mt-1">Tasks</span>
+        <span class="text-[10px] font-medium mt-1">{{ $t('common.tasks') }}</span>
       </ULink>
-      <ULink class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 active:bg-surface-container-low" to="/setup" aria-label="Setup">
+      <ULink class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 active:bg-surface-container-low" to="/setup" :aria-label="$t('nav.setup')">
         <UIcon name="i-lucide-settings" />
-        <span class="text-[10px] font-medium mt-1">Setup</span>
+        <span class="text-[10px] font-medium mt-1">{{ $t('nav.setup') }}</span>
       </ULink>
-      <ULink class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 active:bg-surface-container-low" to="/guide" aria-label="Guide">
+      <ULink class="flex flex-col items-center justify-center text-on-surface-variant px-3 py-1 active:bg-surface-container-low" to="/guide" :aria-label="$t('nav.guide')">
         <UIcon name="i-lucide-circle-question-mark" />
-        <span class="text-[10px] font-medium mt-1">Guide</span>
+        <span class="text-[10px] font-medium mt-1">{{ $t('nav.guide') }}</span>
       </ULink>
     </nav>
   </div>

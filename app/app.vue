@@ -1,14 +1,22 @@
-<script setup>
+<script setup lang="ts">
+import * as locales from "@nuxt/ui/locale";
+
+const { locale, t } = useI18n();
+
+const lang = computed(() => locales[locale.value]?.code || "de");
+const dir = computed(() => locales[locale.value]?.dir || "ltr");
+
 useHead({
-  title: "Handball Helper - Kinetic Coordination",
+  title: computed(() => t("welcome")),
   htmlAttrs: {
-    lang: "en",
+    lang,
+    dir,
   },
 });
 </script>
 
 <template>
-  <UApp>
+  <UApp :locale="locales[locale]">
     <NuxtLayout>
       <NuxtRouteAnnouncer />
       <NuxtPage />

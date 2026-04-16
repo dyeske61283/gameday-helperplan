@@ -1,13 +1,14 @@
 <script lang="ts" setup>
+const { t } = useI18n();
 const q = ref("");
 
-const items = [
-  { label: "Home", icon: "i-lucide-home", to: "/" },
-  { label: "Teams", icon: "i-lucide-users", to: "/teams" },
-  { label: "Spielplan", icon: "i-lucide-calendar-days", to: "/schedule" },
-  { label: "Tabelle", icon: "i-lucide-table", to: "/table" },
-  { label: "Statistiken", icon: "i-lucide-bar-chart-2", to: "/stats" },
-];
+const items = computed(() => [
+  { label: t("nav.home"), icon: "i-lucide-home", to: "/" },
+  { label: t("nav.teams"), icon: "i-lucide-users", to: "/teams" },
+  { label: t("nav.schedule"), icon: "i-lucide-calendar-days", to: "/schedule" },
+  { label: t("nav.table"), icon: "i-lucide-table", to: "/table" },
+  { label: t("nav.stats"), icon: "i-lucide-bar-chart-2", to: "/stats" },
+]);
 </script>
 
 <template>
@@ -15,9 +16,10 @@ const items = [
     <UHeader title="Helperplan" :toggle="false">
       <template #right>
         <UInput
-          id="search-bar-input" v-model="q" icon="i-lucide-search" placeholder="Suchen.." autofocus size="xl"
+          id="search-bar-input" v-model="q" icon="i-lucide-search" :placeholder="$t('common.search')" autofocus size="xl"
           class=""
         />
+        <LanguageSwitcher />
         <UColorModeButton />
       </template>
     </UHeader>

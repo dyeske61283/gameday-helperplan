@@ -1,6 +1,11 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  modules: ["@nuxt/ui", "@formkit/auto-animate", "@nuxt/eslint"],
+  modules: [
+    "@nuxt/ui",
+    "@formkit/auto-animate",
+    "@nuxt/eslint",
+    "@nuxtjs/i18n",
+  ],
   devtools: { enabled: true },
   css: ["~/assets/css/main.css"],
   compatibilityDate: "2025-07-15",
@@ -36,6 +41,21 @@ export default defineNuxtConfig({
         "error",
         "neutral",
       ],
+    },
+  },
+  i18n: {
+    locales: [
+      { code: "de", name: "Deutsch", file: "de.json" },
+      { code: "en", name: "English", file: "en.json" },
+    ],
+    lazy: true,
+    langDir: "i18n",
+    defaultLocale: "de",
+    strategy: "no_prefix",
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: "i18n_redirected",
+      alwaysRedirect: true,
     },
   },
 });
