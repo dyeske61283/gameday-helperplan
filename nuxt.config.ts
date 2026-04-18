@@ -48,12 +48,11 @@ export default defineNuxtConfig({
       { code: "de", name: "Deutsch", file: "de.json" },
       { code: "en", name: "English", file: "en.json" },
     ],
-    lazy: true,
     langDir: "i18n",
     defaultLocale: "de",
     strategy: "no_prefix",
     detectBrowserLanguage: {
-      useCookie: true,
+      useCookie: false,
       cookieKey: "i18n_redirected",
       alwaysRedirect: true,
     },
