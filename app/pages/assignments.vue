@@ -2,13 +2,13 @@
   <UContainer class="py-24">
     <div class="space-y-8 text-center sm:text-left">
       <h1 class="display-md text-on-surface">
-        Assignments
+        {{ $t('pages.assignments.title') }}
       </h1>
       <p class="body-md text-on-surface-variant max-w-2xl mx-auto sm:mx-0">
-        Manage and track volunteer roles for every match. Ensure all positions—from timekeepers to court assistants—are filled.
+        {{ $t('pages.assignments.description') }}
       </p>
       <UButton to="/" icon="i-lucide-arrow-left" size="lg" class="rounded-full">
-        Back to Home
+        {{ $t('common.back_to_home') }}
       </UButton>
     </div>
   </UContainer>

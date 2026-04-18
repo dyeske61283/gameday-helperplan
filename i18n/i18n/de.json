@@ -1,0 +1,80 @@
+{
+  "welcome": "Willkommen beim Handball Helfer",
+  "hero": {
+    "badge": "Fokus auf das Spiel, nicht auf die Admin",
+    "title": "Mühelose Spieltags-",
+    "subtitle": "Helferkoordination",
+    "description": "Ein optimiertes Tool für lokale Handballvereine zur Organisation von Zeitnehmern, Sekretären und Helfern. Keine Accounts, kein Aufwand – einfach leistungsstarkes Management.",
+    "cta_dashboard": "Zum Dashboard",
+    "cta_setup": "Admin Setup"
+  },
+  "nav": {
+    "home": "Startseite",
+    "dashboard": "Dashboard",
+    "assignments": "Einteilungen",
+    "setup": "Setup",
+    "guide": "Anleitung",
+    "teams": "Teams",
+    "schedule": "Spielplan",
+    "table": "Tabelle",
+    "stats": "Statistiken"
+  },
+  "features": {
+    "zero_friction": {
+      "title": "Keine Hürden bei der Anmeldung",
+      "description": "Keine Logins, keine Passwörter, keine Registrierungsformulare. Starten Sie sofort mit der Verwaltung Ihres Spieltags über den lokalen Browser-Speicher."
+    },
+    "real_time": {
+      "title": "Echtzeit-Sharing",
+      "description": "Erstellen Sie einen einzigartigen Link, um Zuweisungen sofort mit Ihrem Team zu teilen. Funktioniert auf jedem Gerät, überall."
+    },
+    "local_priority": {
+      "title": "Lokale Priorität",
+      "description": "Ihre Daten bleiben in Ihrem Browser. Privat, sicher und schnell."
+    },
+    "club_custom": {
+      "title": "Vereinsspezifisch",
+      "description": "Passen Sie die Rollen für Ligaspiele, Jugendturniere oder Freundschaftsspiele an."
+    },
+    "print_ready": {
+      "title": "Druckfertig",
+      "description": "Exportieren Sie saubere PDFs für physische Spielprotokolle und Tabellendienste."
+    }
+  },
+  "cta_section": {
+    "title": "Bereit, Ihren nächsten Spieltag zu organisieren?",
+    "description": "Schließen Sie sich over 50 lokalen Vereinen an, die ihre Spieltagslogistik mit Handball Helfer optimieren.",
+    "start_free": "Kostenlos starten",
+    "read_guide": "Anleitung lesen"
+  },
+  "footer": {
+    "built_for": "Gebaut für die Handball-Community.",
+    "privacy": "Datenschutz",
+    "imprint": "Impressum",
+    "support": "Support",
+    "rights": "© 2026 Handball Helfer. Alle Rechte vorbehalten.",
+    "github": "GitHub"
+  },
+  "common": {
+    "brand": "Handball Helfer",
+    "back_to_home": "Zurück zur Startseite",
+    "search": "Suchen...",
+    "share": "Dashboard teilen",
+    "tasks": "Aufgaben",
+    "go_to_dashboard": "Zum Dashboard"
+  },
+  "pages": {
+    "assignments": {
+      "title": "Einteilungen",
+      "description": "Verwalten und verfolgen Sie Freiwilligenrollen für jedes Spiel. Stellen Sie sicher, dass alle Positionen – vom Zeitnehmer bis zum Helfer – besetzt sind."
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "description": "Ihr zentraler Knotenpunkt für die Verwaltung anstehender Spieltage. Sehen Sie Ihren Spielplan und die aktuellen Zuweisungen auf einen Blick."
+    },
+    "setup": {
+      "title": "Admin Setup",
+      "description": "Konfigurieren Sie die Einstellungen Ihres Vereins, definieren Sie Rollen und importieren Sie Spielpläne aus iCal oder manuellen Einträgen."
+    }
+  }
+}
