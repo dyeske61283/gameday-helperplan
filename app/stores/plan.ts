@@ -1,7 +1,7 @@
 import type * as planTypes from "../utils/plan-types";
 import { useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
-import { ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
 import { useDecryption, useEncryption } from "../composables/use-crypto";
 
 const STORAGE_KEY = "gameday-plan-id";
@@ -11,6 +11,7 @@ export const usePlanStore = defineStore("plan", () => {
   const plan = ref<planTypes.SeasonPlan | null>(null);
   const key = ref<string | null>(null);
   const currentStep = ref(1);
+  const readOnly = ref(false);
   const onboardingPath = ref<"manual" | "auto" | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -21,6 +22,8 @@ export const usePlanStore = defineStore("plan", () => {
 
   const { encryptData, generateKey } = useEncryption();
   const { decryptBlob } = useDecryption();
+
+  const isModifiable = computed(() => !readOnly.value && !!plan.value);
 
   /**
    * Sync key with URL fragment
