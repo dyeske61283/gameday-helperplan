@@ -1,5 +1,6 @@
 import { z } from "zod";
 import env from "~~/utils/env";
+import { retrievedPlansCounter } from "../plugins/otel";
 
 export default eventHandler(async (event) => {
   const { id } = await getValidatedRouterParams(event, z.object({
@@ -33,6 +34,8 @@ export default eventHandler(async (event) => {
     return Response.json({ error: "Plan not found" }, { status: 404 });
   }
 
+  retrievedPlansCounter.add(1);
+
   if (getHeader(event, "accept") === "text/event-stream") {
     let unwatch: Awaited<ReturnType<typeof storage.watch>> | undefined;
     let isClosed = false;
@@ -51,38 +54,38 @@ export default eventHandler(async (event) => {
 
     try {
       unwatch = await storage.watch(async (planUpdateEvent, planIdIncludingPrefix) => {
-      if (isClosed)
-        return;
-      // this is a bit stupid, but the prefix is included in the
-      // event key, so we need to check for it here
-      if (planIdIncludingPrefix !== `${storageName}:${id}`)
-        return;
-      if (planUpdateEvent === "remove") {
-        isClosed = true;
-        await eventStream.close();
-        return;
-      }
-
-      if (planUpdateEvent === "update") {
-        try {
-          const latestPlan = await storage.getItem<string>(id);
-          if (!latestPlan || isClosed) {
-            isClosed = true;
-            await eventStream.close();
-            return;
-          }
-          await eventStream.push(latestPlan);
-        }
-        catch (error) {
+        if (isClosed)
+          return;
+        // this is a bit stupid, but the prefix is included in the
+        // event key, so we need to check for it here
+        if (planIdIncludingPrefix !== `${storageName}:${id}`)
+          return;
+        if (planUpdateEvent === "remove") {
           isClosed = true;
-          console.error("Failed to push update to event stream", error);
           await eventStream.close();
-          if (unwatch)
-            await unwatch();
+          return;
         }
-      }
-    });
-  }
+
+        if (planUpdateEvent === "update") {
+          try {
+            const latestPlan = await storage.getItem<string>(id);
+            if (!latestPlan || isClosed) {
+              isClosed = true;
+              await eventStream.close();
+              return;
+            }
+            await eventStream.push(latestPlan);
+          }
+          catch (error) {
+            isClosed = true;
+            console.error("Failed to push update to event stream", error);
+            await eventStream.close();
+            if (unwatch)
+              await unwatch();
+          }
+        }
+      });
+    }
     catch (error) {
       console.error("Storage watch failed", error);
     }
