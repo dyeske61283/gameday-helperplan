@@ -28,17 +28,17 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@antfu/eslint-config": "^8.1.1",
-    "@axe-core/playwright": "^4.11.1",
+    "@antfu/eslint-config": "^8.2.0",
+    "@axe-core/playwright": "^4.11.2",
     "@nuxt/eslint": "^1.15.2",
     "@nuxt/test-utils": "^4.0.2",
     "@vitest/ui": "4.1.4",
-    "eslint": "^10.2.0",
+    "eslint": "^10.2.1",
     "eslint-plugin-format": "^2.0.1",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
     "playwright": "^1.59.1",
-    "typescript": "6.0.2",
+    "typescript": "6.0.3",
     "vitest": "^4.1.4"
   },
   "lint-staged": {
