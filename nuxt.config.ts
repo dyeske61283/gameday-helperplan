@@ -52,9 +52,11 @@ export default defineNuxtConfig({
     defaultLocale: "de",
     strategy: "no_prefix",
     detectBrowserLanguage: {
-      useCookie: false,
+      useCookie: true,
       cookieKey: "i18n_redirected",
       alwaysRedirect: true,
+      redirectOn: "root",
+      fallbackLocale: "de",
     },
   },
 });
