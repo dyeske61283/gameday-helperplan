@@ -24,21 +24,13 @@ jobs:
       - name: Get Deno Deploy URL
         id: get-url
         env:
-          DENO_PROJECT_NAME: ${{ secrets.DENO_PROJECT_NAME }}
-          DENO_ORG_NAME: ${{ secrets.DENO_ORG_NAME }}
+          DENO_PROJECT_ID: ${{ secrets.DENO_PROJECT_ID }}
+          DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
           BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
         run: |
-          # fix the branch name to be cut to max 25 characters and replace slashes with dashes
-          # also if the 25th character is a dash, cut it to 26 characters to avoid ending with a dash
-          # also convert to lowercase
-          TRIMMED="${BRANCH_NAME:0:25}"
-          if [[ "${TRIMMED: -1}" == "-" ]]; then
-            BRANCH_NAME="${BRANCH_NAME:0:26}"
-          else
-            BRANCH_NAME="${BRANCH_NAME:0:25}"
-          fi
-          BRANCH_NAME=$(echo "${BRANCH_NAME}" | tr '/' '-' | tr '[:upper:]' '[:lower:]')
-          URL="https://${DENO_PROJECT_NAME}--${BRANCH_NAME}.${DENO_ORG_NAME}.deno.net"
+          OUTPUT=$(node scripts/get-deno-url.js)
+          echo "$OUTPUT"
+          URL=https://$(echo "$OUTPUT" | grep "DEPLOYMENT_URL_OUTPUT=" | cut -d'=' -f2)
           echo "TEST_HOST=$URL" >> $GITHUB_ENV
           echo "deployment_url=$URL" >> $GITHUB_OUTPUT
 
