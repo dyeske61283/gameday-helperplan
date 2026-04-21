@@ -5,6 +5,7 @@ export default defineNuxtConfig({
     "@formkit/auto-animate",
     "@nuxt/eslint",
     "@nuxtjs/i18n",
+    "@pinia/nuxt",
   ],
   devtools: { enabled: true },
   css: ["~/assets/css/main.css"],
