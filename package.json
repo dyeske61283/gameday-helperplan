@@ -22,6 +22,7 @@
     "@nuxtjs/i18n": "^10.2.4",
     "@opentelemetry/api": "^1.9.1",
     "@pinia/nuxt": "0.11.3",
+    "@vueuse/nuxt": "14.2.1",
     "nuxt": "^4.4.2",
     "tailwindcss": "^4.2.2",
     "vue": "^3.5.32",
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@antfu/eslint-config": "^8.2.0",
     "@axe-core/playwright": "^4.11.2",
+    "@iconify-json/lucide": "^1.2.102",
     "@nuxt/eslint": "^1.15.2",
     "@nuxt/test-utils": "^4.0.2",
     "@vitest/ui": "4.1.4",
