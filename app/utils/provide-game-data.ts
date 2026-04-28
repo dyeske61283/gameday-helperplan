@@ -171,7 +171,7 @@ export default (): Promise<GamedayEvent[]> => {
   ]);
 };
 
-type GamedayEvent = {
+export type GamedayEvent = {
   dateAndTime: Date;
   locationName: string;
   locationLink: string;

@@ -1,18 +1,5 @@
 <script setup lang="ts">
-type GamedayEvent = {
-  dateAndTime: Date;
-  locationName: string;
-  locationLink: string;
-  homeTeam: string;
-  awayTeam: string;
-  annotations: string[];
-  helpingTeam: string;
-  helperAdmission: string;
-  helperSteward: string;
-  helperTimekeeper: string;
-  helperSecretary: string;
-  helperWipe: string;
-};
+import type { GamedayEvent } from "~/utils/provide-game-data";
 
 defineProps<{
   event: GamedayEvent;
