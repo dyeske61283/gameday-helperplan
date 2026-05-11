@@ -10,6 +10,8 @@
 /** @typedef {{ slug: 'git-branch' | 'preview', partition: { "git.branch_sanitized"?: string, "deno.revision.id"?: string }, "domains": { "domain": string}[] }} Timeline */
 /** @typedef {{ id: string, status: 'succeeded' | 'queued' | 'failed' | 'building' | 'skipped', failure_reason?: string }} Revision */
 
+import process from "node:process";
+
 const APP_ID = process.env.DENO_PROJECT_ID;
 const DEPLOY_TOKEN = process.env.DENO_DEPLOY_TOKEN;
 const BRANCH_NAME = process.env.BRANCH_NAME;

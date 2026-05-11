@@ -12,13 +12,13 @@ export function useEncryption() {
     if (import.meta.server)
       return "";
 
-    const key = await window.crypto.subtle.generateKey(
+    const key = await globalThis.crypto.subtle.generateKey(
       { name: "AES-GCM", length: 128 },
       true,
       ["encrypt", "decrypt"],
     );
 
-    const jwk = await window.crypto.subtle.exportKey("jwk", key);
+    const jwk = await globalThis.crypto.subtle.exportKey("jwk", key);
     return jwk.k!;
   };
 
@@ -32,7 +32,7 @@ export function useEncryption() {
       throw new Error("Encryption is only available on the client side");
     }
 
-    const key = await window.crypto.subtle.importKey(
+    const key = await globalThis.crypto.subtle.importKey(
       "jwk",
       {
         k,
@@ -49,7 +49,7 @@ export function useEncryption() {
     const iv = new Uint8Array(12);
     const encoded = new TextEncoder().encode(data);
 
-    const encrypted = await window.crypto.subtle.encrypt(
+    const encrypted = await globalThis.crypto.subtle.encrypt(
       { name: "AES-GCM", iv },
       key,
       encoded,
@@ -85,7 +85,7 @@ export function useDecryption() {
       bytes[i] = binaryString.charCodeAt(i);
     }
 
-    const key = await window.crypto.subtle.importKey(
+    const key = await globalThis.crypto.subtle.importKey(
       "jwk",
       {
         k,
@@ -102,7 +102,7 @@ export function useDecryption() {
     const iv = new Uint8Array(12);
 
     // Decrypt using the ArrayBuffer blob (preferred method)
-    const decrypted = await window.crypto.subtle.decrypt(
+    const decrypted = await globalThis.crypto.subtle.decrypt(
       { name: "AES-GCM", iv },
       key,
       bytes,

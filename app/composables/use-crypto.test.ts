@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { useDecryption, useEncryption } from "./use-crypto";
+import { useDecryption, useEncryption } from "./use-crypto.ts";
 
 describe("useCrypto", () => {
   beforeEach(() => {

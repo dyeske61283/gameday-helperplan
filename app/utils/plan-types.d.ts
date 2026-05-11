@@ -75,12 +75,14 @@ export type Member = {
   name: string;
   teamIds: string[];
   skillIds: string[];
+  isManual: boolean;
   updatedAt: number;
 };
 
 export type Team = {
   id: string;
   name: string;
+  isManual: boolean;
   updatedAt: number;
 };
 

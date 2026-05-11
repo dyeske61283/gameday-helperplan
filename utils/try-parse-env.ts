@@ -1,6 +1,7 @@
 /* eslint-disable node/no-process-env */
 import type { ZodObject, ZodRawShape } from "zod";
 
+import process from "node:process";
 import { ZodError } from "zod";
 
 export default function tryParseEnv<T extends ZodRawShape>(

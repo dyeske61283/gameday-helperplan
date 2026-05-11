@@ -1,4 +1,5 @@
 /* eslint-disable no-console */
+import process from "node:process";
 import { AxeBuilder } from "@axe-core/playwright";
 import { chromium } from "playwright";
 import { expect } from "playwright/test";

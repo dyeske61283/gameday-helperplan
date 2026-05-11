@@ -1,3 +1,4 @@
+import process from "node:process";
 import z from "zod";
 import tryParseEnv from "./try-parse-env";
 

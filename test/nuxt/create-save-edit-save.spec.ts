@@ -1,7 +1,7 @@
 import { $fetch, fetch, setup } from "@nuxt/test-utils/e2e";
 import { describe, expect, it } from "vitest";
-import { useDecryption, useEncryption } from "../../app/composables/use-crypto";
-import env from "../../utils/env";
+import { useDecryption, useEncryption } from "../../app/composables/use-crypto.ts";
+import env from "../../utils/env.ts";
 
 await setup({
   build: false,

@@ -1,6 +1,6 @@
 import { z } from "zod";
-import env from "~~/utils/env";
-import { retrievedPlansCounter } from "../plugins/otel";
+import env from "../../utils/env.ts";
+import { retrievedPlansCounter } from "../plugins/otel.ts";
 
 export default eventHandler(async (event) => {
   const { id } = await getValidatedRouterParams(event, z.object({

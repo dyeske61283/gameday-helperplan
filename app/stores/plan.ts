@@ -1,4 +1,6 @@
-import type { SeasonPlan } from "../utils/plan-types";
+import type * as planTypes from "../utils/plan-types";
+import { useLocalStorage } from "@vueuse/core";
+import { defineStore } from "pinia";
 import { ref, watch } from "vue";
 import { useDecryption, useEncryption } from "../composables/use-crypto";
 
@@ -6,7 +8,7 @@ const STORAGE_KEY = "gameday-plan-id";
 const FRAGMENT_PREFIX = "key=";
 
 export const usePlanStore = defineStore("plan", () => {
-  const plan = ref<SeasonPlan | null>(null);
+  const plan = ref<planTypes.SeasonPlan | null>(null);
   const key = ref<string | null>(null);
   const currentStep = ref(1);
   const onboardingPath = ref<"manual" | "auto" | null>(null);
@@ -28,10 +30,10 @@ export const usePlanStore = defineStore("plan", () => {
       return;
 
     if (newKey) {
-      window.location.hash = `${FRAGMENT_PREFIX}${newKey}`;
+      globalThis.location.hash = `${FRAGMENT_PREFIX}${newKey}`;
     }
     else {
-      window.location.hash = "";
+      globalThis.location.hash = "";
     }
   });
 
@@ -39,13 +41,36 @@ export const usePlanStore = defineStore("plan", () => {
    * Migrate the plan schema if needed.
    * This is a stub for future schema migrations.
    */
-  function migrateIfNeeded(loadedPlan: SeasonPlan): SeasonPlan {
+  function migrateIfNeeded(
+    loadedPlan: planTypes.SeasonPlan,
+  ): planTypes.SeasonPlan {
     const CURRENT_SCHEMA_VERSION = 1;
 
     if (loadedPlan.schemaVersion < CURRENT_SCHEMA_VERSION) {
-      console.log(`Migrating plan from version ${loadedPlan.schemaVersion} to ${CURRENT_SCHEMA_VERSION}`);
-      // TODO: Implement migration logic here
-      // For now, just update the version
+      console.warn(
+        `Migrating plan from version ${loadedPlan.schemaVersion} to ${CURRENT_SCHEMA_VERSION}`,
+      );
+
+      // Ensure all matches have a slots array
+      if (loadedPlan.matches) {
+        Object.values(loadedPlan.matches).forEach((match: planTypes.Match) => {
+          if (!match.slots) {
+            match.slots = [];
+          }
+        });
+      }
+
+      // Ensure all gamedays have a slots array
+      if (loadedPlan.gamedays) {
+        Object.values(loadedPlan.gamedays).forEach(
+          (gameday: planTypes.Gameday) => {
+            if (!gameday.slots) {
+              gameday.slots = [];
+            }
+          },
+        );
+      }
+
       loadedPlan.schemaVersion = CURRENT_SCHEMA_VERSION;
     }
 
@@ -65,7 +90,7 @@ export const usePlanStore = defineStore("plan", () => {
       }
 
       const decryptedData = await decryptBlob(response.blob, decryptionKey);
-      let loadedPlan = JSON.parse(decryptedData) as SeasonPlan;
+      let loadedPlan = JSON.parse(decryptedData) as planTypes.SeasonPlan;
 
       // Run migration logic
       loadedPlan = migrateIfNeeded(loadedPlan);
@@ -73,8 +98,9 @@ export const usePlanStore = defineStore("plan", () => {
       plan.value = loadedPlan;
       lastPlanId.value = id;
     }
-    catch (err: any) {
-      error.value = err.message || "Failed to load plan";
+    catch (err: unknown) {
+      if (err instanceof Error)
+        error.value = err.message || "Failed to load plan";
       console.error("Error loading plan:", err);
     }
     finally {
@@ -105,12 +131,12 @@ export const usePlanStore = defineStore("plan", () => {
           return;
 
         const decryptedData = await decryptBlob(encryptedBlob, decryptionKey);
-        let updatedPlan = JSON.parse(decryptedData) as SeasonPlan;
+        let updatedPlan = JSON.parse(decryptedData) as planTypes.SeasonPlan;
 
         // Only update if the incoming revision is newer than our local one
         // This prevents overwriting unsaved local changes or re-applying our own save
         if (!plan.value || updatedPlan.rev > plan.value.rev) {
-          console.log("Real-time update received: Rev", updatedPlan.rev);
+          console.warn("Real-time update received: Rev", updatedPlan.rev);
           updatedPlan = migrateIfNeeded(updatedPlan);
           plan.value = updatedPlan;
         }
@@ -191,10 +217,30 @@ export const usePlanStore = defineStore("plan", () => {
       config: {
         locations: [],
         roles: [
-          { id: "timekeeper", name: "Timekeeper", requiredSkillId: "", scope: "gameday" },
-          { id: "scorekeeper", name: "Scorekeeper", requiredSkillId: "", scope: "match" },
-          { id: "floor_manager", name: "Floor Manager", requiredSkillId: "", scope: "match" },
-          { id: "media_liaison", name: "Media Liaison", requiredSkillId: "", scope: "match" },
+          {
+            id: "timekeeper",
+            name: "Timekeeper",
+            requiredSkillId: "",
+            scope: "gameday",
+          },
+          {
+            id: "scorekeeper",
+            name: "Scorekeeper",
+            requiredSkillId: "",
+            scope: "match",
+          },
+          {
+            id: "floor_manager",
+            name: "Floor Manager",
+            requiredSkillId: "",
+            scope: "match",
+          },
+          {
+            id: "media_liaison",
+            name: "Media Liaison",
+            requiredSkillId: "",
+            scope: "match",
+          },
         ],
       },
     };
@@ -218,6 +264,77 @@ export const usePlanStore = defineStore("plan", () => {
     nextStep();
   }
 
+  type NuLigaClub = {
+    clubId: string;
+    clubName: string;
+    contactEmail?: string;
+    homepage?: string;
+  };
+
+  type NuLigaTeam = {
+    teamId: string;
+    teamName: string;
+    leagueName: string;
+  };
+
+  type NuLigaMatch = {
+    meetingId: string;
+    scheduledTime: string;
+    teamHomeName: string;
+    teamGuestName: string;
+  };
+
+  function importClub(nuLigaClub: NuLigaClub) {
+    if (!plan.value)
+      return;
+
+    plan.value.club = {
+      id: nuLigaClub.clubId,
+      name: nuLigaClub.clubName,
+      contactEmail: nuLigaClub.contactEmail || "",
+      homepage: nuLigaClub.homepage || "",
+      lastUpdated: Date.now(),
+    };
+  }
+
+  function importTeams(nuLigaTeams: NuLigaTeam[]) {
+    if (!plan.value)
+      return;
+
+    nuLigaTeams.forEach((team) => {
+      plan.value!.teams[team.teamId] = {
+        id: team.teamId,
+        name: `${team.teamName} (${team.leagueName})`,
+        isManual: false,
+        updatedAt: Date.now(),
+      };
+    });
+  }
+
+  function importMatches(nuLigaMatches: NuLigaMatch[]) {
+    if (!plan.value)
+      return;
+
+    nuLigaMatches.forEach((match) => {
+      plan.value!.matches[match.meetingId] = {
+        id: match.meetingId,
+        time: match.scheduledTime,
+        homeTeam: match.teamHomeName,
+        awayTeam: match.teamGuestName,
+        slots: [],
+        updatedAt: Date.now(),
+      };
+    });
+  }
+
+  function assignHelperTeam(matchId: string, teamId: string) {
+    if (!plan.value || !plan.value.matches[matchId])
+      return;
+
+    plan.value.matches[matchId].helperTeamId = teamId;
+    plan.value.matches[matchId].updatedAt = Date.now();
+  }
+
   /**
    * Extract key from URL fragment
    */
@@ -225,7 +342,7 @@ export const usePlanStore = defineStore("plan", () => {
     if (import.meta.server)
       return;
 
-    const hash = window.location.hash.substring(1);
+    const hash = globalThis.location.hash.substring(1);
     if (hash.startsWith(FRAGMENT_PREFIX)) {
       key.value = hash.substring(FRAGMENT_PREFIX.length);
     }
@@ -240,10 +357,15 @@ export const usePlanStore = defineStore("plan", () => {
     isLoading,
     error,
     loadPlan,
+    migrateIfNeeded,
     watchPlan,
     stopWatching,
     savePlan,
     createNewPlan,
+    importClub,
+    importTeams,
+    importMatches,
+    assignHelperTeam,
     nextStep,
     prevStep,
     setPath,
