@@ -1,3 +1,4 @@
+import { defineVitestProject } from "@nuxt/test-utils/config";
 import { defineConfig } from "vitest/config";
 import env from "./utils/env";
 
@@ -27,23 +28,16 @@ export default defineConfig({
           },
         },
       },
-      {
+      await defineVitestProject({
         test: {
           name: "workflow",
           include: ["test/nuxt/*.{test,spec}.ts"],
-          environment: "happy-dom",
-          testTimeout: 15000,
+          environment: "nuxt",
+          testTimeout: 5000,
           environmentOptions: {
-            happyDOM: {
-              settings: {
-                fetch: {
-                  disableSameOriginPolicy: !!env.TEST_HOST, // Disable same-origin policy if TEST_HOST is set (indicating tests are running against a deployed URL)
-                },
-              },
-            },
           },
         },
-      },
+      }),
     ],
   },
   plugins: [

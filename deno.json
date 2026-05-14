@@ -7,5 +7,12 @@
       "npm:vue-demi@0.14.10",
       "npm:unrs-resolver@1.11.1"
     ]
+  },
+  "lint": {
+    "rules": {
+      "exclude": [
+        "no-sloppy-imports"
+      ]
+    }
   }
 }

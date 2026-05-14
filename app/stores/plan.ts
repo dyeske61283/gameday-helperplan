@@ -19,7 +19,7 @@ export const usePlanStore = defineStore("plan", () => {
   // Local storage for the last active plan ID
   const lastPlanId = useLocalStorage(STORAGE_KEY, "");
 
-  const { encryptData } = useEncryption();
+  const { encryptData, generateKey } = useEncryption();
   const { decryptBlob } = useDecryption();
 
   /**
@@ -97,6 +97,7 @@ export const usePlanStore = defineStore("plan", () => {
 
       plan.value = loadedPlan;
       lastPlanId.value = id;
+      currentStep.value = 5;
     }
     catch (err: unknown) {
       if (err instanceof Error)
@@ -185,8 +186,10 @@ export const usePlanStore = defineStore("plan", () => {
 
       lastPlanId.value = plan.value.id;
     }
-    catch (err: any) {
-      error.value = err.message || "Failed to save plan";
+    catch (err: unknown) {
+      if (err instanceof Error) {
+        error.value = err.message || "Failed to save plan";
+      }
       console.error("Error saving plan:", err);
     }
     finally {
@@ -264,6 +267,21 @@ export const usePlanStore = defineStore("plan", () => {
     nextStep();
   }
 
+  async function finalizePlan() {
+    if (!plan.value)
+      return;
+
+    const id = crypto.randomUUID();
+    const newKey = await generateKey();
+
+    plan.value.id = id;
+    key.value = newKey;
+    lastPlanId.value = id;
+
+    await savePlan();
+    currentStep.value = 5;
+  }
+
   type NuLigaClub = {
     clubId: string;
     clubName: string;
@@ -285,16 +303,45 @@ export const usePlanStore = defineStore("plan", () => {
   };
 
   function importClub(nuLigaClub: NuLigaClub) {
-    if (!plan.value)
-      return;
-
-    plan.value.club = {
-      id: nuLigaClub.clubId,
-      name: nuLigaClub.clubName,
-      contactEmail: nuLigaClub.contactEmail || "",
-      homepage: nuLigaClub.homepage || "",
-      lastUpdated: Date.now(),
-    };
+    if (!plan.value) {
+      plan.value = {
+        id: "draft",
+        club: {
+          id: nuLigaClub.clubId,
+          name: nuLigaClub.clubName,
+          contactEmail: nuLigaClub.contactEmail || "",
+          homepage: nuLigaClub.homepage || "",
+          lastUpdated: Date.now(),
+        },
+        lastUpdated: Date.now(),
+        skills: {},
+        schemaVersion: 1,
+        rev: 0,
+        season: `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`,
+        members: {},
+        teams: {},
+        matches: {},
+        gamedays: {},
+        config: {
+          locations: [],
+          roles: [
+            { id: "timekeeper", name: "Timekeeper", requiredSkillId: "", scope: "gameday" },
+            { id: "scorekeeper", name: "Scorekeeper", requiredSkillId: "", scope: "match" },
+            { id: "floor_manager", name: "Floor Manager", requiredSkillId: "", scope: "match" },
+            { id: "media_liaison", name: "Media Liaison", requiredSkillId: "", scope: "match" },
+          ],
+        },
+      };
+    }
+    else {
+      plan.value.club = {
+        id: nuLigaClub.clubId,
+        name: nuLigaClub.clubName,
+        contactEmail: nuLigaClub.contactEmail || "",
+        homepage: nuLigaClub.homepage || "",
+        lastUpdated: Date.now(),
+      };
+    }
   }
 
   function importTeams(nuLigaTeams: NuLigaTeam[]) {
@@ -369,6 +416,7 @@ export const usePlanStore = defineStore("plan", () => {
     nextStep,
     prevStep,
     setPath,
+    finalizePlan,
     initFromUrl,
   };
 });
