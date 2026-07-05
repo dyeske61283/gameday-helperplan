@@ -8,6 +8,10 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@vueuse/nuxt",
   ],
+  sourcemap: {
+    server: false,
+    client: false,
+  },
   devtools: { enabled: true },
   css: ["~/assets/css/main.css"],
   compatibilityDate: "2025-07-15",
@@ -16,9 +20,9 @@ export default defineNuxtConfig({
       standalone: false,
     },
   },
-  routeRules: {
-    "/": { prerender: true },
-  },
+  // routeRules: {
+  //   "/": { prerender: true },
+  // },
   nitro: {
     storage: {
       plans: {
