@@ -8,9 +8,12 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@vueuse/nuxt",
   ],
-  sourcemap: {
-    server: false,
-    client: false,
+  $production: {
+    sourcemap: {
+      // Enables sourcemaps locally, but disables them on remote production builds
+      server: false,
+      client: false,
+    },
   },
   devtools: { enabled: true },
   css: ["~/assets/css/main.css"],
@@ -20,9 +23,9 @@ export default defineNuxtConfig({
       standalone: false,
     },
   },
-  // routeRules: {
-  //   "/": { prerender: true },
-  // },
+  routeRules: {
+    "/": { prerender: true },
+  },
   nitro: {
     storage: {
       plans: {
