@@ -120,10 +120,10 @@ Here is the structural breakdown for each view, organized by how a user’s eye 
 
 - **Tabs:** One tab per team (e.g., "Men 1", "Women 1", "Youth A").
 - **Member Table:**
-  | Name | Certificates | Actions |
-  | :--- | :--- | :--- |
-  | **John Doe** | [ESB License] [Steward] | [Delete] |
-  | **Jane Smith** | [No Certificates] | [Add License] |
+  | Name           | Certificates            | Actions       |
+  | :------------- | :---------------------- | :------------ |
+  | **John Doe**   | [ESB License] [Steward] | [Delete]      |
+  | **Jane Smith** | [No Certificates]       | [Add License] |
 - **The "Bulk Add" Area:** A simple text area where the admin can paste a list of names separated by commas to quickly populate a team.
 - **Skill Registry Toggle:** A simple list at the bottom where the admin can define what the skills are (e.g., "First Aid," "Referee C-License").
 
@@ -189,13 +189,13 @@ This is the "Workhorse" page. It appears when an admin or team lead clicks on a 
 - A list of members from the assigned helper team with checkboxes (to exclude people who are injured or unavailable).
 
 - **The Roster Table:**
-  | Role | Assigned Person | Action |
-  | :--- | :--- | :--- |
-  | **Timekeeper** | Jane Doe | [Edit/Swap] |
-  | **Secretary** | John Smith | [Edit/Swap] |
-  | **Admissions** | Alex G. | [Edit/Swap] |
+  | Role            | Assigned Person    | Action      |
+  | :-------------- | :----------------- | :---------- |
+  | **Timekeeper**  | Jane Doe           | [Edit/Swap] |
+  | **Secretary**   | John Smith         | [Edit/Swap] |
+  | **Admissions**  | Alex G.            | [Edit/Swap] |
   | **Wiping (x2)** | Sam L. / Taylor M. | [Edit/Swap] |
-  | **Steward** | Riley P. | [Edit/Swap] |
+  | **Steward**     | Riley P.           | [Edit/Swap] |
 
 ## 3. Admin / Scheduling Panel
 

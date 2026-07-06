@@ -23,7 +23,7 @@ export const usePlanStore = defineStore("plan", () => {
   const { encryptData, generateKey } = useEncryption();
   const { decryptBlob } = useDecryption();
 
-  const isModifiable = computed(() => !readOnly.value && !!plan.value);
+  const _isModifiable = computed(() => !readOnly.value && !!plan.value);
 
   /**
    * Sync key with URL fragment

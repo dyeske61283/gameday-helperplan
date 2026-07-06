@@ -13,8 +13,8 @@
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
     "test:api": "vitest run --project=api",
-    "test:app": "vitest run  --project=app",
-    "test:workflow": "vitest run  --project=workflow",
+    "test:app": "vitest run --project=app",
+    "test:workflow": "vitest run --project=workflow",
     "test:a11y": "node scripts/accessibility-test.js",
     "prepare": "husky"
   },

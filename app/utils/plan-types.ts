@@ -2,13 +2,13 @@ export type TeamMember = {
   id: string;
   name: string;
   email?: string;
-}
+};
 
 export type Roster = {
   id: string;
   name: string;
   memberIds: string[];
-}
+};
 
 export type Game = {
   id: string;
@@ -24,7 +24,7 @@ export type Game = {
   helperTimekeeper?: string;
   helperSecretary?: string;
   helperWipe?: string;
-}
+};
 
 export type Plan = {
   id: string;
@@ -32,4 +32,4 @@ export type Plan = {
   teamMembers: TeamMember[];
   rosters: Roster[];
   games: Game[];
-}
+};
