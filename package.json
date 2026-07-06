@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "build": "nuxt build",
-    "build:deno": "nuxt build --preset=deno_deploy",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
