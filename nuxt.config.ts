@@ -10,7 +10,6 @@ export default defineNuxtConfig({
   ],
   $production: {
     sourcemap: {
-      // Enables sourcemaps locally, but disables them on remote production builds
       server: false,
       client: false,
     },
@@ -23,9 +22,9 @@ export default defineNuxtConfig({
       standalone: false,
     },
   },
-  routeRules: {
-    "/": { prerender: true },
-  },
+  // routeRules: {
+  //   "/": { prerender: true },
+  // },
   nitro: {
     storage: {
       plans: {
