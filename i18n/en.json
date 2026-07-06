@@ -1,0 +1,141 @@
+{
+  "welcome": "Welcome to Handball Helper",
+  "hero": {
+    "badge": "Focus on the Game, Not the Admin",
+    "title": "Effortless Match-Day",
+    "subtitle": "Volunteer Coordination",
+    "description": "A streamlined tool for local handball clubs to organize officials, timekeepers, and court assistants. No accounts, no hassle—just high-performance management.",
+    "cta_dashboard": "Go to Dashboard",
+    "cta_setup": "Admin Setup"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "assignments": "Assignments",
+    "setup": "Setup",
+    "guide": "Guide",
+    "teams": "Teams",
+    "schedule": "Schedule",
+    "table": "Table",
+    "stats": "Stats"
+  },
+  "features": {
+    "zero_friction": {
+      "title": "Zero Friction Signup",
+      "description": "No logins, no passwords, no registration forms. Start managing your match-day immediately with local browser storage."
+    },
+    "real_time": {
+      "title": "Real-time Sharing",
+      "description": "Generate a unique link to share assignments with your team instantly. Works on any device, anywhere."
+    },
+    "local_priority": {
+      "title": "Local Priority",
+      "description": "Your data stays in your browser. Private, secure, and fast."
+    },
+    "club_custom": {
+      "title": "Club Custom",
+      "description": "Adapt roles for league matches, youth cups, or friendlies."
+    },
+    "print_ready": {
+      "title": "Print Ready",
+      "description": "Export clean PDFs for physical match records and table duties."
+    }
+  },
+  "cta_section": {
+    "title": "Ready to organize your next home game?",
+    "description": "Join over 50 local clubs streamlining their match-day logistics with Handball Helper.",
+    "start_free": "Start for Free",
+    "read_guide": "Read the Guide"
+  },
+  "footer": {
+    "built_for": "Built for the handball community.",
+    "privacy": "Privacy",
+    "imprint": "Imprint",
+    "support": "Support",
+    "rights": "© 2026 Handball Helper. All Rights Reserved.",
+    "github": "GitHub"
+  },
+  "pages": {
+    "assignments": {
+      "title": "Assignments",
+      "description": "Manage and track volunteer roles for every match. Ensure all positions—from timekeepers to court assistants—are filled."
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "description": "Your central hub for managing upcoming gamedays. View your schedule and current assignments at a glance."
+    },
+    "setup": {
+      "title": "Admin Setup",
+      "description": "Configure your club's settings, define roles, and import game schedules from iCal or manual entries."
+    }
+  },
+  "onboarding": {
+    "common": {
+      "skip": "Skip"
+    },
+    "progress": {
+      "step": "Step {current} of {total}"
+    },
+    "step1": {
+      "title": "How would you like to start?",
+      "description": "Choose a method to create your season plan. You can edit everything later.",
+      "manual": {
+        "title": "Manual Setup",
+        "description": "Configure your club and roles step by step yourself."
+      },
+      "auto": {
+        "title": "NuLiga Import",
+        "description": "Import data directly from the NuLiga system (clubs, rosters, match days)."
+      }
+    },
+    "step2": {
+      "manual": {
+        "title": "General Configuration",
+        "description": "Enter your club's basic details and choose the required helper roles.",
+        "club_name": "Club Name",
+        "season": "Season",
+        "roles_title": "Define Helper Roles"
+      },
+      "auto": {
+        "title": "Select Club",
+        "description": "Search for your club in the NuLiga system.",
+        "search_club": "Search Club",
+        "placeholder": "e.g. TSV Example City",
+        "select": "Select"
+      }
+    },
+    "step3": {
+      "title": "Almost done!",
+      "description": "Your basic structure is ready. You can now add teams and refine the schedule in the dashboard.",
+      "finish": "Go to Dashboard"
+    }
+  },
+  "roles": {
+    "timekeeper": {
+      "name": "Timekeeper",
+      "description": "Responsible for the match clock, timeouts, and suspensions."
+    },
+    "scorekeeper": {
+      "name": "Scorekeeper",
+      "description": "Maintains the official digital scoresheet and player performance logs."
+    },
+    "floor_manager": {
+      "name": "Floor Manager",
+      "description": "Coordinates court-side safety, ball management, and official protocols."
+    },
+    "media_liaison": {
+      "name": "Media Liaison",
+      "description": "Handles match recordings, live-stream moderation, and social updates."
+    }
+  },
+  "common": {
+    "brand": "Handball Helper",
+    "back_to_home": "Back to Home",
+    "search": "Search...",
+    "share": "Share Dashboard",
+    "tasks": "Tasks",
+    "go_to_dashboard": "Go to Dashboard",
+    "continue": "Continue",
+    "back": "Back"
+  }
+}

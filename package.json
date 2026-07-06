@@ -1,30 +1,59 @@
 {
-  "name": "mima",
-  "private": true,
+  "name": "helperplan",
   "type": "module",
+  "private": true,
   "scripts": {
     "build": "nuxt build",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "postinstall": "nuxt prepare",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "vitest run",
+    "test:api": "vitest run --project=api",
+    "test:app": "vitest run --project=app",
+    "test:workflow": "vitest run --project=workflow",
+    "test:a11y": "node scripts/accessibility-test.js",
+    "prepare": "husky"
   },
   "dependencies": {
-    "@formkit/auto-animate": "^0.8.2",
-    "@pinia/nuxt": "^0.11.1",
-    "@tailwindcss/vite": "^4.1.11",
-    "@vueuse/nuxt": "^13.5.0",
-    "daisyui": "^5.0.46",
-    "date-fns": "^4.1.0",
-    "lucide-vue-next": "^0.525.0",
-    "nuxt": "^4.0.0",
-    "pinia": "^3.0.3",
-    "tailwindcss": "^4.1.11",
-    "typescript": "^5.8.3",
-    "uuid": "^11.1.0",
-    "vue": "^3.5.17",
-    "vue-router": "^4.5.1",
-    "vue3-simple-icons": "^15.0.0",
-    "zod": "^3.25.76"
+    "@formkit/auto-animate": "^0.9.0",
+    "@nuxt/ui": "^4.9.0",
+    "@nuxtjs/i18n": "^10.4.0",
+    "@opentelemetry/api": "^1.9.1",
+    "@pinia/nuxt": "0.11.3",
+    "@vueuse/nuxt": "14.3.0",
+    "nuxt": "^4.4.8",
+    "pinia": "^3.0.4",
+    "tailwindcss": "^4.3.2",
+    "vue": "^3.5.39",
+    "vue-router": "^5.1.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^9.1.0",
+    "@axe-core/playwright": "^4.12.1",
+    "@iconify-json/lucide": "^1.2.116",
+    "@nuxt/eslint": "^1.16.0",
+    "@nuxt/test-utils": "^4.0.3",
+    "@vitest/ui": "4.1.10",
+    "@vue/test-utils": "^2.4.11",
+    "@vueuse/core": "^14.3.0",
+    "eslint": "^10.6.0",
+    "eslint-plugin-format": "^2.0.1",
+    "happy-dom": "^20.10.6",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
+    "playwright": "^1.61.1",
+    "typescript": "6.0.3",
+    "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "chokidar": "5.0.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,vue,mjs,mts}": "eslint --fix"
   }
 }

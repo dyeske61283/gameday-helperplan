@@ -1,0 +1,45 @@
+name: Test against Deno Deploy
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    environment: test
+    steps:
+      - uses: actions/checkout@v5
+      - name: Install pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          version: 10
+      - name: Use Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: lts/*
+      - run: pnpm install
+      - name: Install Playwright Browsers
+        run: pnpm exec playwright install --with-deps chromium
+
+      - name: Get Deno Deploy URL
+        id: get-url
+        env:
+          DENO_PROJECT_ID: ${{ secrets.DENO_PROJECT_ID }}
+          DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
+          BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+        run: |
+          OUTPUT=$(node scripts/get-deno-url.js)
+          echo "$OUTPUT"
+          URL=https://$(echo "$OUTPUT" | grep "DEPLOYMENT_URL_OUTPUT=" | cut -d'=' -f2)
+          echo "TEST_HOST=$URL" >> $GITHUB_ENV
+          echo "deployment_url=$URL" >> $GITHUB_OUTPUT
+
+      - name: Run Vitest tests
+        run: pnpm test
+        env:
+          TEST_HOST: ${{ env.TEST_HOST }}
+
+      - name: Run Accessibility tests
+        run: pnpm test:a11y
+        env:
+          TEST_HOST: ${{ env.TEST_HOST }}

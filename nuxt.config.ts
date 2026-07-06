@@ -1,57 +1,70 @@
-import tailwindcss from "@tailwindcss/vite";
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: "2024-11-01",
-  future: {
-    compatibilityVersion: 4,
-  },
-  experimental: {
-    viewTransition: true,
+  modules: [
+    "@nuxt/ui",
+    "@formkit/auto-animate",
+    "@nuxt/eslint",
+    "@nuxtjs/i18n",
+    "@pinia/nuxt",
+    "@vueuse/nuxt",
+  ],
+  $production: {
+    sourcemap: {
+      server: false,
+      client: false,
+    },
   },
   devtools: { enabled: true },
-  plugins: [],
-  modules: ["@formkit/auto-animate/nuxt", "@vueuse/nuxt", "@pinia/nuxt"],
   css: ["~/assets/css/main.css"],
-  vite: {
-    plugins: [tailwindcss()],
+  compatibilityDate: "2025-07-15",
+  eslint: {
+    config: {
+      standalone: false,
+    },
+  },
+  routeRules: {
+    "/": { prerender: true },
   },
   nitro: {
-    preset: "deno",
-    // Production
-    experimental: {
-      openAPI: true,
-    },
     storage: {
       plans: {
         driver: "deno-kv",
-        base: "storage/plans",
       },
     },
     devStorage: {
       plans: {
-        driver: "fs",
-        base: "storage/plans",
+        driver: "memory",
       },
     },
-    openAPI: {
-      production: false,
-      meta: {
-        title: "Gameday Helperplan",
-        description:
-          "A little tool to create, manage and distribute helper plans for sports teams.",
-        version: "0.1",
-      },
-      route: "/_docs/openapi.json",
-      ui: {
-        scalar: {
-          route: "/_docs/scalar",
-          theme: "alternate",
-        },
-        swagger: {
-          route: "/_docs/swagger",
-        },
-      },
+  },
+  ui: {
+    theme: {
+      colors: [
+        "primary",
+        "secondary",
+        "tertiary",
+        "info",
+        "success",
+        "warning",
+        "error",
+        "neutral",
+      ],
+    },
+  },
+  i18n: {
+    locales: [
+      { code: "de", name: "Deutsch", file: "de.json" },
+      { code: "en", name: "English", file: "en.json" },
+    ],
+    langDir: "",
+    defaultLocale: "de",
+    strategy: "no_prefix",
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: "i18n_redirected",
+      alwaysRedirect: true,
+      redirectOn: "root",
+      fallbackLocale: "de",
     },
   },
 });
