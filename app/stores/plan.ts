@@ -12,7 +12,6 @@ export const usePlanStore = defineStore("plan", () => {
   const key = ref<string | null>(null);
   const currentStep = ref(1);
   const readOnly = ref(false);
-  const onboardingPath = ref<"manual" | "auto" | null>(null);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
   const eventSource = ref<EventSource | null>(null);
@@ -252,7 +251,6 @@ export const usePlanStore = defineStore("plan", () => {
     };
     lastPlanId.value = id;
     currentStep.value = 1;
-    onboardingPath.value = null;
   }
 
   function nextStep() {
@@ -263,11 +261,6 @@ export const usePlanStore = defineStore("plan", () => {
     if (currentStep.value > 1) {
       currentStep.value--;
     }
-  }
-
-  function setPath(path: "manual" | "auto") {
-    onboardingPath.value = path;
-    nextStep();
   }
 
   async function finalizePlan() {
@@ -283,98 +276,6 @@ export const usePlanStore = defineStore("plan", () => {
 
     await savePlan();
     currentStep.value = 5;
-  }
-
-  type NuLigaClub = {
-    clubId: string;
-    clubName: string;
-    contactEmail?: string;
-    homepage?: string;
-  };
-
-  type NuLigaTeam = {
-    teamId: string;
-    teamName: string;
-    leagueName: string;
-  };
-
-  type NuLigaMatch = {
-    meetingId: string;
-    scheduledTime: string;
-    teamHomeName: string;
-    teamGuestName: string;
-  };
-
-  function importClub(nuLigaClub: NuLigaClub) {
-    if (!plan.value) {
-      plan.value = {
-        id: "draft",
-        club: {
-          id: nuLigaClub.clubId,
-          name: nuLigaClub.clubName,
-          contactEmail: nuLigaClub.contactEmail || "",
-          homepage: nuLigaClub.homepage || "",
-          lastUpdated: Date.now(),
-        },
-        lastUpdated: Date.now(),
-        skills: {},
-        schemaVersion: 1,
-        rev: 0,
-        season: `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`,
-        members: {},
-        teams: {},
-        matches: {},
-        gamedays: {},
-        config: {
-          locations: [],
-          roles: [
-            { id: "timekeeper", name: "Timekeeper", requiredSkillId: "", scope: "gameday" },
-            { id: "scorekeeper", name: "Scorekeeper", requiredSkillId: "", scope: "match" },
-            { id: "floor_manager", name: "Floor Manager", requiredSkillId: "", scope: "match" },
-            { id: "media_liaison", name: "Media Liaison", requiredSkillId: "", scope: "match" },
-          ],
-        },
-      };
-    }
-    else {
-      plan.value.club = {
-        id: nuLigaClub.clubId,
-        name: nuLigaClub.clubName,
-        contactEmail: nuLigaClub.contactEmail || "",
-        homepage: nuLigaClub.homepage || "",
-        lastUpdated: Date.now(),
-      };
-    }
-  }
-
-  function importTeams(nuLigaTeams: NuLigaTeam[]) {
-    if (!plan.value)
-      return;
-
-    nuLigaTeams.forEach((team) => {
-      plan.value!.teams[team.teamId] = {
-        id: team.teamId,
-        name: `${team.teamName} (${team.leagueName})`,
-        isManual: false,
-        updatedAt: Date.now(),
-      };
-    });
-  }
-
-  function importMatches(nuLigaMatches: NuLigaMatch[]) {
-    if (!plan.value)
-      return;
-
-    nuLigaMatches.forEach((match) => {
-      plan.value!.matches[match.meetingId] = {
-        id: match.meetingId,
-        time: match.scheduledTime,
-        homeTeam: match.teamHomeName,
-        awayTeam: match.teamGuestName,
-        slots: [],
-        updatedAt: Date.now(),
-      };
-    });
   }
 
   function assignHelperTeam(matchId: string, teamId: string) {
@@ -403,7 +304,6 @@ export const usePlanStore = defineStore("plan", () => {
     key,
     lastPlanId,
     currentStep,
-    onboardingPath,
     isLoading,
     error,
     loadPlan,
@@ -412,13 +312,9 @@ export const usePlanStore = defineStore("plan", () => {
     stopWatching,
     savePlan,
     createNewPlan,
-    importClub,
-    importTeams,
-    importMatches,
     assignHelperTeam,
     nextStep,
     prevStep,
-    setPath,
     finalizePlan,
     initFromUrl,
   };

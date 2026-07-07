@@ -18,7 +18,7 @@ describe("setup Wizard", () => {
     setActivePinia(createPinia());
   });
 
-  it("shows the 'Choose your path' step when no plan is active", async () => {
+  it("shows the 'Set up your Gameday Plan' step when on step 1", async () => {
     const component = await mountSuspended(SetupPage, {
       global: {
         mocks: {
@@ -33,13 +33,11 @@ describe("setup Wizard", () => {
 
     await nextTick();
 
-    // Check for Step 1 title or options
-    expect(component.text()).toContain("Choose your setup path");
-    expect(component.text()).toContain("nuLiga Integration");
-    expect(component.text()).toContain("Manual Setup");
+    expect(component.text()).toContain("Set up your Gameday Plan");
+    expect(component.text()).toContain("Start Setup");
   });
 
-  it("sets the path to 'auto' when nuLiga is selected", async () => {
+  it("advances to step 2 when 'Start Setup' is clicked", async () => {
     const component = await mountSuspended(SetupPage, {
       global: {
         mocks: {
@@ -54,22 +52,20 @@ describe("setup Wizard", () => {
 
     await nextTick();
 
-    // Find the nuLiga button and click it
     const buttons = component.findAll("button");
-    const nuLigaBtn = buttons.find(b => b.text().includes("nuLiga"));
+    const startBtn = buttons.find(b => b.text().includes("Start Setup"));
 
-    if (nuLigaBtn) {
-      await nuLigaBtn.trigger("click");
+    if (startBtn) {
+      await startBtn.trigger("click");
       await nextTick();
-      expect(store.onboardingPath).toBe("auto");
       expect(store.currentStep).toBe(2);
     }
     else {
-      throw new Error("nuLiga button not found");
+      throw new Error("'Start Setup' button not found");
     }
   });
 
-  it("shows club search in Step 2 when path is 'auto'", async () => {
+  it("shows club info form in Step 2", async () => {
     const component = await mountSuspended(SetupPage, {
       global: {
         mocks: {
@@ -80,49 +76,11 @@ describe("setup Wizard", () => {
 
     const store = usePlanStore();
     store.plan = null;
-    store.onboardingPath = "auto";
     store.currentStep = 2;
 
     await nextTick();
 
-    expect(component.text()).toContain("Find your Club");
-    // Search input should be present
-    expect(component.find("input[placeholder*=\"Search\"]").exists()).toBe(true);
-  });
-
-  it("shows roster selection in Step 3 when path is 'auto'", async () => {
-    const component = await mountSuspended(SetupPage, {
-      global: {
-        mocks: {
-          $t: (key: string) => key,
-        },
-      },
-    });
-
-    const store = usePlanStore();
-    store.plan = {
-      club: { id: "123", name: "Test Club", contactEmail: "", homepage: "", lastUpdated: 1234 },
-      teams: {},
-      matches: {},
-      config: {
-        locations: [],
-        roles: [],
-      },
-      gamedays: {},
-      id: "",
-      lastUpdated: 1234,
-      members: {},
-      rev: 0,
-      schemaVersion: 1,
-      season: "",
-      skills: {},
-    };
-    store.onboardingPath = "auto";
-    store.currentStep = 3;
-
-    await nextTick();
-
-    expect(component.text()).toContain("Select Teams");
+    expect(component.text()).toContain("Club Information");
   });
 
   it("shows bulk member add in Step 4", async () => {
