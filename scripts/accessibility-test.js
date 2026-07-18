@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import process from "node:process";
 import { AxeBuilder } from "@axe-core/playwright";
+import { createTestContext, loadFixture, startServer, stopServer, url } from "@nuxt/test-utils/e2e";
 import { chromium } from "playwright";
 import { expect } from "playwright/test";
 
@@ -46,19 +47,28 @@ async function runAuditDarkAndLight(page, url, totalViolations) {
 }
 
 (async () => {
+  // eslint-disable-next-line node/no-process-env
+  const host = process.env.TEST_HOST;
+  createTestContext({
+    host,
+    dev: true,
+  });
+
+  if (!host) {
+    await loadFixture();
+    await startServer();
+  }
+
   const browser = await chromium.launch();
   const context = await browser.newContext();
   const page = await context.newPage();
-  // eslint-disable-next-line node/no-process-env
-  const host = process.env.TEST_HOST || "http://localhost:3000";
-  const url = host;
   let totalViolations = 0;
 
   try {
-    totalViolations = await runAuditDarkAndLight(page, `${host}/example`, totalViolations);
-    await expect(page).toHaveURL(`${host}/example`);
+    totalViolations = await runAuditDarkAndLight(page, url("/example"), totalViolations);
+    await expect(page).toHaveURL(url("/example"));
 
-    totalViolations = await runAuditDarkAndLight(page, url, totalViolations);
+    totalViolations = await runAuditDarkAndLight(page, url("/"), totalViolations);
     // "crawl" all other pages by clicking on links
     const linksElements = (await page.getByRole("link").all());
     const links = await Promise.all(linksElements.map(async (link) => {
@@ -70,7 +80,7 @@ async function runAuditDarkAndLight(page, url, totalViolations) {
     const linkSet = new Set(links);
     for (const link of linkSet) {
       if (link && !link.startsWith("#") && link.startsWith("/")) {
-        totalViolations = await runAuditDarkAndLight(page, host + link, totalViolations);
+        totalViolations = await runAuditDarkAndLight(page, url(link), totalViolations);
       }
     }
   }
@@ -79,6 +89,9 @@ async function runAuditDarkAndLight(page, url, totalViolations) {
   }
   finally {
     await browser.close();
+    if (!host) {
+      await stopServer();
+    }
   }
 
   if (totalViolations > 0) {
