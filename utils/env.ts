@@ -1,6 +1,6 @@
+/* eslint-disable node/no-process-env */
 import process from "node:process";
-import z from "zod";
-import tryParseEnv from "./try-parse-env";
+import { z, ZodError } from "zod";
 
 const EnvSchema = z.object({
   TEST_HOST: z.url().optional(),
@@ -9,9 +9,19 @@ const EnvSchema = z.object({
 
 export type EnvSchemaType = z.infer<typeof EnvSchema>;
 
-tryParseEnv(EnvSchema);
+try {
+  EnvSchema.parse(process.env);
+}
+catch (error) {
+  if (error instanceof ZodError) {
+    const missing = error.issues.map(i => i.path[0]?.toString()).join("\n");
+    const e = new Error(`Missing required values in .env:\n${missing}`);
+    e.stack = "";
+    throw e;
+  }
+  else {
+    console.error(error);
+  }
+}
 
-// disable lint error here, in order to make sure
-// this is the only location where we read process.env
-// eslint-disable-next-line node/no-process-env
 export default EnvSchema.parse(process.env);

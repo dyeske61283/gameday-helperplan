@@ -1,6 +1,6 @@
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { usePlanStore } from "./plan.ts";
+import { migrateIfNeeded, usePlanStore } from "./plan.ts";
 
 // Mock dependencies
 vi.mock("../composables/use-crypto", () => ({
@@ -26,8 +26,6 @@ describe("usePlanStore", () => {
 
   describe("migrateIfNeeded", () => {
     it("should migrate an old plan to the current version", () => {
-      const store = usePlanStore();
-
       const oldPlan = {
         id: "old-id",
         schemaVersion: 0,
@@ -38,8 +36,7 @@ describe("usePlanStore", () => {
         },
       };
 
-      // @ts-expect-error - testing migration of incomplete/old data
-      const migratedPlan = store.migrateIfNeeded(oldPlan);
+      const migratedPlan = migrateIfNeeded(oldPlan);
 
       expect(migratedPlan.schemaVersion).toBe(1);
       expect(migratedPlan.matches.m1?.slots).toBeDefined();

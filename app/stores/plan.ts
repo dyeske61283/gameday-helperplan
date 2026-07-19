@@ -7,6 +7,45 @@ import { useDecryption, useEncryption } from "../composables/use-crypto";
 const STORAGE_KEY = "gameday-plan-id";
 const FRAGMENT_PREFIX = "key=";
 
+/**
+ * Migrate the plan schema if needed.
+ */
+export function migrateIfNeeded(
+  loadedPlan: planTypes.SeasonPlan,
+): planTypes.SeasonPlan {
+  const CURRENT_SCHEMA_VERSION = 1;
+
+  if (loadedPlan.schemaVersion < CURRENT_SCHEMA_VERSION) {
+    console.warn(
+      `Migrating plan from version ${loadedPlan.schemaVersion} to ${CURRENT_SCHEMA_VERSION}`,
+    );
+
+    // Ensure all matches have a slots array
+    if (loadedPlan.matches) {
+      Object.values(loadedPlan.matches).forEach((match: planTypes.Match) => {
+        if (!match.slots) {
+          match.slots = [];
+        }
+      });
+    }
+
+    // Ensure all gamedays have a slots array
+    if (loadedPlan.gamedays) {
+      Object.values(loadedPlan.gamedays).forEach(
+        (gameday: planTypes.Gameday) => {
+          if (!gameday.slots) {
+            gameday.slots = [];
+          }
+        },
+      );
+    }
+
+    loadedPlan.schemaVersion = CURRENT_SCHEMA_VERSION;
+  }
+
+  return loadedPlan;
+}
+
 export const usePlanStore = defineStore("plan", () => {
   const plan = ref<planTypes.SeasonPlan | null>(null);
   const key = ref<string | null>(null);
@@ -38,46 +77,6 @@ export const usePlanStore = defineStore("plan", () => {
       globalThis.location.hash = "";
     }
   });
-
-  /**
-   * Migrate the plan schema if needed.
-   * This is a stub for future schema migrations.
-   */
-  function migrateIfNeeded(
-    loadedPlan: planTypes.SeasonPlan,
-  ): planTypes.SeasonPlan {
-    const CURRENT_SCHEMA_VERSION = 1;
-
-    if (loadedPlan.schemaVersion < CURRENT_SCHEMA_VERSION) {
-      console.warn(
-        `Migrating plan from version ${loadedPlan.schemaVersion} to ${CURRENT_SCHEMA_VERSION}`,
-      );
-
-      // Ensure all matches have a slots array
-      if (loadedPlan.matches) {
-        Object.values(loadedPlan.matches).forEach((match: planTypes.Match) => {
-          if (!match.slots) {
-            match.slots = [];
-          }
-        });
-      }
-
-      // Ensure all gamedays have a slots array
-      if (loadedPlan.gamedays) {
-        Object.values(loadedPlan.gamedays).forEach(
-          (gameday: planTypes.Gameday) => {
-            if (!gameday.slots) {
-              gameday.slots = [];
-            }
-          },
-        );
-      }
-
-      loadedPlan.schemaVersion = CURRENT_SCHEMA_VERSION;
-    }
-
-    return loadedPlan;
-  }
 
   async function loadPlan(id: string, decryptionKey: string) {
     isLoading.value = true;
@@ -307,7 +306,6 @@ export const usePlanStore = defineStore("plan", () => {
     isLoading,
     error,
     loadPlan,
-    migrateIfNeeded,
     watchPlan,
     stopWatching,
     savePlan,

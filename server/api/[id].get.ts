@@ -1,35 +1,42 @@
+import { metrics } from "@opentelemetry/api";
 import { z } from "zod";
 import env from "../../utils/env.ts";
-import { retrievedPlansCounter } from "../plugins/otel.ts";
+
+const retrievedPlansCounter = metrics
+  .getMeter("helperplan.plans", "1.0.0")
+  .createCounter("helperplan.plans.retrieved", {
+    description: "The amount of retrieved plans through the GET endpoint",
+    unit: "1",
+  });
+
+function getStorage() {
+  return useStorage(env.DENO_DEPLOYMENT_ID ? "plans" : "memory");
+}
 
 export default eventHandler(async (event) => {
   const { id } = await getValidatedRouterParams(event, z.object({
     id: z.string().length(36),
   }).parse);
 
-  const isDenoDeploy = !!env.DENO_DEPLOYMENT_ID;
-  let storage = useStorage(isDenoDeploy ? "plans" : "memory");
-  let storageName = isDenoDeploy ? "plans" : "memory";
-
+  const storageName = env.DENO_DEPLOYMENT_ID ? "plans" : "memory";
+  let storage = getStorage();
   let plan: string | null = null;
+
   try {
     plan = await storage.getItem<string>(id);
   }
   catch (error) {
-    if (isDenoDeploy) {
+    if (env.DENO_DEPLOYMENT_ID) {
       console.error("Deno KV getItem failed, falling back to memory", error);
       storage = useStorage("memory");
-      storageName = "memory";
       plan = await storage.getItem<string>(id);
     }
     else {
       console.error("Storage getItem failed on memory", error);
-      throw createError({
-        statusCode: 500,
-        statusMessage: "Internal Server Error",
-      });
+      throw createError({ statusCode: 500, statusMessage: "Internal Server Error" });
     }
   }
+
   if (!plan) {
     return Response.json({ error: "Plan not found" }, { status: 404 });
   }
@@ -56,8 +63,6 @@ export default eventHandler(async (event) => {
       unwatch = await storage.watch(async (planUpdateEvent, planIdIncludingPrefix) => {
         if (isClosed)
           return;
-        // this is a bit stupid, but the prefix is included in the
-        // event key, so we need to check for it here
         if (planIdIncludingPrefix !== `${storageName}:${id}`)
           return;
         if (planUpdateEvent === "remove") {

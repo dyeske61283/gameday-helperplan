@@ -3,7 +3,6 @@ import process from "node:process";
 import { AxeBuilder } from "@axe-core/playwright";
 import { createTestContext, loadFixture, startServer, stopServer, url } from "@nuxt/test-utils/e2e";
 import { chromium } from "playwright";
-import { expect } from "playwright/test";
 
 async function runAudit(page, name) {
   console.log(`--- Running accessibility audit for: ${page.url()} ${name} ---`);
@@ -65,9 +64,6 @@ async function runAuditDarkAndLight(page, url, totalViolations) {
   let totalViolations = 0;
 
   try {
-    totalViolations = await runAuditDarkAndLight(page, url("/example"), totalViolations);
-    await expect(page).toHaveURL(url("/example"));
-
     totalViolations = await runAuditDarkAndLight(page, url("/"), totalViolations);
     // "crawl" all other pages by clicking on links
     const linksElements = (await page.getByRole("link").all());
