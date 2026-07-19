@@ -1,6 +1,6 @@
 minimumReleaseAgeExclude:
   - lint-staged@17.0.8 || 17.1.0
-  - '@iconify-json/lucide@1.2.116 || 1.2.118'
+  - "@iconify-json/lucide@1.2.116 || 1.2.118"
   - "@vitest/expect@4.1.10"
   - "@vitest/mocker@4.1.10"
   - "@vitest/pretty-format@4.1.10"
@@ -10,10 +10,10 @@ minimumReleaseAgeExclude:
   - "@vitest/ui@4.1.10"
   - "@vitest/utils@4.1.10"
   - vitest@4.1.10
-  - '@nuxt/kit@4.5.0'
-  - '@nuxt/nitro-server@4.5.0'
-  - '@nuxt/schema@4.5.0'
-  - '@nuxt/vite-builder@4.5.0'
+  - "@nuxt/kit@4.5.0"
+  - "@nuxt/nitro-server@4.5.0"
+  - "@nuxt/schema@4.5.0"
+  - "@nuxt/vite-builder@4.5.0"
   - happy-dom@20.11.0
   - nuxt@4.5.0
 
