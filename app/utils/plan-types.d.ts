@@ -50,6 +50,9 @@ export type Gameday = {
   locationId: string;
   matchIds: string[];
   slots: Slot[]; // Gameday-wide slots (e.g., Entrance, Catering)
+  openingTime?: string; // e.g., "13:00"
+  closingTime?: string; // e.g., "20:15"
+  notes?: string;
   updatedAt: number;
 };
 
@@ -67,6 +70,8 @@ export type Slot = {
   id: string; // Unique ID for the slot itself
   roleId: string;
   assignedMemberId: string | null;
+  customHelperName?: string | null; // For roles like "Wiping", where a non-member name can be typed
+  checkedIn?: boolean; // For "I'm Here" check-in status
   updatedAt: number;
 };
 
@@ -82,6 +87,7 @@ export type Member = {
 export type Team = {
   id: string;
   name: string;
+  league?: string;
   isManual: boolean;
   updatedAt: number;
 };

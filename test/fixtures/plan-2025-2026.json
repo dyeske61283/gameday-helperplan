@@ -1,0 +1,4247 @@
+{
+  "id": "f530083d-8c74-4f10-931a-dd877ee7b52c",
+  "schemaVersion": 1,
+  "rev": 1,
+  "lastUpdated": 1785777749296,
+  "club": {
+    "id": "9684375",
+    "name": "Gladbeck HC",
+    "contactEmail": "Liana65@gladbeck-hc.de",
+    "homepage": "https://www.gladbeck-hc.de",
+    "lastUpdated": 1785777749286
+  },
+  "season": "2025/2026",
+  "members": {
+    "member-nelly-walton": {
+      "id": "member-nelly-walton",
+      "name": "Nelly Walton",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [
+        "referee"
+      ],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-mustafa-gabler": {
+      "id": "member-mustafa-gabler",
+      "name": "Mustafa Gabler",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-francesca-sprenger": {
+      "id": "member-francesca-sprenger",
+      "name": "Francesca Sprenger",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [
+        "steward"
+      ],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-thore-thust": {
+      "id": "member-thore-thust",
+      "name": "Thore Thust",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-felicitas-diekmann": {
+      "id": "member-felicitas-diekmann",
+      "name": "Felicitas Diekmann",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-sebastian-richards": {
+      "id": "member-sebastian-richards",
+      "name": "Sebastian Richards",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-josefine-pajonk": {
+      "id": "member-josefine-pajonk",
+      "name": "Josefine Pajonk",
+      "teamIds": [
+        "maenner-1",
+        "maenner-2"
+      ],
+      "skillIds": [
+        "esb"
+      ],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-kilian-borrmann": {
+      "id": "member-kilian-borrmann",
+      "name": "Kilian Borrmann",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-toni-burger": {
+      "id": "member-toni-burger",
+      "name": "Toni Burger",
+      "teamIds": [
+        "maenner-1",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-aleyna-roloff": {
+      "id": "member-aleyna-roloff",
+      "name": "Aleyna Roloff",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-stina-heinemann": {
+      "id": "member-stina-heinemann",
+      "name": "Stina Heinemann",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-damien-hackelbusch": {
+      "id": "member-damien-hackelbusch",
+      "name": "Damien Hackelbusch",
+      "teamIds": [
+        "maenner-1",
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-jimmy-gutowicz": {
+      "id": "member-jimmy-gutowicz",
+      "name": "Jimmy Gutowicz",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-tanja-beushausen": {
+      "id": "member-tanja-beushausen",
+      "name": "Tanja Beushausen",
+      "teamIds": [
+        "maenner-1",
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-alessio-mordhorst": {
+      "id": "member-alessio-mordhorst",
+      "name": "Alessio Mordhorst",
+      "teamIds": [
+        "maenner-1",
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-peer-teufel": {
+      "id": "member-peer-teufel",
+      "name": "Peer Teufel",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-luka-sujew": {
+      "id": "member-luka-sujew",
+      "name": "Luka Sujew",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-aaron-zipp": {
+      "id": "member-aaron-zipp",
+      "name": "Aaron Zipp",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [
+        "esb"
+      ],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-milla-krauel": {
+      "id": "member-milla-krauel",
+      "name": "Milla Krauel",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-nia-schelk": {
+      "id": "member-nia-schelk",
+      "name": "Nia Schelk",
+      "teamIds": [
+        "maenner-1",
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-judy-spahn": {
+      "id": "member-judy-spahn",
+      "name": "Judy Spahn",
+      "teamIds": [
+        "maenner-1",
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-rebekka-loeser": {
+      "id": "member-rebekka-loeser",
+      "name": "Rebekka Löser",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-isabelle-malucha": {
+      "id": "member-isabelle-malucha",
+      "name": "Isabelle Malucha",
+      "teamIds": [
+        "maenner-1",
+        "maenner-2"
+      ],
+      "skillIds": [
+        "referee"
+      ],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-marcel-jambor": {
+      "id": "member-marcel-jambor",
+      "name": "Marcel Jambor",
+      "teamIds": [
+        "maenner-1",
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-elly-gombert": {
+      "id": "member-elly-gombert",
+      "name": "Elly Gombert",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-kevin-gumbert": {
+      "id": "member-kevin-gumbert",
+      "name": "Kevin Gumbert",
+      "teamIds": [
+        "maenner-1",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-jette-haug": {
+      "id": "member-jette-haug",
+      "name": "Jette Haug",
+      "teamIds": [
+        "maenner-1",
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-aurora-ganzmann": {
+      "id": "member-aurora-ganzmann",
+      "name": "Aurora Ganzmann",
+      "teamIds": [
+        "maenner-1",
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-sofia-hehl": {
+      "id": "member-sofia-hehl",
+      "name": "Sofia Hehl",
+      "teamIds": [
+        "maenner-1",
+        "maenner-3"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-teresa-hold": {
+      "id": "member-teresa-hold",
+      "name": "Teresa Hold",
+      "teamIds": [
+        "maenner-1",
+        "maenner-3"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-mohammed-hermecke": {
+      "id": "member-mohammed-hermecke",
+      "name": "Mohammed Hermecke",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-jette-moormann": {
+      "id": "member-jette-moormann",
+      "name": "Jette Moormann",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-jarno-ritschel": {
+      "id": "member-jarno-ritschel",
+      "name": "Jarno Ritschel",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-philine-astafei": {
+      "id": "member-philine-astafei",
+      "name": "Philine Astafei",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-johann-terlecki": {
+      "id": "member-johann-terlecki",
+      "name": "Johann Terlecki",
+      "teamIds": [
+        "maenner-1",
+        "maenner-3"
+      ],
+      "skillIds": [
+        "referee"
+      ],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-marika-sander": {
+      "id": "member-marika-sander",
+      "name": "Marika Sander",
+      "teamIds": [
+        "maenner-1",
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-jette-preuss": {
+      "id": "member-jette-preuss",
+      "name": "Jette Preuss",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-kaja-ueberacker": {
+      "id": "member-kaja-ueberacker",
+      "name": "Kaja Überacker",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-domenic-hanenberger": {
+      "id": "member-domenic-hanenberger",
+      "name": "Domenic Hanenberger",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-thorge-wartenberg": {
+      "id": "member-thorge-wartenberg",
+      "name": "Thorge Wartenberg",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-marika-burmeister": {
+      "id": "member-marika-burmeister",
+      "name": "Marika Burmeister",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-arda-brinkmann": {
+      "id": "member-arda-brinkmann",
+      "name": "Arda Brinkmann",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-daniela-prange": {
+      "id": "member-daniela-prange",
+      "name": "Daniela Prange",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-eveline-slotta": {
+      "id": "member-eveline-slotta",
+      "name": "Eveline Slotta",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-tia-balkow": {
+      "id": "member-tia-balkow",
+      "name": "Tia Balkow",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-friedrich-bogenrieder": {
+      "id": "member-friedrich-bogenrieder",
+      "name": "Friedrich Bogenrieder",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-helene-frey": {
+      "id": "member-helene-frey",
+      "name": "Helene Frey",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-melvin-philipp": {
+      "id": "member-melvin-philipp",
+      "name": "Melvin Philipp",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-carina-bader": {
+      "id": "member-carina-bader",
+      "name": "Carina Bader",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-marlo-kausemann": {
+      "id": "member-marlo-kausemann",
+      "name": "Marlo Kausemann",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-curt-riediger": {
+      "id": "member-curt-riediger",
+      "name": "Curt Riediger",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-leonardo-renk": {
+      "id": "member-leonardo-renk",
+      "name": "Leonardo Renk",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [
+        "referee"
+      ],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-janne-buerger": {
+      "id": "member-janne-buerger",
+      "name": "Janne Bürger",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-ricardo-volker": {
+      "id": "member-ricardo-volker",
+      "name": "Ricardo Volker",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-mara-honz": {
+      "id": "member-mara-honz",
+      "name": "Mara Honz",
+      "teamIds": [
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-bernd-frey": {
+      "id": "member-bernd-frey",
+      "name": "Bernd Frey",
+      "teamIds": [
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [
+        "esb"
+      ],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-kay-fricke": {
+      "id": "member-kay-fricke",
+      "name": "Kay Fricke",
+      "teamIds": [
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [
+        "esb"
+      ],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-tino-frahmeke": {
+      "id": "member-tino-frahmeke",
+      "name": "Tino Frahmeke",
+      "teamIds": [
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "member-jarno-teufel": {
+      "id": "member-jarno-teufel",
+      "name": "Jarno Teufel",
+      "teamIds": [
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [
+        "steward"
+      ],
+      "isManual": false,
+      "updatedAt": 1785777749287
+    },
+    "member-rick-dittmann": {
+      "id": "member-rick-dittmann",
+      "name": "Rick Dittmann",
+      "teamIds": [
+        "maenner-3"
+      ],
+      "skillIds": [
+        "esb"
+      ],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-nele-tafelmeier": {
+      "id": "member-nele-tafelmeier",
+      "name": "Nele Tafelmeier",
+      "teamIds": [
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [
+        "esb"
+      ],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-friederike-scherbarth": {
+      "id": "member-friederike-scherbarth",
+      "name": "Friederike Scherbarth",
+      "teamIds": [
+        "maenner-3"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-vanessa-beh": {
+      "id": "member-vanessa-beh",
+      "name": "Vanessa Beh",
+      "teamIds": [
+        "maenner-3"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-joline-komoll": {
+      "id": "member-joline-komoll",
+      "name": "Joline Komoll",
+      "teamIds": [
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-johannes-bichler": {
+      "id": "member-johannes-bichler",
+      "name": "Johannes Bichler",
+      "teamIds": [
+        "maenner-3"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-aaron-menne": {
+      "id": "member-aaron-menne",
+      "name": "Aaron Menne",
+      "teamIds": [
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-tara-kuehnke": {
+      "id": "member-tara-kuehnke",
+      "name": "Tara Kühnke",
+      "teamIds": [
+        "maenner-3"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-arda-rose": {
+      "id": "member-arda-rose",
+      "name": "Arda Rose",
+      "teamIds": [
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-kiana-piesker": {
+      "id": "member-kiana-piesker",
+      "name": "Kiana Piesker",
+      "teamIds": [
+        "maenner-3",
+        "maenner-2",
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-irem-priemer": {
+      "id": "member-irem-priemer",
+      "name": "Irem Priemer",
+      "teamIds": [
+        "maenner-3"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-yannik-proske": {
+      "id": "member-yannik-proske",
+      "name": "Yannik Proske",
+      "teamIds": [
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-youssef-gamlin": {
+      "id": "member-youssef-gamlin",
+      "name": "Youssef Gamlin",
+      "teamIds": [
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-leah-hedermann": {
+      "id": "member-leah-hedermann",
+      "name": "Leah Hedermann",
+      "teamIds": [
+        "maenner-3",
+        "maenner-2",
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-dorothea-einert": {
+      "id": "member-dorothea-einert",
+      "name": "Dorothea Einert",
+      "teamIds": [
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-jona-pajonk": {
+      "id": "member-jona-pajonk",
+      "name": "Jona Pajonk",
+      "teamIds": [
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-jayson-sihler": {
+      "id": "member-jayson-sihler",
+      "name": "Jayson Sihler",
+      "teamIds": [
+        "maenner-3"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-karolina-seidel": {
+      "id": "member-karolina-seidel",
+      "name": "Karolina Seidel",
+      "teamIds": [
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-lenja-tilgner": {
+      "id": "member-lenja-tilgner",
+      "name": "Lenja Tilgner",
+      "teamIds": [
+        "maenner-2",
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-vivienne-betz": {
+      "id": "member-vivienne-betz",
+      "name": "Vivienne Betz",
+      "teamIds": [
+        "maenner-2"
+      ],
+      "skillIds": [
+        "referee"
+      ],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-isabella-lohre": {
+      "id": "member-isabella-lohre",
+      "name": "Isabella Lohre",
+      "teamIds": [
+        "maenner-2",
+        "maenner-3"
+      ],
+      "skillIds": [
+        "steward"
+      ],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-ariana-striezel": {
+      "id": "member-ariana-striezel",
+      "name": "Ariana Striezel",
+      "teamIds": [
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-ilayda-keiner": {
+      "id": "member-ilayda-keiner",
+      "name": "Ilayda Keiner",
+      "teamIds": [
+        "maenner-3",
+        "maenner-2"
+      ],
+      "skillIds": [
+        "esb"
+      ],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-linn-bultmann": {
+      "id": "member-linn-bultmann",
+      "name": "Linn Bultmann",
+      "teamIds": [
+        "maenner-3"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-arved-schulz": {
+      "id": "member-arved-schulz",
+      "name": "Arved Schulz",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-marcus-schirmer": {
+      "id": "member-marcus-schirmer",
+      "name": "Marcus Schirmer",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-annemarie-mensing": {
+      "id": "member-annemarie-mensing",
+      "name": "Annemarie Mensing",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-jarne-lichtenfeld": {
+      "id": "member-jarne-lichtenfeld",
+      "name": "Jarne Lichtenfeld",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-lucie-schulte": {
+      "id": "member-lucie-schulte",
+      "name": "Lucie Schulte",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-femke-tremmel": {
+      "id": "member-femke-tremmel",
+      "name": "Femke Tremmel",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-luana-herzenberg": {
+      "id": "member-luana-herzenberg",
+      "name": "Luana Herzenberg",
+      "teamIds": [
+        "maenner-1",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-finia-mulrain": {
+      "id": "member-finia-mulrain",
+      "name": "Finia Mulrain",
+      "teamIds": [
+        "maenner-1",
+        "maenner-2"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-ecrin-figl": {
+      "id": "member-ecrin-figl",
+      "name": "Ecrin Figl",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-nika-schniedermeier": {
+      "id": "member-nika-schniedermeier",
+      "name": "Nika Schniedermeier",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [
+        "steward"
+      ],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-tony-kowalick": {
+      "id": "member-tony-kowalick",
+      "name": "Tony Kowalick",
+      "teamIds": [
+        "maenner-1"
+      ],
+      "skillIds": [],
+      "isManual": false,
+      "updatedAt": 1785777749288
+    },
+    "member-manual-thalia-moehsner": {
+      "id": "member-manual-thalia-moehsner",
+      "name": "Thalia Möhsner",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749290
+    },
+    "member-manual-talia-kloss": {
+      "id": "member-manual-talia-kloss",
+      "name": "Talia Kloss",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749291
+    },
+    "member-manual-clarissa-stube": {
+      "id": "member-manual-clarissa-stube",
+      "name": "Clarissa Stube",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749291
+    },
+    "member-manual-giulia-kinadeter": {
+      "id": "member-manual-giulia-kinadeter",
+      "name": "Giulia Kinadeter",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749291
+    },
+    "member-manual-lenn-kampschulte": {
+      "id": "member-manual-lenn-kampschulte",
+      "name": "Lenn Kampschulte",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749291
+    },
+    "member-manual-aileen-zanner": {
+      "id": "member-manual-aileen-zanner",
+      "name": "Aileen Zanner",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749291
+    },
+    "member-manual-angelo-kruger": {
+      "id": "member-manual-angelo-kruger",
+      "name": "Angelo Kruger",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749291
+    },
+    "member-manual-mariella-schildhauer": {
+      "id": "member-manual-mariella-schildhauer",
+      "name": "Mariella Schildhauer",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749291
+    },
+    "member-manual-ida-weidlich": {
+      "id": "member-manual-ida-weidlich",
+      "name": "Ida Weidlich",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749291
+    },
+    "member-manual-enya-hallmann": {
+      "id": "member-manual-enya-hallmann",
+      "name": "Enya Hallmann",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749291
+    },
+    "member-manual-bela-hoffman": {
+      "id": "member-manual-bela-hoffman",
+      "name": "Bela Hoffman",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749291
+    },
+    "member-manual-charleen-wittl": {
+      "id": "member-manual-charleen-wittl",
+      "name": "Charleen Wittl",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749291
+    },
+    "member-manual-melek-ladewig": {
+      "id": "member-manual-melek-ladewig",
+      "name": "Melek Ladewig",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749291
+    },
+    "member-manual-markus-milde": {
+      "id": "member-manual-markus-milde",
+      "name": "Markus Milde",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749291
+    },
+    "member-manual-peer-thyssen": {
+      "id": "member-manual-peer-thyssen",
+      "name": "Peer Thyssen",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749291
+    },
+    "member-manual-georg-schmidt": {
+      "id": "member-manual-georg-schmidt",
+      "name": "Georg Schmidt",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749291
+    },
+    "member-manual-josefin-stoeppler": {
+      "id": "member-manual-josefin-stoeppler",
+      "name": "Josefin Stöppler",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749291
+    },
+    "member-manual-naomi-kinzy": {
+      "id": "member-manual-naomi-kinzy",
+      "name": "Naomi Kinzy",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749292
+    },
+    "member-manual-jared-arendt": {
+      "id": "member-manual-jared-arendt",
+      "name": "Jared Arendt",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749292
+    },
+    "member-manual-emilio-geissler": {
+      "id": "member-manual-emilio-geissler",
+      "name": "Emilio Geissler",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749292
+    },
+    "member-manual-dorothea-lanig": {
+      "id": "member-manual-dorothea-lanig",
+      "name": "Dorothea Lanig",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749292
+    },
+    "member-manual-larissa-daub": {
+      "id": "member-manual-larissa-daub",
+      "name": "Larissa Daub",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749292
+    },
+    "member-manual-luka-buehler": {
+      "id": "member-manual-luka-buehler",
+      "name": "Luka Bühler",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749292
+    },
+    "member-manual-teo-strausa": {
+      "id": "member-manual-teo-strausa",
+      "name": "Teo Strausa",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749292
+    },
+    "member-manual-alexis-metzger": {
+      "id": "member-manual-alexis-metzger",
+      "name": "Alexis Metzger",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749292
+    },
+    "member-manual-simeon-ahrens": {
+      "id": "member-manual-simeon-ahrens",
+      "name": "Simeon Ahrens",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749292
+    },
+    "member-manual-sude-suthe": {
+      "id": "member-manual-sude-suthe",
+      "name": "Sude Suthe",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749292
+    },
+    "member-manual-lisann-koderisch": {
+      "id": "member-manual-lisann-koderisch",
+      "name": "Lisann Koderisch",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749292
+    },
+    "member-manual-dorian-scheytt": {
+      "id": "member-manual-dorian-scheytt",
+      "name": "Dorian Scheytt",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749292
+    },
+    "member-manual-janne-trampeli": {
+      "id": "member-manual-janne-trampeli",
+      "name": "Janne Trampeli",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749294
+    },
+    "member-manual-alfred-dragu": {
+      "id": "member-manual-alfred-dragu",
+      "name": "Alfred Dragu",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749294
+    },
+    "member-manual-cheyenne-radtke": {
+      "id": "member-manual-cheyenne-radtke",
+      "name": "Cheyenne Radtke",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749294
+    },
+    "member-manual-logan-greb": {
+      "id": "member-manual-logan-greb",
+      "name": "Logan Greb",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749294
+    },
+    "member-manual-josefine-spoettel": {
+      "id": "member-manual-josefine-spoettel",
+      "name": "Josefine Spöttel",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749294
+    },
+    "member-manual-baran-kausemann": {
+      "id": "member-manual-baran-kausemann",
+      "name": "Baran Kausemann",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749294
+    },
+    "member-manual-fynn-hohn": {
+      "id": "member-manual-fynn-hohn",
+      "name": "Fynn Hohn",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749294
+    },
+    "member-manual-ahmad-wenk": {
+      "id": "member-manual-ahmad-wenk",
+      "name": "Ahmad Wenk",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749294
+    },
+    "member-manual-mathilde-frauen": {
+      "id": "member-manual-mathilde-frauen",
+      "name": "Mathilde Frauen",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749294
+    },
+    "member-manual-muhammed-weidner": {
+      "id": "member-manual-muhammed-weidner",
+      "name": "Muhammed Weidner",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749294
+    },
+    "member-manual-vera-koeseoglu": {
+      "id": "member-manual-vera-koeseoglu",
+      "name": "Vera Köseoglu",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749295
+    },
+    "member-manual-jay-timmermann": {
+      "id": "member-manual-jay-timmermann",
+      "name": "Jay Timmermann",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749295
+    },
+    "member-manual-elijah-streit": {
+      "id": "member-manual-elijah-streit",
+      "name": "Elijah Streit",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749295
+    },
+    "member-manual-christina-wollmann": {
+      "id": "member-manual-christina-wollmann",
+      "name": "Christina Wollmann",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749295
+    },
+    "member-manual-mieke-schulte": {
+      "id": "member-manual-mieke-schulte",
+      "name": "Mieke Schulte",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749295
+    },
+    "member-manual-wilhelm-gruszecki": {
+      "id": "member-manual-wilhelm-gruszecki",
+      "name": "Wilhelm Gruszecki",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749295
+    },
+    "member-manual-anton-ludolf": {
+      "id": "member-manual-anton-ludolf",
+      "name": "Anton Ludolf",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749295
+    },
+    "member-manual-josua-heberstreit": {
+      "id": "member-manual-josua-heberstreit",
+      "name": "Josua Heberstreit",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749296
+    },
+    "member-manual-steve-sinnhuber": {
+      "id": "member-manual-steve-sinnhuber",
+      "name": "Steve Sinnhuber",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749296
+    },
+    "member-manual-milan-effler": {
+      "id": "member-manual-milan-effler",
+      "name": "Milan Effler",
+      "teamIds": [],
+      "skillIds": [],
+      "isManual": true,
+      "updatedAt": 1785777749296
+    }
+  },
+  "teams": {
+    "maenner-1": {
+      "id": "maenner-1",
+      "name": "Männer I",
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "maenner-2": {
+      "id": "maenner-2",
+      "name": "Männer II",
+      "isManual": false,
+      "updatedAt": 1785777749286,
+      "league": "BZK M"
+    },
+    "maenner-3": {
+      "id": "maenner-3",
+      "name": "Männer III",
+      "isManual": false,
+      "updatedAt": 1785777749286,
+      "league": "BZK M"
+    },
+    "mb-jgd": {
+      "id": "mb-jgd",
+      "name": "mB-Jugend",
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "md-jgd": {
+      "id": "md-jgd",
+      "name": "mD-Jugend",
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "ge-jgd": {
+      "id": "ge-jgd",
+      "name": "gem. E-Jugend",
+      "isManual": false,
+      "updatedAt": 1785777749286,
+      "league": "SR GE"
+    },
+    "minis": {
+      "id": "minis",
+      "name": "Minis",
+      "isManual": false,
+      "updatedAt": 1785777749286,
+      "league": "SR Minis"
+    },
+    "frauen": {
+      "id": "frauen",
+      "name": "Frauen",
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "wc-jgd": {
+      "id": "wc-jgd",
+      "name": "wC-Jugend",
+      "isManual": false,
+      "updatedAt": 1785777749286
+    },
+    "wd-jgd": {
+      "id": "wd-jgd",
+      "name": "wD-Jugend",
+      "isManual": false,
+      "updatedAt": 1785777749286
+    }
+  },
+  "skills": {
+    "esb": {
+      "id": "esb",
+      "name": "E-Spielbericht (ESB)",
+      "updatedAt": 1785777749286
+    },
+    "referee": {
+      "id": "referee",
+      "name": "Schiedsrichter-Lizenz",
+      "updatedAt": 1785777749286
+    },
+    "steward": {
+      "id": "steward",
+      "name": "Ordner-Schulung",
+      "updatedAt": 1785777749286
+    }
+  },
+  "gamedays": {
+    "gameday-2025-09-21-seebachgrundhalle": {
+      "id": "gameday-2025-09-21-seebachgrundhalle",
+      "date": "2025-09-21",
+      "locationId": "seebachgrundhalle",
+      "matchIds": [
+        "match-2025-09-21-maenner-i-0"
+      ],
+      "slots": [],
+      "openingTime": "17:00",
+      "closingTime": "20:15",
+      "notes": "",
+      "updatedAt": 1785777749294
+    },
+    "gameday-2025-10-04-seebachgrundhalle": {
+      "id": "gameday-2025-10-04-seebachgrundhalle",
+      "date": "2025-10-04",
+      "locationId": "seebachgrundhalle",
+      "matchIds": [
+        "match-2025-10-04-ejgd-0"
+      ],
+      "slots": [],
+      "openingTime": "12:00",
+      "closingTime": "18:00",
+      "notes": "Jugend",
+      "updatedAt": 1785777749294
+    },
+    "gameday-2025-10-05-seebachgrundhalle": {
+      "id": "gameday-2025-10-05-seebachgrundhalle",
+      "date": "2025-10-05",
+      "locationId": "seebachgrundhalle",
+      "matchIds": [
+        "match-2025-10-05-minis-0",
+        "b8318dba-996d-4faf-b1e0-053bdb21fb75",
+        "match-2025-10-05-maenner-i-2"
+      ],
+      "slots": [],
+      "openingTime": "09:00",
+      "closingTime": "20:15",
+      "notes": "bis 15:00 Jugend",
+      "updatedAt": 1785777749294
+    },
+    "gameday-2025-10-12-seebachgrundhalle": {
+      "id": "gameday-2025-10-12-seebachgrundhalle",
+      "date": "2025-10-12",
+      "locationId": "seebachgrundhalle",
+      "matchIds": [
+        "match-2025-10-12-wd-jgd-0"
+      ],
+      "slots": [],
+      "openingTime": "12:00",
+      "closingTime": "17:45",
+      "notes": "Jugend",
+      "updatedAt": 1785777749294
+    },
+    "gameday-2025-10-19-seebachgrundhalle": {
+      "id": "gameday-2025-10-19-seebachgrundhalle",
+      "date": "2025-10-19",
+      "locationId": "seebachgrundhalle",
+      "matchIds": [
+        "match-2025-10-19-minis-0",
+        "ae74fa74-7471-4682-a7b9-2a17dc2599c6",
+        "match-2025-10-19-maenner-i-2"
+      ],
+      "slots": [],
+      "openingTime": "09:00",
+      "closingTime": "20:15",
+      "notes": "bis 15:00 Jugend",
+      "updatedAt": 1785777749294
+    },
+    "gameday-2025-10-26-seebachgrundhalle": {
+      "id": "gameday-2025-10-26-seebachgrundhalle",
+      "date": "2025-10-26",
+      "locationId": "seebachgrundhalle",
+      "matchIds": [
+        "match-2025-10-26-md-jgd-0",
+        "match-2025-10-26-maenner-iii-1"
+      ],
+      "slots": [],
+      "openingTime": "09:00",
+      "closingTime": "17:15",
+      "notes": "Jugend",
+      "updatedAt": 1785777749294
+    },
+    "gameday-2025-11-16-seebachgrundhalle": {
+      "id": "gameday-2025-11-16-seebachgrundhalle",
+      "date": "2025-11-16",
+      "locationId": "seebachgrundhalle",
+      "matchIds": [
+        "match-2025-11-16-maenner-ii-0",
+        "match-2025-11-16-frauen-1",
+        "match-2025-11-16-maenner-i-2"
+      ],
+      "slots": [],
+      "openingTime": "13:00",
+      "closingTime": "18:15",
+      "notes": "",
+      "updatedAt": 1785777749295
+    },
+    "gameday-2025-11-30-seebachgrundhalle": {
+      "id": "gameday-2025-11-30-seebachgrundhalle",
+      "date": "2025-11-30",
+      "locationId": "seebachgrundhalle",
+      "matchIds": [
+        "match-2025-11-30-maenner-ii-0",
+        "match-2025-11-30-maenner-iii-1",
+        "match-2025-11-30-maenner-i-2",
+        "match-2025-11-30-mv-3"
+      ],
+      "slots": [],
+      "openingTime": "13:00",
+      "closingTime": "22:00",
+      "notes": "",
+      "updatedAt": 1785777749295
+    },
+    "gameday-2025-12-06-seebachgrundhalle": {
+      "id": "gameday-2025-12-06-seebachgrundhalle",
+      "date": "2025-12-06",
+      "locationId": "seebachgrundhalle",
+      "matchIds": [
+        "match-2025-12-06-maenner-iii-0",
+        "match-2025-12-06-maenner-i-1"
+      ],
+      "slots": [],
+      "openingTime": "15:00",
+      "closingTime": "20:15",
+      "notes": "",
+      "updatedAt": 1785777749295
+    },
+    "gameday-2026-01-10-emmy-noether-halle": {
+      "id": "gameday-2026-01-10-emmy-noether-halle",
+      "date": "2026-01-10",
+      "locationId": "emmy-noether-halle",
+      "matchIds": [
+        "match-2026-01-10-frauen-0",
+        "match-2026-01-10-wc-jgd-1",
+        "match-2026-01-10-maenner-ii-2",
+        "match-2026-01-10-maenner-iii-3",
+        "match-2026-01-10-frauen-4"
+      ],
+      "slots": [],
+      "openingTime": "11:00",
+      "closingTime": "20:15",
+      "notes": "EUROHALLE!",
+      "updatedAt": 1785777749295
+    },
+    "gameday-2026-01-18-seebachgrundhalle": {
+      "id": "gameday-2026-01-18-seebachgrundhalle",
+      "date": "2026-01-18",
+      "locationId": "seebachgrundhalle",
+      "matchIds": [
+        "match-2026-01-18-md-jgd-0",
+        "match-2026-01-18-frauen-1",
+        "match-2026-01-18-wb-jgd-2",
+        "match-2026-01-18-maenner-i-3"
+      ],
+      "slots": [],
+      "openingTime": "09:00",
+      "closingTime": "20:15",
+      "notes": "bis 15:00 Jugend",
+      "updatedAt": 1785777749295
+    },
+    "gameday-2026-01-27-seebachgrundhalle": {
+      "id": "gameday-2026-01-27-seebachgrundhalle",
+      "date": "2026-01-27",
+      "locationId": "seebachgrundhalle",
+      "matchIds": [
+        "match-2026-01-27-herren-iii-0"
+      ],
+      "slots": [],
+      "openingTime": "20:15",
+      "closingTime": "",
+      "notes": "Hannberg",
+      "updatedAt": 1785777749295
+    },
+    "gameday-2026-02-01-seebachgrundhalle": {
+      "id": "gameday-2026-02-01-seebachgrundhalle",
+      "date": "2026-02-01",
+      "locationId": "seebachgrundhalle",
+      "matchIds": [
+        "match-2026-02-01-wb-jgd-0",
+        "match-2026-02-01-maenner-ii-1",
+        "match-2026-02-01-frauen-2",
+        "match-2026-02-01-maenner-i-3"
+      ],
+      "slots": [],
+      "openingTime": "11:00",
+      "closingTime": "20:15",
+      "notes": "bis 13:00 Jugend",
+      "updatedAt": 1785777749296
+    },
+    "gameday-2026-02-08-seebachgrundhalle": {
+      "id": "gameday-2026-02-08-seebachgrundhalle",
+      "date": "2026-02-08",
+      "locationId": "seebachgrundhalle",
+      "matchIds": [
+        "match-2026-02-08-wd-jgd-0"
+      ],
+      "slots": [],
+      "openingTime": "14:00",
+      "closingTime": "19:00",
+      "notes": "Jugend",
+      "updatedAt": 1785777749296
+    },
+    "gameday-2026-02-21-emmy-noether-halle": {
+      "id": "gameday-2026-02-21-emmy-noether-halle",
+      "date": "2026-02-21",
+      "locationId": "emmy-noether-halle",
+      "matchIds": [
+        "match-2026-02-21-maenner-i-0"
+      ],
+      "slots": [],
+      "openingTime": "14:30",
+      "closingTime": "21:00",
+      "notes": "EUROHALLE!",
+      "updatedAt": 1785777749296
+    },
+    "gameday-2026-03-01-seebachgrundhalle": {
+      "id": "gameday-2026-03-01-seebachgrundhalle",
+      "date": "2026-03-01",
+      "locationId": "seebachgrundhalle",
+      "matchIds": [
+        "match-2026-03-01-wb-jgd-0"
+      ],
+      "slots": [],
+      "openingTime": "13:00",
+      "closingTime": "18:30",
+      "notes": "Jugend",
+      "updatedAt": 1785777749296
+    },
+    "gameday-2026-03-07-emmy-noether-halle": {
+      "id": "gameday-2026-03-07-emmy-noether-halle",
+      "date": "2026-03-07",
+      "locationId": "emmy-noether-halle",
+      "matchIds": [
+        "match-2026-03-07-maenner-ii-0",
+        "match-2026-03-07-maenner-i-1"
+      ],
+      "slots": [],
+      "openingTime": "16:00",
+      "closingTime": "19:00",
+      "notes": "EUROHALLE!",
+      "updatedAt": 1785777749296
+    },
+    "gameday-2026-03-08-emmy-noether-halle": {
+      "id": "gameday-2026-03-08-emmy-noether-halle",
+      "date": "2026-03-08",
+      "locationId": "emmy-noether-halle",
+      "matchIds": [
+        "match-2026-03-08-wc-jgd-0",
+        "match-2026-03-08-maenner-iii-1"
+      ],
+      "slots": [],
+      "openingTime": "14:00",
+      "closingTime": "19:00",
+      "notes": "EUROHALLE!",
+      "updatedAt": 1785777749296
+    },
+    "gameday-2026-03-15-seebachgrundhalle": {
+      "id": "gameday-2026-03-15-seebachgrundhalle",
+      "date": "2026-03-15",
+      "locationId": "seebachgrundhalle",
+      "matchIds": [
+        "match-2026-03-15-minis-0",
+        "match-2026-03-15-e-jgd-1"
+      ],
+      "slots": [],
+      "openingTime": "08:00",
+      "closingTime": "20:00",
+      "notes": "Jugend",
+      "updatedAt": 1785777749296
+    },
+    "gameday-2026-03-28-seebachgrundhalle": {
+      "id": "gameday-2026-03-28-seebachgrundhalle",
+      "date": "2026-03-28",
+      "locationId": "seebachgrundhalle",
+      "matchIds": [
+        "match-2026-03-28-minis-0",
+        "match-2026-03-28-maenner-i-1"
+      ],
+      "slots": [],
+      "openingTime": "12:00",
+      "closingTime": "20:45",
+      "notes": "bis 17:30 Jugend",
+      "updatedAt": 1785777749296
+    }
+  },
+  "matches": {
+    "match-2025-09-21-maenner-i-0": {
+      "id": "match-2025-09-21-maenner-i-0",
+      "time": "18:00",
+      "homeTeam": "SG Menden (Sauerland)",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-491185da-5099-4dc1-8298-434113fff58f",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-jona-pajonk",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-8655a1e4-510c-435f-b7d0-54cd325867e5",
+          "roleId": "secretary",
+          "assignedMemberId": "member-manual-thalia-moehsner",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-c1938246-88c8-41f6-8268-b38a8cb9b9c8",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-kilian-borrmann",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-627ee8e3-8ed9-4cdd-b28b-4d79f9001817",
+          "roleId": "steward_2",
+          "assignedMemberId": "member-manual-janne-trampeli",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-f7972a5d-315f-493b-a46d-c99ea70387dc",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-thore-thust",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-2c50b8f9-e6ae-469e-aa5f-0db675ef1871",
+          "roleId": "wiper_2",
+          "assignedMemberId": "member-manual-alfred-dragu",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        }
+      ],
+      "updatedAt": 1785777749294
+    },
+    "match-2025-10-04-ejgd-0": {
+      "id": "match-2025-10-04-ejgd-0",
+      "time": "13:00",
+      "homeTeam": "HSG Leideland",
+      "awayTeam": "Gast",
+      "helperTeamId": "ge-jgd",
+      "slots": [
+        {
+          "id": "slot-55cfa588-3052-413d-884a-d3d8bdd74884",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-clarissa-stube",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-e31df3c3-2134-49ff-8541-af4d92c4657b",
+          "roleId": "referee_1",
+          "assignedMemberId": "member-isabelle-malucha",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-87f15954-9359-4394-880e-e3e9ae0c16ca",
+          "roleId": "referee_2",
+          "assignedMemberId": "member-johann-terlecki",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-63ca4e04-2f49-42de-bf02-ba51c5752699",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        }
+      ],
+      "updatedAt": 1785777749294
+    },
+    "match-2025-10-05-minis-0": {
+      "id": "match-2025-10-05-minis-0",
+      "time": "10:00",
+      "homeTeam": "SV Willwacherland",
+      "awayTeam": "Gast",
+      "helperTeamId": "minis",
+      "slots": [
+        {
+          "id": "slot-8cff8b3e-e8a2-4187-9a0f-98146b9c8e58",
+          "roleId": "referee_1",
+          "assignedMemberId": "member-manual-cheyenne-radtke",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-1db19fb5-a1e0-41d5-97b3-4bcfcace90de",
+          "roleId": "referee_2",
+          "assignedMemberId": "member-manual-logan-greb",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-4e4a7db1-32f1-4d2d-8e4a-50d248fa1be3",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        }
+      ],
+      "updatedAt": 1785777749294
+    },
+    "b8318dba-996d-4faf-b1e0-053bdb21fb75": {
+      "id": "b8318dba-996d-4faf-b1e0-053bdb21fb75",
+      "time": "16:00",
+      "homeTeam": "Gladbeck HC",
+      "awayTeam": "HC Bichlerburg II",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-3f96aa2f-a2f3-450e-8863-5c5bd2b5f693",
+          "roleId": "timekeeper",
+          "assignedMemberId": null,
+          "customHelperName": "Männer",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-9a17834b-df6e-40f6-ad12-0f53d0816a11",
+          "roleId": "secretary",
+          "assignedMemberId": null,
+          "customHelperName": "Männer I",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-2d3f62f1-c486-475e-9484-9c52e337cc39",
+          "roleId": "steward_entrance",
+          "assignedMemberId": null,
+          "customHelperName": "Männer I",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-d3a4851e-0ba5-4ce9-9348-664c40954699",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Männer I",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-2d81476b-eac9-4b2b-8716-7574153205dc",
+          "roleId": "wiper_1",
+          "assignedMemberId": null,
+          "customHelperName": "Männer I",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-61161792-b8dd-418a-904e-df927c8fe69d",
+          "roleId": "video",
+          "assignedMemberId": null,
+          "customHelperName": "verlegt",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-fda6155d-53dd-4b3a-ad4b-36236aa1a87a",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        }
+      ],
+      "updatedAt": 1785777749294
+    },
+    "match-2025-10-05-maenner-i-2": {
+      "id": "match-2025-10-05-maenner-i-2",
+      "time": "18:00",
+      "homeTeam": "SG Menden (Sauerland)",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-4891ca1b-1b60-49f2-b365-1eb8f30eb9f9",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-kiana-piesker",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-11f4bd9d-690a-43cb-9639-e65e071adfff",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-tino-frahmeke",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-9887e1c6-ddf9-4b3f-82d4-d9c5019c8fe4",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        }
+      ],
+      "updatedAt": 1785777749294
+    },
+    "match-2025-10-12-wd-jgd-0": {
+      "id": "match-2025-10-12-wd-jgd-0",
+      "time": "13:00",
+      "homeTeam": "TV Neu Armin",
+      "awayTeam": "Gast",
+      "helperTeamId": "club-wide",
+      "slots": [
+        {
+          "id": "slot-e4b1badc-51fc-49d3-baae-2838bbccabc3",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-josefine-spoettel",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-af111f5c-1688-4056-8451-c1f4a9b0514a",
+          "roleId": "secretary",
+          "assignedMemberId": "member-manual-josefine-spoettel",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-5779c7b2-251d-49f3-997e-6ef836c23351",
+          "roleId": "referee_1",
+          "assignedMemberId": "member-manual-josefine-spoettel",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-1d49887f-a684-406d-bda4-fa4bbc44f8ba",
+          "roleId": "referee_2",
+          "assignedMemberId": "member-manual-josefine-spoettel",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-dda4a1e1-8ed5-4ec4-a20e-f831d0555e3e",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        }
+      ],
+      "updatedAt": 1785777749294
+    },
+    "match-2025-10-19-minis-0": {
+      "id": "match-2025-10-19-minis-0",
+      "time": "10:00",
+      "homeTeam": "SV Willwacherland",
+      "awayTeam": "Gast",
+      "helperTeamId": "minis",
+      "slots": [
+        {
+          "id": "slot-091cbab1-a67d-4ecc-9cd0-878779b658e6",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-dorothea-einert",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-007f13a3-16c1-4dab-b919-81448d72c701",
+          "roleId": "referee_1",
+          "assignedMemberId": "member-johann-terlecki",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-8945743e-430a-45d8-877e-e89f3450e59c",
+          "roleId": "referee_2",
+          "assignedMemberId": "member-manual-baran-kausemann",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-a532d240-da06-4e26-a90c-29a39dff490c",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        }
+      ],
+      "updatedAt": 1785777749294
+    },
+    "ae74fa74-7471-4682-a7b9-2a17dc2599c6": {
+      "id": "ae74fa74-7471-4682-a7b9-2a17dc2599c6",
+      "time": "16:00",
+      "homeTeam": "Gladbeck HC",
+      "awayTeam": "SG Yannickdorf",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-1a1fd71b-55b0-4325-a9fb-440a6f882eac",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-francesca-sprenger",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-eaf433ed-884a-477a-9b06-4ba3aae578df",
+          "roleId": "secretary",
+          "assignedMemberId": "member-nelly-walton",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-1faf38b7-7f7a-4e3d-bf94-3b2d8b6c8ab2",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-aaron-zipp",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-52a43929-a82c-4ed0-b533-1d6e83a8bef4",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-40d83496-e545-4034-b01b-047a32df3fc8",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-manual-simeon-ahrens",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-9cc22f8f-e9d4-4037-8287-fa87a839bf47",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        }
+      ],
+      "updatedAt": 1785777749294
+    },
+    "match-2025-10-19-maenner-i-2": {
+      "id": "match-2025-10-19-maenner-i-2",
+      "time": "18:00",
+      "homeTeam": "SG Menden (Sauerland)",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-873bd691-ea29-416e-827b-5d5173bdbad2",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-nele-tafelmeier",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-969d5c17-f27a-4ce6-9895-3e1be928508b",
+          "roleId": "secretary",
+          "assignedMemberId": "member-manual-fynn-hohn",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-ae6f33b8-b252-4711-a70b-034b05e846d7",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-kay-fricke",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-8458fa05-3f91-4c8a-bfe6-723c53243b13",
+          "roleId": "steward_2",
+          "assignedMemberId": "member-friederike-scherbarth",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-67532e48-a664-4ced-b714-bc158f0c4ce3",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-vanessa-beh",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-c30e725c-54c9-4651-ab45-edf5d87c3567",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        }
+      ],
+      "updatedAt": 1785777749294
+    },
+    "match-2025-10-26-md-jgd-0": {
+      "id": "match-2025-10-26-md-jgd-0",
+      "time": "10:00",
+      "homeTeam": "TV Ost Janinaburg",
+      "awayTeam": "Gast",
+      "helperTeamId": "md-jgd",
+      "slots": [
+        {
+          "id": "slot-d11fa1dc-d225-4ac5-8573-61428e4a153b",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-talia-kloss",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-e42d9d10-e1d1-4a1c-b729-6c4a5c3f306f",
+          "roleId": "referee_1",
+          "assignedMemberId": "member-johann-terlecki",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-ec24718a-3aea-44a9-ab77-17c79dba9124",
+          "roleId": "referee_2",
+          "assignedMemberId": "member-manual-lenn-kampschulte",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-9b59781e-0abe-4468-ada3-c3fc40d3cf83",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        }
+      ],
+      "updatedAt": 1785777749294
+    },
+    "match-2025-10-26-maenner-iii-1": {
+      "id": "match-2025-10-26-maenner-iii-1",
+      "time": "15:00",
+      "homeTeam": "SV Bad Lucastadt III",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-51b2cc97-b17b-4018-acdd-3207f5c61497",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        }
+      ],
+      "updatedAt": 1785777749294
+    },
+    "match-2025-11-16-maenner-ii-0": {
+      "id": "match-2025-11-16-maenner-ii-0",
+      "time": "14:00",
+      "homeTeam": "TV Göbelscheid II",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-9241c0a6-3b8f-4a20-a0b5-0dbb3e2d7d5a",
+          "roleId": "secretary",
+          "assignedMemberId": "member-kay-fricke",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-af7b5b61-e7b6-4fe4-a418-a7918b4712bc",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-aaron-menne",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-75656e3d-c030-4eae-91ef-a5852da86cf2",
+          "roleId": "steward_2",
+          "assignedMemberId": "member-manual-ahmad-wenk",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-9cb73bcf-fa39-43f5-94df-3b02bea57865",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-sofia-hehl",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-b1b609b1-ae0c-4355-b214-b0a0a49113ec",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        }
+      ],
+      "updatedAt": 1785777749294
+    },
+    "match-2025-11-16-frauen-1": {
+      "id": "match-2025-11-16-frauen-1",
+      "time": "16:00",
+      "homeTeam": "SG Nord Jonah",
+      "awayTeam": "Gast",
+      "helperTeamId": "frauen",
+      "slots": [
+        {
+          "id": "slot-46af2303-8b33-49c8-bc6f-e943e95be77a",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-joline-komoll",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-964c57d5-8eb3-4fb0-80f6-ff39f36c94ab",
+          "roleId": "secretary",
+          "assignedMemberId": "member-kay-fricke",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-427e8bdc-b1da-4fac-9216-796defbe59d7",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-manual-lenn-kampschulte",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-6884c530-81bf-4f0d-a841-06ead4caafc0",
+          "roleId": "steward_2",
+          "assignedMemberId": "member-kay-fricke",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-c65444db-d1b9-42ca-ae52-e28b07e501c2",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-manual-mathilde-frauen",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-b1287fea-d98e-441f-872d-6890edafdc4a",
+          "roleId": "wiper_2",
+          "assignedMemberId": "member-manual-muhammed-weidner",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-9760a77b-13ac-4a63-9c50-6da74e584883",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        }
+      ],
+      "updatedAt": 1785777749294
+    },
+    "match-2025-11-16-maenner-i-2": {
+      "id": "match-2025-11-16-maenner-i-2",
+      "time": "18:00",
+      "homeTeam": "SG Menden (Sauerland)",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-2447a7a4-bce2-4717-81de-efd262d16127",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-josefine-spoettel",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-4969870b-107e-475c-8c59-cd541157a437",
+          "roleId": "secretary",
+          "assignedMemberId": "member-manual-josefine-spoettel",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-c34aa264-f56b-493c-bf52-b1552e6b6f95",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-manual-josefine-spoettel",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-b22f04c4-f2fc-4497-9a5c-e6b5f617bef3",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-cf915ccd-4a8b-40b0-b88e-fd85b1580b99",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-manual-josefine-spoettel",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-7b53d378-e64a-4298-9c8c-a55e60946a56",
+          "roleId": "video",
+          "assignedMemberId": "member-manual-thalia-moehsner",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        },
+        {
+          "id": "slot-c1f0ca84-fa4d-44a3-a06c-78bff83c9a5e",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2025-11-30-maenner-ii-0": {
+      "id": "match-2025-11-30-maenner-ii-0",
+      "time": "14:00",
+      "homeTeam": "TV Göbelscheid II",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-7fab7509-9620-4fb6-9c52-a7561f8840f0",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-nelly-walton",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-fb4664d2-f50d-4de0-acae-fdd08f813f33",
+          "roleId": "secretary",
+          "assignedMemberId": "member-dorothea-einert",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-b8503e98-39ce-4609-9abf-250293e2a8da",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-rick-dittmann",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-fb90f7d9-8bf2-42ff-a6cf-7bdbbd53f13e",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-ded50676-5dda-4f43-a2ae-44ddc1142a4f",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-marika-sander",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-ce1b11f4-3d2d-4175-a6d7-58e2e36a7e8e",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2025-11-30-maenner-iii-1": {
+      "id": "match-2025-11-30-maenner-iii-1",
+      "time": "16:00",
+      "homeTeam": "SV Bad Lucastadt III",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-6d63eba3-a914-4051-9535-3743a88f384c",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-lenn-kampschulte",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-84d32a47-11d2-46d4-860e-6223bc951999",
+          "roleId": "secretary",
+          "assignedMemberId": "member-rebekka-loeser",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-c9329321-73b5-440a-b4b5-4add0fddc535",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-leah-hedermann",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-0054ec1d-e8ea-4c26-a202-550159c6f7a5",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-39f62f0c-8cc9-439f-aaf1-e300ef9a0020",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-arved-schulz",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-a4296a02-a709-4124-861e-acd5737343f8",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2025-11-30-maenner-i-2": {
+      "id": "match-2025-11-30-maenner-i-2",
+      "time": "18:00",
+      "homeTeam": "SG Menden (Sauerland)",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-c6cf8392-5a4d-4fc6-8f08-c4d5b0962cda",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-kay-fricke",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-dcdf5a3d-64d0-4e9c-8797-26c971a94442",
+          "roleId": "secretary",
+          "assignedMemberId": "member-manual-thalia-moehsner",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-565227a3-76e1-4c5e-8749-a5b4334adb83",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-manual-lenn-kampschulte",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-b3aca1f0-93c7-4eb3-939c-ca8ce6317424",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-fe217f8f-4f2c-4087-b004-54b350f81e81",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-manual-vera-koeseoglu",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-dd23c17b-5059-4aff-b38c-e6b0cdaf990b",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2025-11-30-mv-3": {
+      "id": "match-2025-11-30-mv-3",
+      "time": "20:00",
+      "homeTeam": "HSG Nord Arneland",
+      "awayTeam": "Gast",
+      "helperTeamId": "club-wide",
+      "slots": [
+        {
+          "id": "slot-d926afef-49e1-469b-b75c-e2ca1e68dc77",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2025-12-06-maenner-iii-0": {
+      "id": "match-2025-12-06-maenner-iii-0",
+      "time": "16:00",
+      "homeTeam": "SV Bad Lucastadt III",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-d834d1f7-1a0f-4f97-80ff-18a85f69bc0a",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-giulia-kinadeter",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-298a0d13-bc52-4e10-9aa4-e36574f7fe4c",
+          "roleId": "secretary",
+          "assignedMemberId": "member-marcus-schirmer",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-6ef7ea3e-9555-4091-8d6e-672ee21e6f94",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-manual-georg-schmidt",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-d18c3b65-3270-4b8d-952f-58bd8fe9afe1",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-e364a2df-f369-4d44-bd8c-c46037952bf5",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-manual-jay-timmermann",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-5356f550-aca6-4434-a99b-b795f7803c26",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2025-12-06-maenner-i-1": {
+      "id": "match-2025-12-06-maenner-i-1",
+      "time": "18:00",
+      "homeTeam": "SG Menden (Sauerland)",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-e5a57ced-8f5a-4cb1-8667-8d6abf5edc11",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-jona-pajonk",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-90c2089f-7ff9-4ebb-976f-c52a4075a657",
+          "roleId": "secretary",
+          "assignedMemberId": "member-nele-tafelmeier",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-66b173ac-6db7-4b09-934d-296d236ca3cf",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-tino-frahmeke",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-4ea22215-00a4-40f7-877d-fc260701ea9a",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-1487c6c8-432a-43a3-af34-8e1f95072c5d",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-teresa-hold",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-250439be-c771-4789-9bc4-ac64f0d153ac",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2026-01-10-frauen-0": {
+      "id": "match-2026-01-10-frauen-0",
+      "time": "18:00",
+      "homeTeam": "SG Nord Jonah",
+      "awayTeam": "Gast",
+      "helperTeamId": "frauen",
+      "slots": [
+        {
+          "id": "slot-f7b1ce4d-bd8d-4f95-82a0-db7a975ee1f5",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-francesca-sprenger",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-1fcec98b-08f4-41b5-9654-576823ffc57d",
+          "roleId": "secretary",
+          "assignedMemberId": "member-manual-janne-trampeli",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-2d2f62b9-7d41-4e7b-97bd-4b42ca7134c3",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-manual-sude-suthe",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-a750b05c-cf22-4c36-9267-90f98aac5d11",
+          "roleId": "steward_2",
+          "assignedMemberId": "member-manual-giulia-kinadeter",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-c4c72c90-5336-411d-9e42-0a74731cce11",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-manual-elijah-streit",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-1e67d000-f1cc-402f-a3a6-041bf9937d52",
+          "roleId": "video",
+          "assignedMemberId": "member-manual-thalia-moehsner",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-0bfe1602-0bc0-4177-ab9e-8d9f52f71061",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2026-01-10-wc-jgd-1": {
+      "id": "match-2026-01-10-wc-jgd-1",
+      "time": "12:00",
+      "homeTeam": "SV West Gian",
+      "awayTeam": "Gast",
+      "helperTeamId": "club-wide",
+      "slots": [
+        {
+          "id": "slot-f6b410ae-de42-464a-9321-8ee1a1df8534",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-lenn-kampschulte",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-cd32eaa3-6d2e-44ff-8111-8e324387b6c6",
+          "roleId": "secretary",
+          "assignedMemberId": "member-manual-baran-kausemann",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-1603b9a4-d6de-479a-9e22-1c81b5cbd887",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-tino-frahmeke",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-584f5f28-b202-45ec-af4e-5307494236be",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2026-01-10-maenner-ii-2": {
+      "id": "match-2026-01-10-maenner-ii-2",
+      "time": "14:00",
+      "homeTeam": "TV Göbelscheid II",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-e666db75-ef29-4a0b-9d87-be395c0549e7",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-alexis-metzger",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-6ce3d272-f2f7-4e7b-bad0-e5f62d81e8b7",
+          "roleId": "secretary",
+          "assignedMemberId": "member-johann-terlecki",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-31cd0e30-a129-47e4-8255-01739d19b9d0",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-dorothea-einert",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-11602134-5237-46ec-8859-7cc67a1a47ce",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-d92cb1d3-3c16-4213-9d79-2b36b37854cd",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-teresa-hold",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2026-01-10-maenner-iii-3": {
+      "id": "match-2026-01-10-maenner-iii-3",
+      "time": "16:00",
+      "homeTeam": "SV Bad Lucastadt III",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-e87a20b6-2978-4068-9d7e-c42462f2d80d",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-alexis-metzger",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-b0faab74-096e-40fc-b3e3-99a97a6ac54a",
+          "roleId": "secretary",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-77de7acd-2612-4b1c-85cf-5c47a8d7db69",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-manual-lenn-kampschulte",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-cbeda8f5-5c66-4004-a235-478b770285a8",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-d2335193-8a2b-4aae-bafe-8186e8d59396",
+          "roleId": "wiper_1",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2026-01-10-frauen-4": {
+      "id": "match-2026-01-10-frauen-4",
+      "time": "18:00",
+      "homeTeam": "SG Nord Jonah",
+      "awayTeam": "Gast",
+      "helperTeamId": "frauen",
+      "slots": [
+        {
+          "id": "slot-f32551e6-90e3-478f-a80a-5b4f830c8d52",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-fynn-hohn",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-41988f85-e0f4-464b-9052-0e3a52e0f18f",
+          "roleId": "secretary",
+          "assignedMemberId": "member-manual-christina-wollmann",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-3694f3b7-7a02-49e3-8b2e-509f5a34185e",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-manual-lenn-kampschulte",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-25a93b9b-3631-4765-ac82-ab6741b10c8d",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-5a4f9573-d3e5-4fdd-a15f-5b2a9bc7f4e1",
+          "roleId": "video",
+          "assignedMemberId": "member-manual-thalia-moehsner",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2026-01-18-md-jgd-0": {
+      "id": "match-2026-01-18-md-jgd-0",
+      "time": "10:00",
+      "homeTeam": "TV Ost Janinaburg",
+      "awayTeam": "Gast",
+      "helperTeamId": "md-jgd",
+      "slots": [
+        {
+          "id": "slot-c01a6bbe-a8c9-46b7-8f7f-bfa0edd5559d",
+          "roleId": "timekeeper",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-0feb4bde-dc9c-4493-be7c-c8f333546c55",
+          "roleId": "secretary",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-8f861bd1-b525-4841-97a3-afe0516739b1",
+          "roleId": "steward_entrance",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-e283be37-eddc-4edc-9e2f-038516cd718e",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-bb3a2a1f-5534-4b62-af86-30ba8476a456",
+          "roleId": "wiper_1",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-ff156abf-14bb-4347-a0f2-b027f2a82cc6",
+          "roleId": "referee_1",
+          "assignedMemberId": "member-manual-mieke-schulte",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-69a33b97-70f5-41d6-8382-4a1c01a76750",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2026-01-18-frauen-1": {
+      "id": "match-2026-01-18-frauen-1",
+      "time": "14:00",
+      "homeTeam": "SG Nord Jonah",
+      "awayTeam": "Gast",
+      "helperTeamId": "frauen",
+      "slots": [
+        {
+          "id": "slot-b85192d8-228e-42bd-b93b-bb3a52e405cb",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-talia-kloss",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-4411faa4-7324-40eb-8d5d-2dc3b2e3052f",
+          "roleId": "secretary",
+          "assignedMemberId": "member-josefine-pajonk",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-bf4e7705-32b4-4fd4-803c-6c1f02b56949",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-nelly-walton",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-a5c4fb8f-68b2-4f1a-8548-0cd5789c2795",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-c3d9871f-524c-4344-810b-97215e303f54",
+          "roleId": "wiper_1",
+          "assignedMemberId": null,
+          "customHelperName": "mD",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-a096f644-8f57-492a-b88b-5a17e7a0257b",
+          "roleId": "video",
+          "assignedMemberId": "member-manual-thalia-moehsner",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-de97eb37-803f-494b-8fb8-6c92f227c454",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2026-01-18-wb-jgd-2": {
+      "id": "match-2026-01-18-wb-jgd-2",
+      "time": "16:00",
+      "homeTeam": "HC Josephburg",
+      "awayTeam": "Gast",
+      "helperTeamId": "club-wide",
+      "slots": [
+        {
+          "id": "slot-1027d99a-df67-42a6-8119-07e276b6a39a",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-wilhelm-gruszecki",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-d6b5a264-c115-4ec2-abc3-f61c7fc99351",
+          "roleId": "secretary",
+          "assignedMemberId": "member-rebekka-loeser",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-71b0c443-eb52-4329-b84a-5f19c8a3538e",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-aaron-zipp",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-9486ecda-3cd1-402d-8ff0-339020ef7811",
+          "roleId": "steward_2",
+          "assignedMemberId": "member-milla-krauel",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-4220b3a3-66ff-4a20-80b9-fc605b52b197",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-arved-schulz",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-ead135d9-48e6-4b61-91ce-639b66e37f65",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2026-01-18-maenner-i-3": {
+      "id": "match-2026-01-18-maenner-i-3",
+      "time": "18:00",
+      "homeTeam": "SG Menden (Sauerland)",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-ac1d3a63-adae-42bd-a47b-a0d08c27ad94",
+          "roleId": "timekeeper",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-2a62daaf-22fc-4633-9924-68c65c24f822",
+          "roleId": "secretary",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-5dc357eb-cbf2-4196-a4eb-7802d5f84aea",
+          "roleId": "steward_entrance",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-71c47c5e-fdcb-497d-bf87-48e3804aaf8a",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-ca3425b0-61bb-41fd-b899-3fec6805f08d",
+          "roleId": "wiper_1",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-c362b6eb-32b9-4c05-9c9d-1f9c1aeaf19f",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2026-01-27-herren-iii-0": {
+      "id": "match-2026-01-27-herren-iii-0",
+      "time": "20:00",
+      "homeTeam": "HSG Kochanstadt III",
+      "awayTeam": "Gast",
+      "helperTeamId": "club-wide",
+      "slots": [
+        {
+          "id": "slot-62546582-1346-4bf1-9d6c-93b98d3a2c15",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-anton-ludolf",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-613be79b-7875-481b-9f0f-edf9b5643393",
+          "roleId": "secretary",
+          "assignedMemberId": "member-manual-alexis-metzger",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-05441e2d-fe0a-4e92-b12d-681c94c9b310",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-manual-anton-ludolf",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-e7c26608-aeaf-4873-8afd-156d440b0693",
+          "roleId": "steward_2",
+          "assignedMemberId": "member-manual-anton-ludolf",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-99e853c3-94ae-4249-9adb-c60b84148f32",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-manual-anton-ludolf",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2026-02-01-wb-jgd-0": {
+      "id": "match-2026-02-01-wb-jgd-0",
+      "time": "12:00",
+      "homeTeam": "HC Josephburg",
+      "awayTeam": "Gast",
+      "helperTeamId": "club-wide",
+      "slots": [
+        {
+          "id": "slot-3c835c24-36a6-47b7-ad5c-bf6556575939",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-tia-balkow",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-90599419-4c23-4dc5-bcce-2e024effb44b",
+          "roleId": "secretary",
+          "assignedMemberId": "member-kay-fricke",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-90f2ae8f-7304-4673-bdf6-6ce91b6fcf31",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-manual-lenn-kampschulte",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-fb403bb3-912c-490d-99d0-a5ce2697174e",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-460dbe87-41ae-4f65-b518-16774e502e0b",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        }
+      ],
+      "updatedAt": 1785777749295
+    },
+    "match-2026-02-01-maenner-ii-1": {
+      "id": "match-2026-02-01-maenner-ii-1",
+      "time": "14:00",
+      "homeTeam": "TV Göbelscheid II",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-68485b1e-4f65-4410-98a0-5a78eeab8d36",
+          "roleId": "timekeeper",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-14bd03a5-8ddb-479a-9fee-4df2a2f858c8",
+          "roleId": "secretary",
+          "assignedMemberId": "member-manual-alexis-metzger",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-d6487b7a-cebe-45a2-87a7-f4927cdc4e82",
+          "roleId": "steward_entrance",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-e268e313-a8c5-4aa8-8d9b-b0d5fa6cab14",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-b0b8f795-8d3c-4ada-a0b1-2d85b344fc60",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-manual-josua-heberstreit",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749295
+        },
+        {
+          "id": "slot-5ba4c235-ce90-469e-980a-7aae9bfdf4f8",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        }
+      ],
+      "updatedAt": 1785777749296
+    },
+    "match-2026-02-01-frauen-2": {
+      "id": "match-2026-02-01-frauen-2",
+      "time": "16:00",
+      "homeTeam": "SG Nord Jonah",
+      "awayTeam": "Gast",
+      "helperTeamId": "frauen",
+      "slots": [
+        {
+          "id": "slot-4251f660-5c0c-4523-af84-e473972b1b3d",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-marcus-schirmer",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-fd2e51af-1955-4fdb-a266-e2760294788b",
+          "roleId": "secretary",
+          "assignedMemberId": "member-leah-hedermann",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-919f2031-972b-44c0-b507-bb2815f9e2d9",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-manual-steve-sinnhuber",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-7fe64cdd-287d-4224-b344-24e526e71517",
+          "roleId": "steward_2",
+          "assignedMemberId": "member-manual-georg-schmidt",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-f1ce4ca7-ffdf-4b41-91d2-52c05e48a140",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-manual-milan-effler",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-774f6a0c-c001-4368-8cdd-6478f0097e6b",
+          "roleId": "video",
+          "assignedMemberId": "member-manual-thalia-moehsner",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-1ecbc4cb-bb3a-4d12-a2ce-ba3f3d94c6d8",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        }
+      ],
+      "updatedAt": 1785777749296
+    },
+    "match-2026-02-01-maenner-i-3": {
+      "id": "match-2026-02-01-maenner-i-3",
+      "time": "18:00",
+      "homeTeam": "SG Menden (Sauerland)",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-bc5152ff-ac46-480a-9d12-ebdb46b240ec",
+          "roleId": "timekeeper",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-f18d747f-bcbd-4779-9f7a-3aaaaa4d6b51",
+          "roleId": "secretary",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-6fbc77ea-39be-4777-a8f1-5bc39b326fde",
+          "roleId": "steward_entrance",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-da796bde-0923-40bf-b535-c17ef4e04e36",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-5639c298-9d2d-434d-8ff7-5fc29fb46def",
+          "roleId": "wiper_1",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-63bf35ac-db24-4717-a051-a901c18ee4cd",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        }
+      ],
+      "updatedAt": 1785777749296
+    },
+    "match-2026-02-08-wd-jgd-0": {
+      "id": "match-2026-02-08-wd-jgd-0",
+      "time": "14:30",
+      "homeTeam": "TV Neu Armin",
+      "awayTeam": "Gast",
+      "helperTeamId": "wd-jgd",
+      "slots": [
+        {
+          "id": "slot-460846b3-284c-47bc-874a-a1a9d3c69a31",
+          "roleId": "timekeeper",
+          "assignedMemberId": null,
+          "customHelperName": "wD-Jgd",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-9c411b4b-aea5-4219-9637-9482de502e32",
+          "roleId": "secretary",
+          "assignedMemberId": null,
+          "customHelperName": "wD-Jgd",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-a6cedc07-5799-47f7-bde0-b4668bd591f6",
+          "roleId": "steward_entrance",
+          "assignedMemberId": null,
+          "customHelperName": "WD-Jgd",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-bcb2ee6a-acc7-40cf-824b-6c43ed65e1f7",
+          "roleId": "referee_1",
+          "assignedMemberId": "member-manual-mieke-schulte",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-dc048726-6a91-4d99-8740-6742341bdd86",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        }
+      ],
+      "updatedAt": 1785777749296
+    },
+    "match-2026-02-21-maenner-i-0": {
+      "id": "match-2026-02-21-maenner-i-0",
+      "time": "16:00",
+      "homeTeam": "SG Menden (Sauerland)",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-005c8376-ff07-46f2-ba5c-26a013d14590",
+          "roleId": "timekeeper",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-6e88dd2b-eed2-40a6-8a69-8e95796636f7",
+          "roleId": "secretary",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-81508f37-bd58-4c44-8b18-611cc4116d63",
+          "roleId": "steward_entrance",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-454278e8-8a4b-41a5-89a1-4da3125004f0",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-39f503f8-1b7c-42ae-90e0-4e928d10bc07",
+          "roleId": "wiper_1",
+          "assignedMemberId": null,
+          "customHelperName": "Frauen",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        }
+      ],
+      "updatedAt": 1785777749296
+    },
+    "match-2026-03-01-wb-jgd-0": {
+      "id": "match-2026-03-01-wb-jgd-0",
+      "time": "14:00",
+      "homeTeam": "HC Josephburg",
+      "awayTeam": "Gast",
+      "helperTeamId": "club-wide",
+      "slots": [
+        {
+          "id": "slot-b00bae98-b7d6-4336-9b7a-2a87d7fb3a0b",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-josua-heberstreit",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-5942b1f9-9e84-4661-a1cb-72c6515a2fca",
+          "roleId": "secretary",
+          "assignedMemberId": "member-manual-josua-heberstreit",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-0b2b9a7b-ad53-4f50-8ed0-50a5dfc5a704",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-manual-josua-heberstreit",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-2cb7f836-dd9d-4162-a675-a400f537965f",
+          "roleId": "steward_2",
+          "assignedMemberId": "member-manual-josua-heberstreit",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-898185a2-407e-4874-9a09-a4c777195b3b",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        }
+      ],
+      "updatedAt": 1785777749296
+    },
+    "match-2026-03-07-maenner-ii-0": {
+      "id": "match-2026-03-07-maenner-ii-0",
+      "time": "15:00",
+      "homeTeam": "TV Göbelscheid II",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-f558237a-8bdd-440a-b938-6fb9ce57f98b",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-milan-effler",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-446fe8ba-7176-42a0-979d-984f8a7d3e31",
+          "roleId": "secretary",
+          "assignedMemberId": "member-manual-angelo-kruger",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-ee89e6dc-dff6-430b-960a-aae7c3c27e39",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-manual-simeon-ahrens",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-0f4f9df6-510b-4798-819e-0cac1cff1566",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-1ff2a59c-dd3e-4461-96cb-8d048443d833",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-manual-alfred-dragu",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        }
+      ],
+      "updatedAt": 1785777749296
+    },
+    "match-2026-03-07-maenner-i-1": {
+      "id": "match-2026-03-07-maenner-i-1",
+      "time": "17:00",
+      "homeTeam": "SG Menden (Sauerland)",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-72f187b4-9f57-435b-b71d-62138234f0b1",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-fynn-hohn",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-141b888c-459e-4a7d-97ca-a2f0cf702678",
+          "roleId": "secretary",
+          "assignedMemberId": "member-manual-fynn-hohn",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-47cf3c16-8bfd-4f64-a375-02a40a221261",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-isabella-lohre",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-29e31755-9bdf-44bb-8419-b0136f6dfcca",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-141b4ecc-5993-43b0-a754-3e5fd93c5bd0",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-manual-aileen-zanner",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        }
+      ],
+      "updatedAt": 1785777749296
+    },
+    "match-2026-03-08-wc-jgd-0": {
+      "id": "match-2026-03-08-wc-jgd-0",
+      "time": "15:00",
+      "homeTeam": "SV West Gian",
+      "awayTeam": "Gast",
+      "helperTeamId": "club-wide",
+      "slots": [
+        {
+          "id": "slot-24f0fb0f-b162-4e47-b987-e2312d27cdfc",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-fynn-hohn",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-0a6a8a77-b5fe-4ec9-85f9-07d6dd6316d1",
+          "roleId": "secretary",
+          "assignedMemberId": "member-johann-terlecki",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-89ab37f8-88af-4442-bb5e-cd50c47a23ae",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-manual-angelo-kruger",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-71cded47-a58d-4d0c-8f4b-c9e1e2e83487",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Zuschauer",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-9521eac7-d6c7-4aa7-ad01-2ca0f88835c9",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-marika-sander",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        }
+      ],
+      "updatedAt": 1785777749296
+    },
+    "match-2026-03-08-maenner-iii-1": {
+      "id": "match-2026-03-08-maenner-iii-1",
+      "time": "17:00",
+      "homeTeam": "SV Bad Lucastadt III",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-e3aeb4c7-5868-486c-9e32-5bf95707b924",
+          "roleId": "timekeeper",
+          "assignedMemberId": null,
+          "customHelperName": "Männer II",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-718662c6-576a-4ae9-a401-eae652daf216",
+          "roleId": "secretary",
+          "assignedMemberId": null,
+          "customHelperName": "Männer II",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-2436e92d-2147-4053-a891-c223f1fd91a2",
+          "roleId": "steward_entrance",
+          "assignedMemberId": null,
+          "customHelperName": "Männer II",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-312bd596-26ae-409b-8351-02e8dc38b023",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Männer II",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-af10b469-b9a2-41a4-8026-8cfaca25f1b0",
+          "roleId": "wiper_1",
+          "assignedMemberId": null,
+          "customHelperName": "Männer II",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        }
+      ],
+      "updatedAt": 1785777749296
+    },
+    "match-2026-03-15-minis-0": {
+      "id": "match-2026-03-15-minis-0",
+      "time": "09:00",
+      "homeTeam": "SV Willwacherland",
+      "awayTeam": "Gast",
+      "helperTeamId": "minis",
+      "slots": [
+        {
+          "id": "slot-6d5541d8-3aff-465e-929c-2eab5c335a65",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-aurora-ganzmann",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-fbe620a0-e7ae-4548-bd95-e8e59d4469ae",
+          "roleId": "secretary",
+          "assignedMemberId": "member-manual-angelo-kruger",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-794e641e-12bd-422c-8f72-2e6b65a84d40",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-manual-milan-effler",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-c7a424a9-b1f0-40e6-9c25-9d3ddb10fcf4",
+          "roleId": "wiper_2",
+          "assignedMemberId": "member-rebekka-loeser",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-dc5a4ab9-a7b7-456a-8813-5ee41873b30a",
+          "roleId": "referee_1",
+          "assignedMemberId": "member-josefine-pajonk",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-8b973ef2-b407-4e71-b314-e1b62c6fa09f",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        }
+      ],
+      "updatedAt": 1785777749296
+    },
+    "match-2026-03-15-e-jgd-1": {
+      "id": "match-2026-03-15-e-jgd-1",
+      "time": "14:00",
+      "homeTeam": "HC Schwerdtnerdorf",
+      "awayTeam": "Gast",
+      "helperTeamId": "club-wide",
+      "slots": [
+        {
+          "id": "slot-432c63d9-323f-4dbb-bede-7f726a4e98d7",
+          "roleId": "timekeeper",
+          "assignedMemberId": null,
+          "customHelperName": "Männer II",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-f0049317-434d-4059-b13c-842611951bd4",
+          "roleId": "secretary",
+          "assignedMemberId": null,
+          "customHelperName": "Männer II Männer II",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-773af84c-f1c6-49c3-a07b-db5a0327ddc8",
+          "roleId": "steward_entrance",
+          "assignedMemberId": null,
+          "customHelperName": "Männer II",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-c7801a0a-68a4-4bd6-ab39-1a8090063726",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Männer II",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-3d0aa489-6f97-467a-832b-b095d78d55fc",
+          "roleId": "wiper_1",
+          "assignedMemberId": null,
+          "customHelperName": "Männer II",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-9fd83ec9-5987-41ec-ab05-95a98637c133",
+          "roleId": "wiper_2",
+          "assignedMemberId": null,
+          "customHelperName": "Männer II",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-58afec3f-5a26-42a8-b98b-7e3be7506514",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        }
+      ],
+      "updatedAt": 1785777749296
+    },
+    "match-2026-03-28-minis-0": {
+      "id": "match-2026-03-28-minis-0",
+      "time": "14:00",
+      "homeTeam": "SV Willwacherland",
+      "awayTeam": "Gast",
+      "helperTeamId": "minis",
+      "slots": [
+        {
+          "id": "slot-ae0be3c2-c61e-43be-8973-c410d3e08d20",
+          "roleId": "timekeeper",
+          "assignedMemberId": "member-manual-janne-trampeli",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-5f96448a-2aaa-4a9b-a4bd-710449dfc1c1",
+          "roleId": "secretary",
+          "assignedMemberId": "member-marcus-schirmer",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-82cae979-cffc-4982-af5e-cc344c7aef05",
+          "roleId": "steward_entrance",
+          "assignedMemberId": "member-manual-giulia-kinadeter",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-6d2db86d-7d69-409a-a770-8905f44301e6",
+          "roleId": "wiper_1",
+          "assignedMemberId": "member-manual-janne-trampeli",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-8aba4fec-23f6-4243-ad7f-ac1c0d00f63a",
+          "roleId": "wiper_2",
+          "assignedMemberId": "member-francesca-sprenger",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-011c9660-1c4d-4a45-9202-2ebeae9c09d4",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        }
+      ],
+      "updatedAt": 1785777749296
+    },
+    "match-2026-03-28-maenner-i-1": {
+      "id": "match-2026-03-28-maenner-i-1",
+      "time": "18:30",
+      "homeTeam": "SG Menden (Sauerland)",
+      "awayTeam": "Gast",
+      "helperTeamId": "maenner-1",
+      "slots": [
+        {
+          "id": "slot-826959b0-6a0c-4956-aa3f-5a47c1d59d69",
+          "roleId": "timekeeper",
+          "assignedMemberId": null,
+          "customHelperName": "Männer",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-08acc129-384e-4ff4-a11b-7bb79dc91b09",
+          "roleId": "secretary",
+          "assignedMemberId": null,
+          "customHelperName": "Männer Männer I",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-896d90f4-5699-4bb9-9775-57fcac123876",
+          "roleId": "steward_entrance",
+          "assignedMemberId": null,
+          "customHelperName": "Männer I",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-657d5968-f628-4f5c-990b-152ea7a8c612",
+          "roleId": "steward_2",
+          "assignedMemberId": null,
+          "customHelperName": "Männer",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        },
+        {
+          "id": "slot-64f13a1e-5fab-4e0a-a54b-78e5362cb652",
+          "roleId": "catering",
+          "assignedMemberId": null,
+          "customHelperName": "Verkauf",
+          "checkedIn": false,
+          "updatedAt": 1785777749296
+        }
+      ],
+      "updatedAt": 1785777749296
+    }
+  },
+  "config": {
+    "roles": [
+      {
+        "id": "timekeeper",
+        "name": "Zeitnehmer",
+        "scope": "match",
+        "requiredSkillId": "esb"
+      },
+      {
+        "id": "secretary",
+        "name": "Sekretär",
+        "scope": "match",
+        "requiredSkillId": "esb"
+      },
+      {
+        "id": "steward_entrance",
+        "name": "Ordner Einlass",
+        "scope": "match",
+        "requiredSkillId": "steward"
+      },
+      {
+        "id": "steward_2",
+        "name": "Ordner 2",
+        "scope": "match"
+      },
+      {
+        "id": "wiper_1",
+        "name": "Wischer 1",
+        "scope": "match"
+      },
+      {
+        "id": "wiper_2",
+        "name": "Wischer 2",
+        "scope": "match"
+      },
+      {
+        "id": "referee_1",
+        "name": "Schiedsrichter 1",
+        "scope": "match",
+        "requiredSkillId": "referee"
+      },
+      {
+        "id": "referee_2",
+        "name": "Schiedsrichter 2",
+        "scope": "match",
+        "requiredSkillId": "referee"
+      },
+      {
+        "id": "video",
+        "name": "Video",
+        "scope": "match"
+      },
+      {
+        "id": "catering",
+        "name": "Catering (Verkauf)",
+        "scope": "match"
+      }
+    ],
+    "locations": [
+      {
+        "id": "seebachgrundhalle",
+        "name": "Aalen, Seebach-Arena",
+        "link": "https://maps.google.com/?q=An%20der%20Kante%2068%209%20OG"
+      },
+      {
+        "id": "siemens-sporthalle",
+        "name": "Kraldorf, Siemens-Sportpark",
+        "link": "https://maps.google.com/?q=Heinrich-L%C3%BCtzenkirchen-Weg%2096b%202%20OG"
+      },
+      {
+        "id": "schulzentrum-spardorf",
+        "name": "Alt Kimiland, Sporthalle am Schulzentrum",
+        "link": "https://maps.google.com/?q=K%C3%B6schenberg%20978%20Zimmer%20802"
+      },
+      {
+        "id": "emmy-noether-halle",
+        "name": "Süd Chiara, Emmy-Noether-Halle",
+        "link": "https://maps.google.com/?q=Jakob-Kaiser-Str.%2079%20Zimmer%20243"
+      },
+      {
+        "id": "europakanal-sporthalle",
+        "name": "Unna, Sporthalle am Europakanal",
+        "link": "https://maps.google.com/?q=Gregor-Mendel-Str.%2061%20Apt.%20775"
+      }
+    ]
+  }
+}
