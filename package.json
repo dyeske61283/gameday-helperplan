@@ -15,6 +15,7 @@
     "test:api": "vitest run --project=api",
     "test:app": "vitest run --project=app",
     "test:workflow": "vitest run --project=workflow",
+    "test:e2e": "vitest run --project=e2e",
     "test:a11y": "node scripts/accessibility-test.js",
     "prepare": "husky"
   },
