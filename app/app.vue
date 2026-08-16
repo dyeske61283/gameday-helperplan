@@ -6,6 +6,12 @@ const { locale, t } = useI18n();
 const lang = computed(() => locales[locale.value]?.code || "de");
 const dir = computed(() => locales[locale.value]?.dir || "ltr");
 
+const planStore = usePlanStore();
+
+onMounted(() => {
+  planStore.initFromUrl();
+});
+
 useHead({
   title: computed(() => t("welcome")),
   htmlAttrs: {
