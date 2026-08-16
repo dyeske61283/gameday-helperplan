@@ -1,18 +1,23 @@
-import type * as planTypes from "../utils/plan-types";
+import type {
+  Gameday,
+  Match,
+  Member,
+  SeasonPlan,
+  Team,
+} from "../utils/plan-types";
 import { useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
+import examplePlan from "../../test/fixtures/plan-2025-2026.json";
 import { useDecryption, useEncryption } from "../composables/use-crypto";
 
 const STORAGE_KEY = "gameday-plan-id";
-const FRAGMENT_PREFIX = "key=";
+const _FRAGMENT_PREFIX = "key=";
 
 /**
  * Migrate the plan schema if needed.
  */
-export function migrateIfNeeded(
-  loadedPlan: planTypes.SeasonPlan,
-): planTypes.SeasonPlan {
+export function migrateIfNeeded(loadedPlan: SeasonPlan): SeasonPlan {
   const CURRENT_SCHEMA_VERSION = 1;
 
   if (loadedPlan.schemaVersion < CURRENT_SCHEMA_VERSION) {
@@ -22,7 +27,7 @@ export function migrateIfNeeded(
 
     // Ensure all matches have a slots array
     if (loadedPlan.matches) {
-      Object.values(loadedPlan.matches).forEach((match: planTypes.Match) => {
+      Object.values(loadedPlan.matches).forEach((match: Match) => {
         if (!match.slots) {
           match.slots = [];
         }
@@ -31,13 +36,11 @@ export function migrateIfNeeded(
 
     // Ensure all gamedays have a slots array
     if (loadedPlan.gamedays) {
-      Object.values(loadedPlan.gamedays).forEach(
-        (gameday: planTypes.Gameday) => {
-          if (!gameday.slots) {
-            gameday.slots = [];
-          }
-        },
-      );
+      Object.values(loadedPlan.gamedays).forEach((gameday: Gameday) => {
+        if (!gameday.slots) {
+          gameday.slots = [];
+        }
+      });
     }
 
     loadedPlan.schemaVersion = CURRENT_SCHEMA_VERSION;
@@ -47,9 +50,8 @@ export function migrateIfNeeded(
 }
 
 export const usePlanStore = defineStore("plan", () => {
-  const plan = ref<planTypes.SeasonPlan | null>(null);
+  const plan = ref<SeasonPlan | null>(null);
   const key = ref<string | null>(null);
-  const currentStep = ref(1);
   const readOnly = ref(false);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
@@ -61,22 +63,34 @@ export const usePlanStore = defineStore("plan", () => {
   const { encryptData, generateKey } = useEncryption();
   const { decryptBlob } = useDecryption();
 
-  const _isModifiable = computed(() => !readOnly.value && !!plan.value);
+  // Computed Getters & Domain Views
+  const isModifiable = computed(() => !readOnly.value && !!plan.value);
+  const teams = computed(() => plan.value?.teams ?? {});
+  const members = computed(() => plan.value?.members ?? {});
+  const matches = computed(() => plan.value?.matches ?? {});
+  const gamedays = computed(() => plan.value?.gamedays ?? {});
+  const teamsList = computed(() => Object.values(teams.value));
+  const membersList = computed(() => Object.values(members.value));
 
   /**
-   * Sync key with URL fragment
+   * Load the example plan fixture into state
    */
-  watch(key, (newKey) => {
-    if (import.meta.server)
-      return;
+  function loadExamplePlan(): SeasonPlan {
+    const cloned = JSON.parse(JSON.stringify(examplePlan)) as SeasonPlan;
+    const migrated = migrateIfNeeded(cloned);
+    plan.value = migrated;
+    return migrated;
+  }
 
-    if (newKey) {
-      globalThis.location.hash = `${FRAGMENT_PREFIX}${newKey}`;
+  /**
+   * Ensure plan is loaded, falling back to example plan if null
+   */
+  function ensurePlanLoaded(): SeasonPlan {
+    if (!plan.value) {
+      return loadExamplePlan();
     }
-    else {
-      globalThis.location.hash = "";
-    }
-  });
+    return plan.value;
+  }
 
   async function loadPlan(id: string, decryptionKey: string) {
     isLoading.value = true;
@@ -91,14 +105,13 @@ export const usePlanStore = defineStore("plan", () => {
       }
 
       const decryptedData = await decryptBlob(response.blob, decryptionKey);
-      let loadedPlan = JSON.parse(decryptedData) as planTypes.SeasonPlan;
+      let loadedPlan = JSON.parse(decryptedData) as SeasonPlan;
 
       // Run migration logic
       loadedPlan = migrateIfNeeded(loadedPlan);
 
       plan.value = loadedPlan;
       lastPlanId.value = id;
-      currentStep.value = 5;
     }
     catch (err: unknown) {
       if (err instanceof Error)
@@ -133,10 +146,8 @@ export const usePlanStore = defineStore("plan", () => {
           return;
 
         const decryptedData = await decryptBlob(encryptedBlob, decryptionKey);
-        let updatedPlan = JSON.parse(decryptedData) as planTypes.SeasonPlan;
+        let updatedPlan = JSON.parse(decryptedData) as SeasonPlan;
 
-        // Only update if the incoming revision is newer than our local one
-        // This prevents overwriting unsaved local changes or re-applying our own save
         if (!plan.value || updatedPlan.rev > plan.value.rev) {
           console.warn("Real-time update received: Rev", updatedPlan.rev);
           updatedPlan = migrateIfNeeded(updatedPlan);
@@ -150,7 +161,6 @@ export const usePlanStore = defineStore("plan", () => {
 
     eventSource.value.onerror = (err) => {
       console.error("SSE connection error:", err);
-      // EventSource automatically retries by default
     };
   }
 
@@ -171,7 +181,6 @@ export const usePlanStore = defineStore("plan", () => {
     error.value = null;
 
     try {
-      // Increment revision and update timestamp
       plan.value.rev++;
       plan.value.lastUpdated = Date.now();
 
@@ -249,17 +258,6 @@ export const usePlanStore = defineStore("plan", () => {
       },
     };
     lastPlanId.value = id;
-    currentStep.value = 1;
-  }
-
-  function nextStep() {
-    currentStep.value++;
-  }
-
-  function prevStep() {
-    if (currentStep.value > 1) {
-      currentStep.value--;
-    }
   }
 
   async function finalizePlan() {
@@ -274,8 +272,85 @@ export const usePlanStore = defineStore("plan", () => {
     lastPlanId.value = id;
 
     await savePlan();
-    currentStep.value = 5;
   }
+
+  // --- Domain Methods: Teams ---
+
+  function addTeam(name: string): Team {
+    const currentPlan = ensurePlanLoaded();
+    const newId = `team-${crypto.randomUUID().substring(0, 8)}`;
+    const newTeam: Team = {
+      id: newId,
+      name,
+      isManual: true,
+      updatedAt: Date.now(),
+    };
+    currentPlan.teams[newId] = newTeam;
+    currentPlan.lastUpdated = Date.now();
+    return newTeam;
+  }
+
+  function updateTeam(teamId: string, name: string) {
+    if (!plan.value || !plan.value.teams[teamId])
+      return;
+    plan.value.teams[teamId].name = name;
+    plan.value.teams[teamId].updatedAt = Date.now();
+    plan.value.lastUpdated = Date.now();
+  }
+
+  function deleteTeam(teamId: string) {
+    if (!plan.value)
+      return;
+    delete plan.value.teams[teamId];
+    // Remove team from all members
+    Object.values(plan.value.members).forEach((m) => {
+      m.teamIds = m.teamIds.filter(tId => tId !== teamId);
+    });
+    plan.value.lastUpdated = Date.now();
+  }
+
+  // --- Domain Methods: Members ---
+
+  function addMember(data: Partial<Omit<Member, "id" | "updatedAt">> & { name: string }): Member {
+    const currentPlan = ensurePlanLoaded();
+    const newId = `member-${crypto.randomUUID().substring(0, 8)}`;
+    const newMember: Member = {
+      id: newId,
+      name: data.name,
+      teamIds: data.teamIds ? [...data.teamIds] : [],
+      skillIds: data.skillIds ? [...data.skillIds] : [],
+      isManual: data.isManual ?? true,
+      updatedAt: Date.now(),
+    };
+    currentPlan.members[newId] = newMember;
+    currentPlan.lastUpdated = Date.now();
+    return newMember;
+  }
+
+  function updateMember(memberId: string, updates: Partial<Omit<Member, "id">>) {
+    if (!plan.value || !plan.value.members[memberId])
+      return;
+    const member = plan.value.members[memberId];
+    if (updates.name !== undefined)
+      member.name = updates.name;
+    if (updates.teamIds !== undefined)
+      member.teamIds = [...updates.teamIds];
+    if (updates.skillIds !== undefined)
+      member.skillIds = [...updates.skillIds];
+    if (updates.isManual !== undefined)
+      member.isManual = updates.isManual;
+    member.updatedAt = Date.now();
+    plan.value.lastUpdated = Date.now();
+  }
+
+  function deleteMember(memberId: string) {
+    if (!plan.value)
+      return;
+    delete plan.value.members[memberId];
+    plan.value.lastUpdated = Date.now();
+  }
+
+  // --- Domain Methods: Matches & Helpers ---
 
   function assignHelperTeam(matchId: string, teamId: string) {
     if (!plan.value || !plan.value.matches[matchId])
@@ -283,18 +358,27 @@ export const usePlanStore = defineStore("plan", () => {
 
     plan.value.matches[matchId].helperTeamId = teamId;
     plan.value.matches[matchId].updatedAt = Date.now();
+    plan.value.lastUpdated = Date.now();
   }
 
   /**
    * Extract key from URL fragment
    */
   function initFromUrl() {
-    if (import.meta.server)
+    // Ensure this only runs in the browser
+    if (!import.meta.client || !globalThis.location.hash)
       return;
 
-    const hash = globalThis.location.hash.substring(1);
-    if (hash.startsWith(FRAGMENT_PREFIX)) {
-      key.value = hash.substring(FRAGMENT_PREFIX.length);
+    // Parse parameters from URL fragment (e.g., key=abc&plan=123)
+    const hashParams = new URLSearchParams(globalThis.location.hash.substring(1));
+    const keyFromUrl = hashParams.get("key");
+
+    if (keyFromUrl) {
+      key.value = keyFromUrl;
+
+      // Remove the fragment from the URL without triggering a page refresh
+      const cleanUrl = globalThis.location.pathname + globalThis.location.search;
+      globalThis.history.replaceState(null, "", cleanUrl);
     }
   }
 
@@ -302,17 +386,29 @@ export const usePlanStore = defineStore("plan", () => {
     plan,
     key,
     lastPlanId,
-    currentStep,
     isLoading,
     error,
+    isModifiable,
+    teams,
+    members,
+    matches,
+    gamedays,
+    teamsList,
+    membersList,
+    loadExamplePlan,
+    ensurePlanLoaded,
     loadPlan,
     watchPlan,
     stopWatching,
     savePlan,
     createNewPlan,
+    addTeam,
+    updateTeam,
+    deleteTeam,
+    addMember,
+    updateMember,
+    deleteMember,
     assignHelperTeam,
-    nextStep,
-    prevStep,
     finalizePlan,
     initFromUrl,
   };

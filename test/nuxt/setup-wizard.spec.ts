@@ -29,7 +29,7 @@ describe("setup Wizard", () => {
 
     const store = usePlanStore();
     store.plan = null;
-    store.currentStep = 1;
+    component.vm.currentStep = 1;
 
     await nextTick();
 
@@ -48,7 +48,7 @@ describe("setup Wizard", () => {
 
     const store = usePlanStore();
     store.plan = null;
-    store.currentStep = 1;
+    component.vm.currentStep = 1;
 
     await nextTick();
 
@@ -58,7 +58,7 @@ describe("setup Wizard", () => {
     if (startBtn) {
       await startBtn.trigger("click");
       await nextTick();
-      expect(store.currentStep).toBe(2);
+      expect(component.vm.currentStep).toBe(2);
     }
     else {
       throw new Error("'Start Setup' button not found");
@@ -76,7 +76,7 @@ describe("setup Wizard", () => {
 
     const store = usePlanStore();
     store.plan = null;
-    store.currentStep = 2;
+    component.vm.currentStep = 2;
 
     await nextTick();
 
@@ -110,7 +110,7 @@ describe("setup Wizard", () => {
       season: "",
       skills: {},
     };
-    store.currentStep = 4;
+    component.vm.currentStep = 4;
 
     await nextTick();
 

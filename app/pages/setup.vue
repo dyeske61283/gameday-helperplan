@@ -5,12 +5,26 @@ const planStore = usePlanStore();
 const route = useRoute();
 const toast = useToast();
 const clip = useClipboard();
-
+const currentStep = ref(1);
 const jsonInput = ref("");
 const isSyncing = computed(() => !!planStore.plan && !!planStore.key);
 
 const membersInput = ref("");
 const manualClubName = ref("");
+
+function nextStep() {
+  currentStep.value++;
+}
+
+function prevStep() {
+  if (currentStep.value > 0)
+    currentStep.value--;
+}
+
+async function finalizePlan() {
+  nextStep();
+  planStore.finalizePlan();
+}
 
 function handleManualClub() {
   const id = `manual-${crypto.randomUUID().substring(0, 8)}`;
@@ -26,7 +40,7 @@ function handleManualClub() {
       lastUpdated: Date.now(),
     };
   }
-  planStore.nextStep();
+  nextStep();
 }
 
 function handleImportMembers() {
@@ -52,7 +66,7 @@ function handleImportMembers() {
     color: "success",
   });
 
-  planStore.finalizePlan();
+  finalizePlan();
 }
 
 // Synchronize jsonInput with planStore.plan
@@ -106,6 +120,7 @@ async function handleResume() {
 
   if (lastId && currentKey) {
     await planStore.loadPlan(lastId, currentKey);
+    currentStep.value = 5;
   }
   else {
     toast.add({
@@ -136,13 +151,17 @@ onMounted(async () => {
 onUnmounted(() => {
   planStore.stopWatching();
 });
+
+defineExpose({
+  currentStep,
+});
 </script>
 
 <template>
   <UContainer class="py-12 md:py-24">
-    <div v-if="planStore.currentStep < 5" class="space-y-12">
+    <div v-if="currentStep < 5" class="space-y-12">
       <!-- Wizard Step 1: Start Setup -->
-      <div v-if="planStore.currentStep === 1" class="space-y-12">
+      <div v-if="currentStep === 1" class="space-y-12">
         <div class="text-center space-y-4">
           <h1 class="headline-lg text-on-surface">
             Set up your Gameday Plan
@@ -156,7 +175,7 @@ onUnmounted(() => {
           <UButton
             size="xl"
             icon="i-lucide-arrow-right"
-            @click="planStore.nextStep()"
+            @click="nextStep()"
           >
             Start Setup
           </UButton>
@@ -180,15 +199,15 @@ onUnmounted(() => {
           <UButton
             icon="i-lucide-arrow-left"
             variant="ghost"
-            @click="planStore.prevStep()"
+            @click="prevStep()"
           >
             Back
           </UButton>
-          <span class="text-sm font-medium text-on-surface-variant">Step {{ planStore.currentStep }}</span>
+          <span class="text-sm font-medium text-on-surface-variant">Step {{ currentStep }}</span>
         </div>
 
         <!-- Step 4: Members (Bulk Add) -->
-        <div v-if="planStore.currentStep === 4" class="space-y-6 max-w-2xl mx-auto">
+        <div v-if="currentStep === 4" class="space-y-6 max-w-2xl mx-auto">
           <div class="text-center space-y-2">
             <h2 class="headline-md">
               Add Members
@@ -207,7 +226,7 @@ onUnmounted(() => {
           />
 
           <div class="flex justify-center gap-4">
-            <UButton variant="ghost" @click="planStore.finalizePlan()">
+            <UButton variant="ghost" @click="finalizePlan()">
               Skip for now
             </UButton>
             <UButton size="xl" @click="handleImportMembers">
@@ -217,7 +236,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Step 2: Club Info -->
-        <div v-if="planStore.currentStep === 2" class="space-y-6 max-w-2xl mx-auto">
+        <div v-if="currentStep === 2" class="space-y-6 max-w-2xl mx-auto">
           <div class="space-y-2">
             <h2 class="headline-md">
               Club Information
@@ -239,12 +258,12 @@ onUnmounted(() => {
         </div>
 
         <!-- Step 3: Teams -->
-        <div v-if="planStore.currentStep === 3" class="space-y-6 max-w-2xl mx-auto text-center">
+        <div v-if="currentStep === 3" class="space-y-6 max-w-2xl mx-auto text-center">
           <h2 class="headline-md">
             Manual Team Setup
           </h2>
           <p>Manual team entry coming soon...</p>
-          <UButton size="xl" @click="planStore.nextStep()">
+          <UButton size="xl" @click="nextStep()">
             Continue to Members
           </UButton>
         </div>

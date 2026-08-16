@@ -36,11 +36,70 @@ describe("usePlanStore", () => {
         },
       };
 
-      const migratedPlan = migrateIfNeeded(oldPlan);
+      const migratedPlan = migrateIfNeeded(oldPlan as any);
 
       expect(migratedPlan.schemaVersion).toBe(1);
       expect(migratedPlan.matches.m1?.slots).toBeDefined();
       expect(Array.isArray(migratedPlan.matches.m1?.slots)).toBe(true);
+    });
+  });
+
+  describe("example plan loading", () => {
+    it("should load the example plan into state", () => {
+      const store = usePlanStore();
+      expect(store.plan).toBeNull();
+
+      const loaded = store.loadExamplePlan();
+      expect(loaded).toBeDefined();
+      expect(store.plan).not.toBeNull();
+      expect(Object.keys(store.teams).length).toBeGreaterThan(0);
+    });
+
+    it("should ensure plan is loaded on demand", () => {
+      const store = usePlanStore();
+      expect(store.plan).toBeNull();
+
+      store.ensurePlanLoaded();
+      expect(store.plan).not.toBeNull();
+    });
+  });
+
+  describe("team management", () => {
+    it("should add, update, and delete a team", () => {
+      const store = usePlanStore();
+      store.createNewPlan("test-plan", "test-key");
+
+      const newTeam = store.addTeam("Men 1");
+      expect(store.teams[newTeam.id]).toBeDefined();
+      expect(store.teams[newTeam.id]?.name).toBe("Men 1");
+
+      const member = store.addMember({ name: "John Doe", teamIds: [newTeam.id] });
+      expect(store.members[member.id]?.teamIds).toContain(newTeam.id);
+
+      store.updateTeam(newTeam.id, "Men Senior");
+      expect(store.teams[newTeam.id]?.name).toBe("Men Senior");
+
+      store.deleteTeam(newTeam.id);
+      expect(store.teams[newTeam.id]).toBeUndefined();
+      expect(store.members[member.id]?.teamIds).not.toContain(newTeam.id);
+    });
+  });
+
+  describe("member management", () => {
+    it("should add, update, and delete a member", () => {
+      const store = usePlanStore();
+      store.createNewPlan("test-plan", "test-key");
+
+      const member = store.addMember({ name: "Jane Doe", skillIds: ["referee"] });
+      expect(store.members[member.id]).toBeDefined();
+      expect(store.members[member.id]?.name).toBe("Jane Doe");
+
+      store.updateMember(member.id, { name: "Jane Smith", skillIds: ["referee", "esb"] });
+      expect(store.members[member.id]?.name).toBe("Jane Smith");
+      expect(store.members[member.id]?.skillIds).toEqual(["referee", "esb"]);
+
+      store.deleteMember(member.id);
+      expect(store.members[member.id]).toBeUndefined();
     });
   });
 
