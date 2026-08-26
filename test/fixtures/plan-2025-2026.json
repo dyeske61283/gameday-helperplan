@@ -1678,7 +1678,6 @@
       ],
       "slots": [],
       "openingTime": "20:15",
-      "closingTime": "",
       "notes": "Hannberg",
       "updatedAt": 1785777749295
     },
@@ -1798,8 +1797,8 @@
     "match-2025-09-21-maenner-i-0": {
       "id": "match-2025-09-21-maenner-i-0",
       "time": "18:00",
-      "homeTeam": "SG Menden (Sauerland)",
-      "awayTeam": "Gast",
+      "homeTeamId": "SG Menden (Sauerland)",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -1856,8 +1855,8 @@
     "match-2025-10-04-ejgd-0": {
       "id": "match-2025-10-04-ejgd-0",
       "time": "13:00",
-      "homeTeam": "HSG Leideland",
-      "awayTeam": "Gast",
+      "homeTeamId": "HSG Leideland",
+      "awayTeamName": "Gast",
       "helperTeamId": "ge-jgd",
       "slots": [
         {
@@ -1898,8 +1897,8 @@
     "match-2025-10-05-minis-0": {
       "id": "match-2025-10-05-minis-0",
       "time": "10:00",
-      "homeTeam": "SV Willwacherland",
-      "awayTeam": "Gast",
+      "homeTeamId": "SV Willwacherland",
+      "awayTeamName": "Gast",
       "helperTeamId": "minis",
       "slots": [
         {
@@ -1932,8 +1931,8 @@
     "b8318dba-996d-4faf-b1e0-053bdb21fb75": {
       "id": "b8318dba-996d-4faf-b1e0-053bdb21fb75",
       "time": "16:00",
-      "homeTeam": "Gladbeck HC",
-      "awayTeam": "HC Bichlerburg II",
+      "homeTeamId": "Gladbeck HC",
+      "awayTeamName": "HC Bichlerburg II",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -1998,8 +1997,8 @@
     "match-2025-10-05-maenner-i-2": {
       "id": "match-2025-10-05-maenner-i-2",
       "time": "18:00",
-      "homeTeam": "SG Menden (Sauerland)",
-      "awayTeam": "Gast",
+      "homeTeamId": "SG Menden (Sauerland)",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -2032,8 +2031,8 @@
     "match-2025-10-12-wd-jgd-0": {
       "id": "match-2025-10-12-wd-jgd-0",
       "time": "13:00",
-      "homeTeam": "TV Neu Armin",
-      "awayTeam": "Gast",
+      "homeTeamId": "TV Neu Armin",
+      "awayTeamName": "Gast",
       "helperTeamId": "club-wide",
       "slots": [
         {
@@ -2082,8 +2081,8 @@
     "match-2025-10-19-minis-0": {
       "id": "match-2025-10-19-minis-0",
       "time": "10:00",
-      "homeTeam": "SV Willwacherland",
-      "awayTeam": "Gast",
+      "homeTeamId": "SV Willwacherland",
+      "awayTeamName": "Gast",
       "helperTeamId": "minis",
       "slots": [
         {
@@ -2124,8 +2123,8 @@
     "ae74fa74-7471-4682-a7b9-2a17dc2599c6": {
       "id": "ae74fa74-7471-4682-a7b9-2a17dc2599c6",
       "time": "16:00",
-      "homeTeam": "Gladbeck HC",
-      "awayTeam": "SG Yannickdorf",
+      "homeTeamId": "Gladbeck HC",
+      "awayTeamName": "SG Yannickdorf",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -2182,8 +2181,8 @@
     "match-2025-10-19-maenner-i-2": {
       "id": "match-2025-10-19-maenner-i-2",
       "time": "18:00",
-      "homeTeam": "SG Menden (Sauerland)",
-      "awayTeam": "Gast",
+      "homeTeamId": "SG Menden (Sauerland)",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -2240,8 +2239,8 @@
     "match-2025-10-26-md-jgd-0": {
       "id": "match-2025-10-26-md-jgd-0",
       "time": "10:00",
-      "homeTeam": "TV Ost Janinaburg",
-      "awayTeam": "Gast",
+      "homeTeamId": "TV Ost Janinaburg",
+      "awayTeamName": "Gast",
       "helperTeamId": "md-jgd",
       "slots": [
         {
@@ -2282,8 +2281,8 @@
     "match-2025-10-26-maenner-iii-1": {
       "id": "match-2025-10-26-maenner-iii-1",
       "time": "15:00",
-      "homeTeam": "SV Bad Lucastadt III",
-      "awayTeam": "Gast",
+      "homeTeamId": "SV Bad Lucastadt III",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -2300,8 +2299,8 @@
     "match-2025-11-16-maenner-ii-0": {
       "id": "match-2025-11-16-maenner-ii-0",
       "time": "14:00",
-      "homeTeam": "TV Göbelscheid II",
-      "awayTeam": "Gast",
+      "homeTeamId": "TV Göbelscheid II",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -2350,8 +2349,8 @@
     "match-2025-11-16-frauen-1": {
       "id": "match-2025-11-16-frauen-1",
       "time": "16:00",
-      "homeTeam": "SG Nord Jonah",
-      "awayTeam": "Gast",
+      "homeTeamId": "SG Nord Jonah",
+      "awayTeamName": "Gast",
       "helperTeamId": "frauen",
       "slots": [
         {
@@ -2416,8 +2415,8 @@
     "match-2025-11-16-maenner-i-2": {
       "id": "match-2025-11-16-maenner-i-2",
       "time": "18:00",
-      "homeTeam": "SG Menden (Sauerland)",
-      "awayTeam": "Gast",
+      "homeTeamId": "SG Menden (Sauerland)",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -2482,8 +2481,8 @@
     "match-2025-11-30-maenner-ii-0": {
       "id": "match-2025-11-30-maenner-ii-0",
       "time": "14:00",
-      "homeTeam": "TV Göbelscheid II",
-      "awayTeam": "Gast",
+      "homeTeamId": "TV Göbelscheid II",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -2540,8 +2539,8 @@
     "match-2025-11-30-maenner-iii-1": {
       "id": "match-2025-11-30-maenner-iii-1",
       "time": "16:00",
-      "homeTeam": "SV Bad Lucastadt III",
-      "awayTeam": "Gast",
+      "homeTeamId": "SV Bad Lucastadt III",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -2598,8 +2597,8 @@
     "match-2025-11-30-maenner-i-2": {
       "id": "match-2025-11-30-maenner-i-2",
       "time": "18:00",
-      "homeTeam": "SG Menden (Sauerland)",
-      "awayTeam": "Gast",
+      "homeTeamId": "SG Menden (Sauerland)",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -2656,8 +2655,8 @@
     "match-2025-11-30-mv-3": {
       "id": "match-2025-11-30-mv-3",
       "time": "20:00",
-      "homeTeam": "HSG Nord Arneland",
-      "awayTeam": "Gast",
+      "homeTeamId": "HSG Nord Arneland",
+      "awayTeamName": "Gast",
       "helperTeamId": "club-wide",
       "slots": [
         {
@@ -2674,8 +2673,8 @@
     "match-2025-12-06-maenner-iii-0": {
       "id": "match-2025-12-06-maenner-iii-0",
       "time": "16:00",
-      "homeTeam": "SV Bad Lucastadt III",
-      "awayTeam": "Gast",
+      "homeTeamId": "SV Bad Lucastadt III",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -2732,8 +2731,8 @@
     "match-2025-12-06-maenner-i-1": {
       "id": "match-2025-12-06-maenner-i-1",
       "time": "18:00",
-      "homeTeam": "SG Menden (Sauerland)",
-      "awayTeam": "Gast",
+      "homeTeamId": "SG Menden (Sauerland)",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -2790,8 +2789,8 @@
     "match-2026-01-10-frauen-0": {
       "id": "match-2026-01-10-frauen-0",
       "time": "18:00",
-      "homeTeam": "SG Nord Jonah",
-      "awayTeam": "Gast",
+      "homeTeamId": "SG Nord Jonah",
+      "awayTeamName": "Gast",
       "helperTeamId": "frauen",
       "slots": [
         {
@@ -2856,8 +2855,8 @@
     "match-2026-01-10-wc-jgd-1": {
       "id": "match-2026-01-10-wc-jgd-1",
       "time": "12:00",
-      "homeTeam": "SV West Gian",
-      "awayTeam": "Gast",
+      "homeTeamId": "SV West Gian",
+      "awayTeamName": "Gast",
       "helperTeamId": "club-wide",
       "slots": [
         {
@@ -2898,8 +2897,8 @@
     "match-2026-01-10-maenner-ii-2": {
       "id": "match-2026-01-10-maenner-ii-2",
       "time": "14:00",
-      "homeTeam": "TV Göbelscheid II",
-      "awayTeam": "Gast",
+      "homeTeamId": "TV Göbelscheid II",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -2948,8 +2947,8 @@
     "match-2026-01-10-maenner-iii-3": {
       "id": "match-2026-01-10-maenner-iii-3",
       "time": "16:00",
-      "homeTeam": "SV Bad Lucastadt III",
-      "awayTeam": "Gast",
+      "homeTeamId": "SV Bad Lucastadt III",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -2998,8 +2997,8 @@
     "match-2026-01-10-frauen-4": {
       "id": "match-2026-01-10-frauen-4",
       "time": "18:00",
-      "homeTeam": "SG Nord Jonah",
-      "awayTeam": "Gast",
+      "homeTeamId": "SG Nord Jonah",
+      "awayTeamName": "Gast",
       "helperTeamId": "frauen",
       "slots": [
         {
@@ -3048,8 +3047,8 @@
     "match-2026-01-18-md-jgd-0": {
       "id": "match-2026-01-18-md-jgd-0",
       "time": "10:00",
-      "homeTeam": "TV Ost Janinaburg",
-      "awayTeam": "Gast",
+      "homeTeamId": "TV Ost Janinaburg",
+      "awayTeamName": "Gast",
       "helperTeamId": "md-jgd",
       "slots": [
         {
@@ -3114,8 +3113,8 @@
     "match-2026-01-18-frauen-1": {
       "id": "match-2026-01-18-frauen-1",
       "time": "14:00",
-      "homeTeam": "SG Nord Jonah",
-      "awayTeam": "Gast",
+      "homeTeamId": "SG Nord Jonah",
+      "awayTeamName": "Gast",
       "helperTeamId": "frauen",
       "slots": [
         {
@@ -3180,8 +3179,8 @@
     "match-2026-01-18-wb-jgd-2": {
       "id": "match-2026-01-18-wb-jgd-2",
       "time": "16:00",
-      "homeTeam": "HC Josephburg",
-      "awayTeam": "Gast",
+      "homeTeamId": "HC Josephburg",
+      "awayTeamName": "Gast",
       "helperTeamId": "club-wide",
       "slots": [
         {
@@ -3238,8 +3237,8 @@
     "match-2026-01-18-maenner-i-3": {
       "id": "match-2026-01-18-maenner-i-3",
       "time": "18:00",
-      "homeTeam": "SG Menden (Sauerland)",
-      "awayTeam": "Gast",
+      "homeTeamId": "SG Menden (Sauerland)",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -3296,8 +3295,8 @@
     "match-2026-01-27-herren-iii-0": {
       "id": "match-2026-01-27-herren-iii-0",
       "time": "20:00",
-      "homeTeam": "HSG Kochanstadt III",
-      "awayTeam": "Gast",
+      "homeTeamId": "HSG Kochanstadt III",
+      "awayTeamName": "Gast",
       "helperTeamId": "club-wide",
       "slots": [
         {
@@ -3346,8 +3345,8 @@
     "match-2026-02-01-wb-jgd-0": {
       "id": "match-2026-02-01-wb-jgd-0",
       "time": "12:00",
-      "homeTeam": "HC Josephburg",
-      "awayTeam": "Gast",
+      "homeTeamId": "HC Josephburg",
+      "awayTeamName": "Gast",
       "helperTeamId": "club-wide",
       "slots": [
         {
@@ -3396,8 +3395,8 @@
     "match-2026-02-01-maenner-ii-1": {
       "id": "match-2026-02-01-maenner-ii-1",
       "time": "14:00",
-      "homeTeam": "TV Göbelscheid II",
-      "awayTeam": "Gast",
+      "homeTeamId": "TV Göbelscheid II",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -3454,8 +3453,8 @@
     "match-2026-02-01-frauen-2": {
       "id": "match-2026-02-01-frauen-2",
       "time": "16:00",
-      "homeTeam": "SG Nord Jonah",
-      "awayTeam": "Gast",
+      "homeTeamId": "SG Nord Jonah",
+      "awayTeamName": "Gast",
       "helperTeamId": "frauen",
       "slots": [
         {
@@ -3520,8 +3519,8 @@
     "match-2026-02-01-maenner-i-3": {
       "id": "match-2026-02-01-maenner-i-3",
       "time": "18:00",
-      "homeTeam": "SG Menden (Sauerland)",
-      "awayTeam": "Gast",
+      "homeTeamId": "SG Menden (Sauerland)",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -3578,8 +3577,8 @@
     "match-2026-02-08-wd-jgd-0": {
       "id": "match-2026-02-08-wd-jgd-0",
       "time": "14:30",
-      "homeTeam": "TV Neu Armin",
-      "awayTeam": "Gast",
+      "homeTeamId": "TV Neu Armin",
+      "awayTeamName": "Gast",
       "helperTeamId": "wd-jgd",
       "slots": [
         {
@@ -3628,8 +3627,8 @@
     "match-2026-02-21-maenner-i-0": {
       "id": "match-2026-02-21-maenner-i-0",
       "time": "16:00",
-      "homeTeam": "SG Menden (Sauerland)",
-      "awayTeam": "Gast",
+      "homeTeamId": "SG Menden (Sauerland)",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -3678,8 +3677,8 @@
     "match-2026-03-01-wb-jgd-0": {
       "id": "match-2026-03-01-wb-jgd-0",
       "time": "14:00",
-      "homeTeam": "HC Josephburg",
-      "awayTeam": "Gast",
+      "homeTeamId": "HC Josephburg",
+      "awayTeamName": "Gast",
       "helperTeamId": "club-wide",
       "slots": [
         {
@@ -3728,8 +3727,8 @@
     "match-2026-03-07-maenner-ii-0": {
       "id": "match-2026-03-07-maenner-ii-0",
       "time": "15:00",
-      "homeTeam": "TV Göbelscheid II",
-      "awayTeam": "Gast",
+      "homeTeamId": "TV Göbelscheid II",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -3778,8 +3777,8 @@
     "match-2026-03-07-maenner-i-1": {
       "id": "match-2026-03-07-maenner-i-1",
       "time": "17:00",
-      "homeTeam": "SG Menden (Sauerland)",
-      "awayTeam": "Gast",
+      "homeTeamId": "SG Menden (Sauerland)",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -3828,8 +3827,8 @@
     "match-2026-03-08-wc-jgd-0": {
       "id": "match-2026-03-08-wc-jgd-0",
       "time": "15:00",
-      "homeTeam": "SV West Gian",
-      "awayTeam": "Gast",
+      "homeTeamId": "SV West Gian",
+      "awayTeamName": "Gast",
       "helperTeamId": "club-wide",
       "slots": [
         {
@@ -3878,8 +3877,8 @@
     "match-2026-03-08-maenner-iii-1": {
       "id": "match-2026-03-08-maenner-iii-1",
       "time": "17:00",
-      "homeTeam": "SV Bad Lucastadt III",
-      "awayTeam": "Gast",
+      "homeTeamId": "SV Bad Lucastadt III",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {
@@ -3928,8 +3927,8 @@
     "match-2026-03-15-minis-0": {
       "id": "match-2026-03-15-minis-0",
       "time": "09:00",
-      "homeTeam": "SV Willwacherland",
-      "awayTeam": "Gast",
+      "homeTeamId": "SV Willwacherland",
+      "awayTeamName": "Gast",
       "helperTeamId": "minis",
       "slots": [
         {
@@ -3986,8 +3985,8 @@
     "match-2026-03-15-e-jgd-1": {
       "id": "match-2026-03-15-e-jgd-1",
       "time": "14:00",
-      "homeTeam": "HC Schwerdtnerdorf",
-      "awayTeam": "Gast",
+      "homeTeamId": "HC Schwerdtnerdorf",
+      "awayTeamName": "Gast",
       "helperTeamId": "club-wide",
       "slots": [
         {
@@ -4052,8 +4051,8 @@
     "match-2026-03-28-minis-0": {
       "id": "match-2026-03-28-minis-0",
       "time": "14:00",
-      "homeTeam": "SV Willwacherland",
-      "awayTeam": "Gast",
+      "homeTeamId": "SV Willwacherland",
+      "awayTeamName": "Gast",
       "helperTeamId": "minis",
       "slots": [
         {
@@ -4110,8 +4109,8 @@
     "match-2026-03-28-maenner-i-1": {
       "id": "match-2026-03-28-maenner-i-1",
       "time": "18:30",
-      "homeTeam": "SG Menden (Sauerland)",
-      "awayTeam": "Gast",
+      "homeTeamId": "SG Menden (Sauerland)",
+      "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
       "slots": [
         {

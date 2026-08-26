@@ -182,7 +182,7 @@ export const usePlanStore = defineStore("plan", () => {
 
     try {
       plan.value.rev++;
-      plan.value.lastUpdated = Date.now();
+      plan.value.lastUpdated = new Date();
 
       const serializedPlan = JSON.stringify(plan.value);
       const encryptedBlob = await encryptData(serializedPlan, key.value);
@@ -209,6 +209,7 @@ export const usePlanStore = defineStore("plan", () => {
 
   function createNewPlan(id: string, newKey: string) {
     key.value = newKey;
+    const now = new Date();
     plan.value = {
       id,
       club: {
@@ -216,9 +217,9 @@ export const usePlanStore = defineStore("plan", () => {
         name: "",
         contactEmail: "",
         homepage: "",
-        lastUpdated: 0,
+        lastUpdated: now,
       },
-      lastUpdated: Date.now(),
+      lastUpdated: now,
       skills: {},
       schemaVersion: 1,
       rev: 0,
@@ -279,23 +280,25 @@ export const usePlanStore = defineStore("plan", () => {
   function addTeam(name: string): Team {
     const currentPlan = ensurePlanLoaded();
     const newId = `team-${crypto.randomUUID().substring(0, 8)}`;
+    const now = new Date();
     const newTeam: Team = {
       id: newId,
       name,
       isManual: true,
-      updatedAt: Date.now(),
+      updatedAt: now,
     };
     currentPlan.teams[newId] = newTeam;
-    currentPlan.lastUpdated = Date.now();
+    currentPlan.lastUpdated = now;
     return newTeam;
   }
 
   function updateTeam(teamId: string, name: string) {
     if (!plan.value || !plan.value.teams[teamId])
       return;
+    const now = new Date();
     plan.value.teams[teamId].name = name;
-    plan.value.teams[teamId].updatedAt = Date.now();
-    plan.value.lastUpdated = Date.now();
+    plan.value.teams[teamId].updatedAt = now;
+    plan.value.lastUpdated = now;
   }
 
   function deleteTeam(teamId: string) {
@@ -306,7 +309,7 @@ export const usePlanStore = defineStore("plan", () => {
     Object.values(plan.value.members).forEach((m) => {
       m.teamIds = m.teamIds.filter(tId => tId !== teamId);
     });
-    plan.value.lastUpdated = Date.now();
+    plan.value.lastUpdated = new Date();
   }
 
   // --- Domain Methods: Members ---
@@ -314,16 +317,17 @@ export const usePlanStore = defineStore("plan", () => {
   function addMember(data: Partial<Omit<Member, "id" | "updatedAt">> & { name: string }): Member {
     const currentPlan = ensurePlanLoaded();
     const newId = `member-${crypto.randomUUID().substring(0, 8)}`;
+    const now = new Date();
     const newMember: Member = {
       id: newId,
       name: data.name,
       teamIds: data.teamIds ? [...data.teamIds] : [],
       skillIds: data.skillIds ? [...data.skillIds] : [],
       isManual: data.isManual ?? true,
-      updatedAt: Date.now(),
+      updatedAt: now,
     };
     currentPlan.members[newId] = newMember;
-    currentPlan.lastUpdated = Date.now();
+    currentPlan.lastUpdated = now;
     return newMember;
   }
 
@@ -339,15 +343,16 @@ export const usePlanStore = defineStore("plan", () => {
       member.skillIds = [...updates.skillIds];
     if (updates.isManual !== undefined)
       member.isManual = updates.isManual;
-    member.updatedAt = Date.now();
-    plan.value.lastUpdated = Date.now();
+    const now = new Date();
+    member.updatedAt = now;
+    plan.value.lastUpdated = now;
   }
 
   function deleteMember(memberId: string) {
     if (!plan.value)
       return;
     delete plan.value.members[memberId];
-    plan.value.lastUpdated = Date.now();
+    plan.value.lastUpdated = new Date();
   }
 
   // --- Domain Methods: Matches & Helpers ---
@@ -357,8 +362,9 @@ export const usePlanStore = defineStore("plan", () => {
       return;
 
     plan.value.matches[matchId].helperTeamId = teamId;
-    plan.value.matches[matchId].updatedAt = Date.now();
-    plan.value.lastUpdated = Date.now();
+    const now = new Date();
+    plan.value.matches[matchId].updatedAt = now;
+    plan.value.lastUpdated = now;
   }
 
   /**

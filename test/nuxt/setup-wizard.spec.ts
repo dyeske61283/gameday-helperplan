@@ -94,7 +94,7 @@ describe("setup Wizard", () => {
 
     const store = usePlanStore();
     store.plan = {
-      club: { id: "123", name: "Test Club", contactEmail: "", homepage: "", lastUpdated: 1234 },
+      club: { id: "123", name: "Test Club", contactEmail: "", homepage: "", lastUpdated: new Date(0) },
       teams: {},
       matches: {},
       config: {
@@ -103,7 +103,7 @@ describe("setup Wizard", () => {
       },
       gamedays: {},
       id: "",
-      lastUpdated: 1234,
+      lastUpdated: new Date(0),
       members: {},
       rev: 0,
       schemaVersion: 1,

@@ -111,16 +111,16 @@ describe("usePlanStore", () => {
       store.plan!.matches.m1 = {
         id: "m1",
         time: "18:00",
-        homeTeam: "A",
-        awayTeam: "B",
+        homeTeamId: "A",
+        awayTeamName: "B",
         slots: [],
-        updatedAt: 0,
+        updatedAt: new Date(0),
       };
 
       store.assignHelperTeam("m1", "t1");
 
       expect(store.plan?.matches.m1.helperTeamId).toBe("t1");
-      expect(store.plan?.matches.m1.updatedAt).toBeGreaterThan(0);
+      expect(store.plan?.matches.m1.updatedAt.getTime()).toBeGreaterThan(0);
     });
   });
 });

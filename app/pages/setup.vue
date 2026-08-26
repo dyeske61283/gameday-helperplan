@@ -37,7 +37,7 @@ function handleManualClub() {
       name: manualClubName.value,
       contactEmail: "",
       homepage: "",
-      lastUpdated: Date.now(),
+      lastUpdated: new Date(),
     };
   }
   nextStep();
@@ -56,7 +56,7 @@ function handleImportMembers() {
       skillIds: [],
       teamIds: [],
       isManual: false,
-      updatedAt: Date.now(),
+      updatedAt: new Date(),
     };
   });
 
