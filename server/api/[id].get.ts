@@ -1,35 +1,24 @@
-import { metrics } from "@opentelemetry/api";
+import type { StoredPlan } from "../types/stored-plan.ts";
 import { z } from "zod";
 import env from "../../utils/env.ts";
 
-const retrievedPlansCounter = metrics
-  .getMeter("helperplan.plans", "1.0.0")
-  .createCounter("helperplan.plans.retrieved", {
-    description: "The amount of retrieved plans through the GET endpoint",
-    unit: "1",
-  });
-
-function getStorage() {
-  return useStorage(env.DENO_DEPLOYMENT_ID ? "plans" : "memory");
-}
-
 export default eventHandler(async (event) => {
   const { id } = await getValidatedRouterParams(event, z.object({
-    id: z.string().length(36),
+    id: z.uuid(),
   }).parse);
 
-  const storageName = env.DENO_DEPLOYMENT_ID ? "plans" : "memory";
-  let storage = getStorage();
-  let plan: string | null = null;
+  const storageName = "plans";
+  const storage = useStorage<StoredPlan>(storageName);
+  let plan: StoredPlan | null = null;
 
   try {
-    plan = await storage.getItem<string>(id);
+    plan = await storage.getItem(id);
   }
   catch (error) {
     if (env.DENO_DEPLOYMENT_ID) {
       console.error("Deno KV getItem failed, falling back to memory", error);
-      storage = useStorage("memory");
-      plan = await storage.getItem<string>(id);
+      const fallBackInMemoryStorage = useStorage<StoredPlan>();
+      plan = await fallBackInMemoryStorage.getItem(id);
     }
     else {
       console.error("Storage getItem failed on memory", error);
@@ -40,8 +29,6 @@ export default eventHandler(async (event) => {
   if (!plan) {
     return Response.json({ error: "Plan not found" }, { status: 404 });
   }
-
-  retrievedPlansCounter.add(1);
 
   if (getHeader(event, "accept") === "text/event-stream") {
     let unwatch: Awaited<ReturnType<typeof storage.watch>> | undefined;
@@ -56,7 +43,7 @@ export default eventHandler(async (event) => {
     });
 
     if (plan) {
-      eventStream.push(plan);
+      eventStream.push(plan.blob);
     }
 
     try {
@@ -73,13 +60,13 @@ export default eventHandler(async (event) => {
 
         if (planUpdateEvent === "update") {
           try {
-            const latestPlan = await storage.getItem<string>(id);
+            const latestPlan = await storage.getItem(id);
             if (!latestPlan || isClosed) {
               isClosed = true;
               await eventStream.close();
               return;
             }
-            await eventStream.push(latestPlan);
+            await eventStream.push(latestPlan.blob);
           }
           catch (error) {
             isClosed = true;
@@ -98,5 +85,5 @@ export default eventHandler(async (event) => {
     return eventStream.send();
   }
 
-  return { blob: plan };
+  return plan;
 });
