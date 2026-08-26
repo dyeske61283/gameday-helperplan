@@ -115,11 +115,9 @@ async function handleLoad() {
 
 async function handleResume() {
   const lastId = planStore.lastPlanId;
-  planStore.initFromUrl();
   const currentKey = planStore.key;
 
   if (lastId && currentKey) {
-    await planStore.loadPlan(lastId, currentKey);
     currentStep.value = 5;
   }
   else {
@@ -136,6 +134,7 @@ const shareLink = computed(() => {
     return "";
   const url = new URL(window.location.href);
   url.searchParams.set("planId", planStore.plan.id);
+  url.hash = `key=${planStore.key}`;
   return url.toString();
 });
 
