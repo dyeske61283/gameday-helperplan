@@ -1,7 +1,7 @@
 import type { Plugin } from "vitest/config";
 import { defineVitestProject } from "@nuxt/test-utils/config";
 import { defineConfig } from "vitest/config";
-import env from "./utils/env";
+import env from "./utils/env.ts";
 
 const ignoreBunTest: Plugin = {
   name: "ignore-bun-test",
