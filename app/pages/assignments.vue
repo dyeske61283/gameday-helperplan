@@ -1,9 +1,14 @@
 <script setup lang="ts">
 import type { Match, Slot } from "../utils/plan-types";
 import { usePlanStore } from "../stores/plan";
+import { proposeHelperTeamsForMatch } from "../utils/helper-team-proposals";
 
 const planStore = usePlanStore();
 const toast = useToast();
+
+function getSuggestedHelperTeams(match: Match): string[] {
+  return proposeHelperTeamsForMatch(match, Object.values(planStore.matches)).slice(0, 2);
+}
 
 const searchQuery = ref("");
 const selectedGamedayDate = ref<string>("");
@@ -341,38 +346,62 @@ async function handleSavePlan() {
           </div>
 
           <!-- Helper Team Dropdown & Auto-Staff Action -->
-          <div class="flex flex-wrap items-center gap-3">
-            <div class="flex items-center gap-2">
-              <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Duty Team:</span>
-              <select
-                :value="match.helperTeamId || ''"
-                class="text-xs font-semibold rounded-lg bg-surface-container-lowest border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-                @change="(e: any) => planStore.assignHelperTeam(match.id, e.target.value)"
-              >
-                <option v-for="opt in teamOptions" :key="opt.value" :value="opt.value">
-                  {{ opt.label }}
-                </option>
-              </select>
+          <div class="flex flex-col sm:items-end gap-2">
+            <div class="flex flex-wrap items-center gap-3">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Duty Team:</span>
+                <select
+                  :value="match.helperTeamId || ''"
+                  class="text-xs font-semibold rounded-lg bg-surface-container-lowest border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
+                  @change="(e: any) => planStore.assignHelperTeam(match.id, e.target.value)"
+                >
+                  <option v-for="opt in teamOptions" :key="opt.value" :value="opt.value">
+                    {{ opt.label }}
+                  </option>
+                </select>
+              </div>
+
+              <div class="flex items-center gap-1.5">
+                <UButton
+                  size="xs"
+                  variant="soft"
+                  color="secondary"
+                  icon="i-lucide-wand-sparkles"
+                  @click="handleAutoStaff(match.id)"
+                >
+                  Auto-Staff
+                </UButton>
+                <UButton
+                  size="xs"
+                  variant="ghost"
+                  color="neutral"
+                  icon="i-lucide-rotate-ccw"
+                  @click="handleClearMatch(match.id)"
+                >
+                  Reset
+                </UButton>
+              </div>
             </div>
 
-            <div class="flex items-center gap-1.5">
+            <!-- Smart Helper Team Suggestions (Based on Gameday Proximity) -->
+            <div
+              v-if="!match.helperTeamId && getSuggestedHelperTeams(match).length > 0"
+              class="flex flex-wrap items-center gap-1.5"
+            >
+              <span class="text-[10px] text-secondary font-bold uppercase flex items-center gap-1">
+                <UIcon name="i-lucide-sparkles" class="w-3 h-3" />
+                Suggested:
+              </span>
               <UButton
+                v-for="suggestedTeamId in getSuggestedHelperTeams(match)"
+                :key="suggestedTeamId"
                 size="xs"
-                variant="soft"
+                variant="subtle"
                 color="secondary"
-                icon="i-lucide-wand-sparkles"
-                @click="handleAutoStaff(match.id)"
+                class="rounded-md text-[10px] py-0.5 px-2"
+                @click="planStore.assignHelperTeam(match.id, suggestedTeamId)"
               >
-                Auto-Staff
-              </UButton>
-              <UButton
-                size="xs"
-                variant="ghost"
-                color="neutral"
-                icon="i-lucide-rotate-ccw"
-                @click="handleClearMatch(match.id)"
-              >
-                Reset
+                + {{ planStore.teams[suggestedTeamId]?.name || suggestedTeamId }}
               </UButton>
             </div>
           </div>
