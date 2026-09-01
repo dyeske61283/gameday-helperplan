@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Match } from "../utils/plan-types";
 import { usePlanStore } from "../stores/plan";
 import { generateMemberICal } from "../utils/ical-export";
 
@@ -31,7 +32,7 @@ const filteredGamedays = computed(() => {
   return planStore.gamedaysList.filter((gameday) => {
     const matches = gameday.matchIds
       .map(id => planStore.matches[id])
-      .filter(Boolean);
+      .filter((m): m is Match => !!m);
 
     // Team Filter match
     if (teamFilter) {

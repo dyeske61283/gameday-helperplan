@@ -53,7 +53,7 @@ function getRoleName(roleId: string) {
 
 function getMemberName(slot: Slot) {
   if (slot.assignedMemberId && planStore.members[slot.assignedMemberId]) {
-    return planStore.members[slot.assignedMemberId].name;
+    return planStore.members[slot.assignedMemberId]?.name || "Unassigned";
   }
   return slot.customHelperName || "Unassigned";
 }

@@ -147,8 +147,8 @@ describe("usePlanStore", () => {
 
       store.assignMemberToSlot("m1", "slot-1", "mem-1", "Parent Volunteer");
 
-      expect(store.plan?.matches.m1.slots[0].assignedMemberId).toBe("mem-1");
-      expect(store.plan?.matches.m1.slots[0].customHelperName).toBe("Parent Volunteer");
+      expect(store.plan?.matches.m1?.slots[0]?.assignedMemberId).toBe("mem-1");
+      expect(store.plan?.matches.m1?.slots[0]?.customHelperName).toBe("Parent Volunteer");
     });
 
     it("should toggle check-in status on a slot", () => {
@@ -173,10 +173,10 @@ describe("usePlanStore", () => {
       };
 
       store.toggleCheckIn("m1", "slot-1");
-      expect(store.plan?.matches.m1.slots[0].checkedIn).toBe(true);
+      expect(store.plan?.matches.m1?.slots[0]?.checkedIn).toBe(true);
 
       store.toggleCheckIn("m1", "slot-1");
-      expect(store.plan?.matches.m1.slots[0].checkedIn).toBe(false);
+      expect(store.plan?.matches.m1?.slots[0]?.checkedIn).toBe(false);
     });
   });
 });
