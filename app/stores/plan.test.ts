@@ -110,7 +110,7 @@ describe("usePlanStore", () => {
 
       store.plan!.matches.m1 = {
         id: "m1",
-        time: "18:00",
+        time: new Date(),
         homeTeamId: "A",
         awayTeamName: "B",
         slots: [],
@@ -121,6 +121,62 @@ describe("usePlanStore", () => {
 
       expect(store.plan?.matches.m1.helperTeamId).toBe("t1");
       expect(store.plan?.matches.m1.updatedAt.getTime()).toBeGreaterThan(0);
+    });
+  });
+
+  describe("assignMemberToSlot and toggleCheckIn", () => {
+    it("should assign a member or custom name to a slot", () => {
+      const store = usePlanStore();
+      store.createNewPlan("test-plan-id", "test-key");
+
+      store.plan!.matches.m1 = {
+        id: "m1",
+        time: new Date(),
+        homeTeamId: "A",
+        awayTeamName: "B",
+        slots: [
+          {
+            id: "slot-1",
+            roleId: "timekeeper",
+            assignedMemberId: null,
+            updatedAt: new Date(0),
+          },
+        ],
+        updatedAt: new Date(0),
+      };
+
+      store.assignMemberToSlot("m1", "slot-1", "mem-1", "Parent Volunteer");
+
+      expect(store.plan?.matches.m1.slots[0].assignedMemberId).toBe("mem-1");
+      expect(store.plan?.matches.m1.slots[0].customHelperName).toBe("Parent Volunteer");
+    });
+
+    it("should toggle check-in status on a slot", () => {
+      const store = usePlanStore();
+      store.createNewPlan("test-plan-id", "test-key");
+
+      store.plan!.matches.m1 = {
+        id: "m1",
+        time: new Date(),
+        homeTeamId: "A",
+        awayTeamName: "B",
+        slots: [
+          {
+            id: "slot-1",
+            roleId: "timekeeper",
+            assignedMemberId: "mem-1",
+            checkedIn: false,
+            updatedAt: new Date(0),
+          },
+        ],
+        updatedAt: new Date(0),
+      };
+
+      store.toggleCheckIn("m1", "slot-1");
+      expect(store.plan?.matches.m1.slots[0].checkedIn).toBe(true);
+
+      store.toggleCheckIn("m1", "slot-1");
+      expect(store.plan?.matches.m1.slots[0].checkedIn).toBe(false);
     });
   });
 });

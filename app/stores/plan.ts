@@ -69,8 +69,13 @@ export const usePlanStore = defineStore("plan", () => {
   const members = computed(() => plan.value?.members ?? {});
   const matches = computed(() => plan.value?.matches ?? {});
   const gamedays = computed(() => plan.value?.gamedays ?? {});
+  const roles = computed(() => plan.value?.config?.roles ?? []);
+  const locations = computed(() => plan.value?.config?.locations ?? []);
   const teamsList = computed(() => Object.values(teams.value));
   const membersList = computed(() => Object.values(members.value));
+  const gamedaysList = computed(() =>
+    Object.values(gamedays.value).sort((a, b) => a.date.localeCompare(b.date)),
+  );
 
   /**
    * Load the example plan fixture into state
@@ -367,6 +372,44 @@ export const usePlanStore = defineStore("plan", () => {
     plan.value.lastUpdated = now;
   }
 
+  function assignMemberToSlot(
+    matchId: string,
+    slotId: string,
+    memberId: string | null,
+    customHelperName?: string | null,
+  ) {
+    if (!plan.value || !plan.value.matches[matchId])
+      return;
+
+    const match = plan.value.matches[matchId];
+    const slot = match.slots?.find(s => s.id === slotId);
+    if (!slot)
+      return;
+
+    slot.assignedMemberId = memberId;
+    slot.customHelperName = customHelperName ?? null;
+    const now = new Date();
+    slot.updatedAt = now;
+    match.updatedAt = now;
+    plan.value.lastUpdated = now;
+  }
+
+  function toggleCheckIn(matchId: string, slotId: string, forceValue?: boolean) {
+    if (!plan.value || !plan.value.matches[matchId])
+      return;
+
+    const match = plan.value.matches[matchId];
+    const slot = match.slots?.find(s => s.id === slotId);
+    if (!slot)
+      return;
+
+    slot.checkedIn = forceValue !== undefined ? forceValue : !slot.checkedIn;
+    const now = new Date();
+    slot.updatedAt = now;
+    match.updatedAt = now;
+    plan.value.lastUpdated = now;
+  }
+
   /**
    * Extract key from URL fragment
    */
@@ -399,8 +442,11 @@ export const usePlanStore = defineStore("plan", () => {
     members,
     matches,
     gamedays,
+    roles,
+    locations,
     teamsList,
     membersList,
+    gamedaysList,
     loadExamplePlan,
     ensurePlanLoaded,
     loadPlan,
@@ -415,6 +461,8 @@ export const usePlanStore = defineStore("plan", () => {
     updateMember,
     deleteMember,
     assignHelperTeam,
+    assignMemberToSlot,
+    toggleCheckIn,
     finalizePlan,
     initFromUrl,
   };
