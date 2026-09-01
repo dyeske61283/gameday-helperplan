@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import type { Match, Slot } from "../utils/plan-types";
 import { usePlanStore } from "../stores/plan";
+import { checkMemberConflict, getMatchConflicts } from "../utils/conflict-detector";
 import { proposeHelperTeamsForMatch } from "../utils/helper-team-proposals";
 
 const planStore = usePlanStore();
@@ -9,6 +10,19 @@ const toast = useToast();
 function getSuggestedHelperTeams(match: Match): string[] {
   return proposeHelperTeamsForMatch(match, Object.values(planStore.matches)).slice(0, 2);
 }
+
+// Per-match conflict map: matchId -> { slotId -> ScheduleConflict }
+const matchConflicts = computed(() => {
+  if (!planStore.plan)
+    return {} as Record<string, Record<string, import("../utils/conflict-detector").ScheduleConflict>>;
+  const result: Record<string, Record<string, import("../utils/conflict-detector").ScheduleConflict>> = {};
+  for (const match of Object.values(planStore.matches)) {
+    const conflicts = getMatchConflicts(planStore.plan, match);
+    if (Object.keys(conflicts).length > 0)
+      result[match.id] = conflicts;
+  }
+  return result;
+});
 
 const searchQuery = ref("");
 const selectedGamedayDate = ref<string>("");
@@ -168,7 +182,7 @@ const candidateMembers = computed(() => {
   const role = activeSlot.value ? getRole(activeSlot.value.roleId) : null;
   const reqSkill = role?.requiredSkillId;
 
-  // Sort qualified members to the top
+  // Sort: qualified first, then by name
   return [...list].sort((a, b) => {
     if (!reqSkill)
       return a.name.localeCompare(b.name);
@@ -179,6 +193,13 @@ const candidateMembers = computed(() => {
     return a.name.localeCompare(b.name);
   });
 });
+
+// Conflict check for a specific member in the active modal context
+function getMemberModalConflict(memberId: string) {
+  if (!planStore.plan || !activeMatch.value)
+    return null;
+  return checkMemberConflict(planStore.plan, memberId, activeMatch.value, activeSlot.value?.id);
+}
 
 function confirmAssignment() {
   if (!activeMatchId.value || !activeSlot.value)
@@ -414,9 +435,11 @@ async function handleSavePlan() {
             :key="slot.id"
             class="p-3.5 rounded-xl border transition-all cursor-pointer flex flex-col justify-between gap-3"
             :class="[
-              getMemberName(slot)
-                ? 'bg-surface-container-lowest border-neutral-200 dark:border-neutral-800 hover:border-primary/50'
-                : 'bg-amber-500/5 border-dashed border-amber-500/30 hover:border-amber-500',
+              matchConflicts[match.id]?.[slot.id]
+                ? 'bg-error/5 border-error/40 hover:border-error'
+                : getMemberName(slot)
+                  ? 'bg-surface-container-lowest border-neutral-200 dark:border-neutral-800 hover:border-primary/50'
+                  : 'bg-amber-500/5 border-dashed border-amber-500/30 hover:border-amber-500',
             ]"
             @click="openAssignmentModal(match.id, slot)"
           >
@@ -434,7 +457,14 @@ async function handleSavePlan() {
                   Requires {{ getRole(slot.roleId)?.requiredSkillId }}
                 </span>
               </div>
+              <!-- Conflict icon or edit icon -->
               <UIcon
+                v-if="matchConflicts[match.id]?.[slot.id]"
+                name="i-lucide-triangle-alert"
+                class="w-4 h-4 text-error shrink-0"
+              />
+              <UIcon
+                v-else
                 name="i-lucide-pencil"
                 class="w-3.5 h-3.5 text-neutral-400 shrink-0"
               />
@@ -442,13 +472,23 @@ async function handleSavePlan() {
 
             <!-- Slot Assigned Person -->
             <div class="pt-1">
-              <div v-if="getMemberName(slot)" class="flex items-center gap-2">
-                <div class="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0">
-                  {{ getMemberName(slot)?.substring(0, 1) }}
+              <div v-if="getMemberName(slot)" class="flex flex-col gap-1">
+                <div class="flex items-center gap-2">
+                  <div class="w-6 h-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center shrink-0">
+                    {{ getMemberName(slot)?.substring(0, 1) }}
+                  </div>
+                  <span class="text-sm font-semibold text-on-surface truncate">
+                    {{ getMemberName(slot) }}
+                  </span>
                 </div>
-                <span class="text-sm font-semibold text-on-surface truncate">
-                  {{ getMemberName(slot) }}
-                </span>
+                <!-- Conflict warning message -->
+                <div
+                  v-if="matchConflicts[match.id]?.[slot.id]"
+                  class="flex items-center gap-1 text-[10px] text-error font-semibold"
+                >
+                  <UIcon name="i-lucide-triangle-alert" class="w-3 h-3 shrink-0" />
+                  {{ matchConflicts[match.id]?.[slot.id]?.message }}
+                </div>
               </div>
               <div v-else class="text-xs text-amber-700 dark:text-amber-400 font-medium flex items-center gap-1.5">
                 <UIcon name="i-lucide-user-plus" class="w-4 h-4" />
@@ -549,15 +589,25 @@ async function handleSavePlan() {
                 ]"
                 @click="selectedMemberId = member.id; customHelperInput = ''"
               >
-                <div class="flex items-center gap-2">
-                  <div class="w-6 h-6 rounded-full bg-neutral-200 dark:bg-neutral-700 text-xs flex items-center justify-center font-bold">
-                    {{ member.name.substring(0, 1) }}
+                <div class="flex flex-col gap-0.5 min-w-0">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-full bg-neutral-200 dark:bg-neutral-700 text-xs flex items-center justify-center font-bold shrink-0">
+                      {{ member.name.substring(0, 1) }}
+                    </div>
+                    <span class="text-sm truncate">{{ member.name }}</span>
                   </div>
-                  <span class="text-sm">{{ member.name }}</span>
+                  <!-- Conflict warning in picker -->
+                  <div
+                    v-if="getMemberModalConflict(member.id)"
+                    class="flex items-center gap-1 pl-8 text-[10px] text-error font-semibold"
+                  >
+                    <UIcon name="i-lucide-triangle-alert" class="w-3 h-3 shrink-0" />
+                    {{ getMemberModalConflict(member.id)?.message }}
+                  </div>
                 </div>
 
                 <!-- License Badges -->
-                <div class="flex gap-1">
+                <div class="flex gap-1 shrink-0">
                   <UBadge
                     v-if="member.skillIds.includes('referee')"
                     size="xs"
