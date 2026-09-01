@@ -1602,7 +1602,7 @@
   "matches": {
     "3e5cf1d5-373e-42f7-b255-e2c745a8da89": {
       "id": "3e5cf1d5-373e-42f7-b255-e2c745a8da89",
-      "time": "14:00",
+      "time": "2024-09-22T14:00:00.000Z",
       "homeTeamId": "Gladbeck HC",
       "awayTeamName": "HSG Eileenscheid II",
       "helperTeamId": "maenner-1",
@@ -1660,7 +1660,7 @@
     },
     "match-2024-09-22-maenner-i-1": {
       "id": "match-2024-09-22-maenner-i-1",
-      "time": "16:00",
+      "time": "2024-09-22T16:00:00.000Z",
       "homeTeamId": "SG Menden (Sauerland)",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -1718,7 +1718,7 @@
     },
     "match-2024-09-22-maenner-ii-2": {
       "id": "match-2024-09-22-maenner-ii-2",
-      "time": "18:00",
+      "time": "2024-09-22T18:00:00.000Z",
       "homeTeamId": "TV Göbelscheid II",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -1776,7 +1776,7 @@
     },
     "match-2024-09-29-e-jugend-0": {
       "id": "match-2024-09-29-e-jugend-0",
-      "time": "13:30",
+      "time": "2024-09-29T13:30:00.000Z",
       "homeTeamId": "TSV Wellerburg",
       "awayTeamName": "Gast",
       "helperTeamId": "ge-jgd",
@@ -1810,7 +1810,7 @@
     },
     "match-2024-10-06-mb-jgd-0": {
       "id": "match-2024-10-06-mb-jgd-0",
-      "time": "12:00",
+      "time": "2024-10-06T12:00:00.000Z",
       "homeTeamId": "HSG Zenderland",
       "awayTeamName": "Gast",
       "helperTeamId": "mb-jgd",
@@ -1860,7 +1860,7 @@
     },
     "match-2024-10-06-maenner-ii-1": {
       "id": "match-2024-10-06-maenner-ii-1",
-      "time": "14:00",
+      "time": "2024-10-06T14:00:00.000Z",
       "homeTeamId": "TV Göbelscheid II",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -1918,7 +1918,7 @@
     },
     "1be06b34-abda-4d17-af58-93bdc2f68b05": {
       "id": "1be06b34-abda-4d17-af58-93bdc2f68b05",
-      "time": "16:00",
+      "time": "2024-10-06T16:00:00.000Z",
       "homeTeamId": "Gladbeck HC",
       "awayTeamName": "HSG Alt Lukaburg II",
       "helperTeamId": "maenner-1",
@@ -1976,7 +1976,7 @@
     },
     "match-2024-10-06-maenner-i-3": {
       "id": "match-2024-10-06-maenner-i-3",
-      "time": "18:00",
+      "time": "2024-10-06T18:00:00.000Z",
       "homeTeamId": "SG Menden (Sauerland)",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -2034,7 +2034,7 @@
     },
     "match-2024-10-13-frauen-0": {
       "id": "match-2024-10-13-frauen-0",
-      "time": "18:00",
+      "time": "2024-10-13T18:00:00.000Z",
       "homeTeamId": "SG Nord Jonah",
       "awayTeamName": "Gast",
       "helperTeamId": "frauen",
@@ -2092,7 +2092,7 @@
     },
     "match-2024-10-19-mb-jgd-0": {
       "id": "match-2024-10-19-mb-jgd-0",
-      "time": "14:00",
+      "time": "2024-10-19T14:00:00.000Z",
       "homeTeamId": "HSG Zenderland",
       "awayTeamName": "Gast",
       "helperTeamId": "mb-jgd",
@@ -2150,7 +2150,7 @@
     },
     "match-2024-10-19-maenner-ii-1": {
       "id": "match-2024-10-19-maenner-ii-1",
-      "time": "16:00",
+      "time": "2024-10-19T16:00:00.000Z",
       "homeTeamId": "TV Göbelscheid II",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -2208,7 +2208,7 @@
     },
     "match-2024-10-19-maenner-iii-2": {
       "id": "match-2024-10-19-maenner-iii-2",
-      "time": "18:00",
+      "time": "2024-10-19T18:00:00.000Z",
       "homeTeamId": "SV Bad Lucastadt III",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -2258,7 +2258,7 @@
     },
     "match-2024-10-19-maenner-i-3": {
       "id": "match-2024-10-19-maenner-i-3",
-      "time": "20:00",
+      "time": "2024-10-19T20:00:00.000Z",
       "homeTeamId": "SG Menden (Sauerland)",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -2308,7 +2308,7 @@
     },
     "match-2024-11-17-wc-jgd-0": {
       "id": "match-2024-11-17-wc-jgd-0",
-      "time": "16:00",
+      "time": "2024-11-17T16:00:00.000Z",
       "homeTeamId": "SV West Gian",
       "awayTeamName": "Gast",
       "helperTeamId": "wc-jgd",
@@ -2358,7 +2358,7 @@
     },
     "match-2024-11-17-frauen-1": {
       "id": "match-2024-11-17-frauen-1",
-      "time": "16:00",
+      "time": "2024-11-17T16:00:00.000Z",
       "homeTeamId": "SG Nord Jonah",
       "awayTeamName": "Gast",
       "helperTeamId": "frauen",
@@ -2400,7 +2400,7 @@
     },
     "match-2024-11-17-maenner-iii-2": {
       "id": "match-2024-11-17-maenner-iii-2",
-      "time": "18:00",
+      "time": "2024-11-17T18:00:00.000Z",
       "homeTeamId": "SV Bad Lucastadt III",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -2442,7 +2442,7 @@
     },
     "match-2024-11-24-mb-jgd-0": {
       "id": "match-2024-11-24-mb-jgd-0",
-      "time": "14:00",
+      "time": "2024-11-24T14:00:00.000Z",
       "homeTeamId": "HSG Zenderland",
       "awayTeamName": "Gast",
       "helperTeamId": "mb-jgd",
@@ -2492,7 +2492,7 @@
     },
     "match-2024-11-24-maenner-ii-1": {
       "id": "match-2024-11-24-maenner-ii-1",
-      "time": "16:00",
+      "time": "2024-11-24T16:00:00.000Z",
       "homeTeamId": "TV Göbelscheid II",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -2550,7 +2550,7 @@
     },
     "match-2024-11-24-maenner-i-2": {
       "id": "match-2024-11-24-maenner-i-2",
-      "time": "18:00",
+      "time": "2024-11-24T18:00:00.000Z",
       "homeTeamId": "SG Menden (Sauerland)",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -2608,7 +2608,7 @@
     },
     "match-2024-12-01-minis-0": {
       "id": "match-2024-12-01-minis-0",
-      "time": "10:00",
+      "time": "2024-12-01T10:00:00.000Z",
       "homeTeamId": "SV Willwacherland",
       "awayTeamName": "Gast",
       "helperTeamId": "minis",
@@ -2642,7 +2642,7 @@
     },
     "match-2024-12-01-e-jugend-1": {
       "id": "match-2024-12-01-e-jugend-1",
-      "time": "13:30",
+      "time": "2024-12-01T13:30:00.000Z",
       "homeTeamId": "TSV Wellerburg",
       "awayTeamName": "Gast",
       "helperTeamId": "ge-jgd",
@@ -2676,7 +2676,7 @@
     },
     "match-2024-12-01-maenner-iii-2": {
       "id": "match-2024-12-01-maenner-iii-2",
-      "time": "18:00",
+      "time": "2024-12-01T18:00:00.000Z",
       "homeTeamId": "SV Bad Lucastadt III",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -2726,7 +2726,7 @@
     },
     "match-2024-12-08-wd-jgd-0": {
       "id": "match-2024-12-08-wd-jgd-0",
-      "time": "09:00",
+      "time": "2024-12-08T09:00:00.000Z",
       "homeTeamId": "TV Neu Armin",
       "awayTeamName": "Gast",
       "helperTeamId": "wd-jgd",
@@ -2760,7 +2760,7 @@
     },
     "match-2024-12-08-wc-jgd-1": {
       "id": "match-2024-12-08-wc-jgd-1",
-      "time": "14:00",
+      "time": "2024-12-08T14:00:00.000Z",
       "homeTeamId": "SV West Gian",
       "awayTeamName": "Gast",
       "helperTeamId": "wc-jgd",
@@ -2794,7 +2794,7 @@
     },
     "match-2024-12-08-frauen-2": {
       "id": "match-2024-12-08-frauen-2",
-      "time": "16:00",
+      "time": "2024-12-08T16:00:00.000Z",
       "homeTeamId": "SG Nord Jonah",
       "awayTeamName": "Gast",
       "helperTeamId": "frauen",
@@ -2844,7 +2844,7 @@
     },
     "match-2024-12-08-maenner-ii-3": {
       "id": "match-2024-12-08-maenner-ii-3",
-      "time": "18:00",
+      "time": "2024-12-08T18:00:00.000Z",
       "homeTeamId": "TV Göbelscheid II",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -2894,7 +2894,7 @@
     },
     "match-2024-12-14-md-jgd-0": {
       "id": "match-2024-12-14-md-jgd-0",
-      "time": "14:00",
+      "time": "2024-12-14T14:00:00.000Z",
       "homeTeamId": "TV Ost Janinaburg",
       "awayTeamName": "Gast",
       "helperTeamId": "md-jgd",
@@ -2928,7 +2928,7 @@
     },
     "match-2025-01-19-mb-jgd-0": {
       "id": "match-2025-01-19-mb-jgd-0",
-      "time": "14:00",
+      "time": "2025-01-19T14:00:00.000Z",
       "homeTeamId": "HSG Zenderland",
       "awayTeamName": "Gast",
       "helperTeamId": "mb-jgd",
@@ -2986,7 +2986,7 @@
     },
     "match-2025-01-19-maenner-ii-1": {
       "id": "match-2025-01-19-maenner-ii-1",
-      "time": "14:00",
+      "time": "2025-01-19T14:00:00.000Z",
       "homeTeamId": "TV Göbelscheid II",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -3012,7 +3012,7 @@
     },
     "match-2025-01-19-maenner-iii-2": {
       "id": "match-2025-01-19-maenner-iii-2",
-      "time": "16:00",
+      "time": "2025-01-19T16:00:00.000Z",
       "homeTeamId": "SV Bad Lucastadt III",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -3038,7 +3038,7 @@
     },
     "match-2025-01-19-maenner-i-3": {
       "id": "match-2025-01-19-maenner-i-3",
-      "time": "16:00",
+      "time": "2025-01-19T16:00:00.000Z",
       "homeTeamId": "SG Menden (Sauerland)",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -3088,7 +3088,7 @@
     },
     "match-2025-01-25-md-jgd-0": {
       "id": "match-2025-01-25-md-jgd-0",
-      "time": "13:00",
+      "time": "2025-01-25T13:00:00.000Z",
       "homeTeamId": "TV Ost Janinaburg",
       "awayTeamName": "Gast",
       "helperTeamId": "md-jgd",
@@ -3114,7 +3114,7 @@
     },
     "match-2025-01-25-frauen-1": {
       "id": "match-2025-01-25-frauen-1",
-      "time": "18:00",
+      "time": "2025-01-25T18:00:00.000Z",
       "homeTeamId": "SG Nord Jonah",
       "awayTeamName": "Gast",
       "helperTeamId": "frauen",
@@ -3172,7 +3172,7 @@
     },
     "match-2025-02-09-minis-0": {
       "id": "match-2025-02-09-minis-0",
-      "time": "00:00",
+      "time": "2025-02-09T00:00:00.000Z",
       "homeTeamId": "SV Willwacherland",
       "awayTeamName": "Gast",
       "helperTeamId": "minis",
@@ -3190,7 +3190,7 @@
     },
     "match-2025-02-09-ge-jgd-1": {
       "id": "match-2025-02-09-ge-jgd-1",
-      "time": "00:00",
+      "time": "2025-02-09T00:00:00.000Z",
       "homeTeamId": "TSV Ost Kurtland",
       "awayTeamName": "Gast",
       "helperTeamId": "ge-jgd",
@@ -3216,7 +3216,7 @@
     },
     "match-2025-02-09-maenner-ii-2": {
       "id": "match-2025-02-09-maenner-ii-2",
-      "time": "14:00",
+      "time": "2025-02-09T14:00:00.000Z",
       "homeTeamId": "TV Göbelscheid II",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -3242,7 +3242,7 @@
     },
     "match-2025-02-09-maenner-iii-3": {
       "id": "match-2025-02-09-maenner-iii-3",
-      "time": "16:00",
+      "time": "2025-02-09T16:00:00.000Z",
       "homeTeamId": "SV Bad Lucastadt III",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -3300,7 +3300,7 @@
     },
     "match-2025-02-09-maenner-i-4": {
       "id": "match-2025-02-09-maenner-i-4",
-      "time": "18:00",
+      "time": "2025-02-09T18:00:00.000Z",
       "homeTeamId": "SG Menden (Sauerland)",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -3350,7 +3350,7 @@
     },
     "match-2025-02-23-mb-jgd-0": {
       "id": "match-2025-02-23-mb-jgd-0",
-      "time": "15:00",
+      "time": "2025-02-23T15:00:00.000Z",
       "homeTeamId": "HSG Zenderland",
       "awayTeamName": "Gast",
       "helperTeamId": "mb-jgd",
@@ -3408,7 +3408,7 @@
     },
     "match-2025-02-23-maenner-ii-1": {
       "id": "match-2025-02-23-maenner-ii-1",
-      "time": "17:00",
+      "time": "2025-02-23T17:00:00.000Z",
       "homeTeamId": "TV Göbelscheid II",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -3458,7 +3458,7 @@
     },
     "match-2025-02-23-maenner-i-2": {
       "id": "match-2025-02-23-maenner-i-2",
-      "time": "19:00",
+      "time": "2025-02-23T19:00:00.000Z",
       "homeTeamId": "SG Menden (Sauerland)",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -3516,7 +3516,7 @@
     },
     "match-2025-03-15-ge-jgd-0": {
       "id": "match-2025-03-15-ge-jgd-0",
-      "time": "00:00",
+      "time": "2025-03-15T00:00:00.000Z",
       "homeTeamId": "TSV Ost Kurtland",
       "awayTeamName": "Gast",
       "helperTeamId": "ge-jgd",
@@ -3525,7 +3525,7 @@
     },
     "match-2025-03-15-maenner-ii-1": {
       "id": "match-2025-03-15-maenner-ii-1",
-      "time": "16:00",
+      "time": "2025-03-15T16:00:00.000Z",
       "homeTeamId": "TV Göbelscheid II",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -3575,7 +3575,7 @@
     },
     "match-2025-03-15-maenner-i-2": {
       "id": "match-2025-03-15-maenner-i-2",
-      "time": "18:00",
+      "time": "2025-03-15T18:00:00.000Z",
       "homeTeamId": "SG Menden (Sauerland)",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",
@@ -3633,7 +3633,7 @@
     },
     "match-2024-03-23-md-jgd-0": {
       "id": "match-2024-03-23-md-jgd-0",
-      "time": "11:00",
+      "time": "2024-03-23T11:00:00.000Z",
       "homeTeamId": "TV Ost Janinaburg",
       "awayTeamName": "Gast",
       "helperTeamId": "md-jgd",
@@ -3651,7 +3651,7 @@
     },
     "match-2024-03-23-mb-jgd-1": {
       "id": "match-2024-03-23-mb-jgd-1",
-      "time": "16:00",
+      "time": "2024-03-23T16:00:00.000Z",
       "homeTeamId": "HSG Zenderland",
       "awayTeamName": "Gast",
       "helperTeamId": "mb-jgd",
@@ -3709,7 +3709,7 @@
     },
     "match-2024-03-23-maenner-iii-2": {
       "id": "match-2024-03-23-maenner-iii-2",
-      "time": "18:00",
+      "time": "2024-03-23T18:00:00.000Z",
       "homeTeamId": "SV Bad Lucastadt III",
       "awayTeamName": "Gast",
       "helperTeamId": "maenner-1",

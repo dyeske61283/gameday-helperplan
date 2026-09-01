@@ -2,6 +2,7 @@ import type { ZodType } from "zod";
 import z from "zod";
 
 const unixTimestampToDateSchema: ZodType<Date, number> = z.number().int().positive().transform(millis => new Date(millis));
+const isoDateTimeStringToDateSchema: ZodType<Date, string> = z.iso.datetime().transform(millis => new Date(millis));
 
 export const ClubSchema = z.object({
   id: z.string(),
@@ -66,7 +67,7 @@ export type Gameday = z.infer<typeof GamedaySchema>;
 
 export const MatchSchema = z.object({
   id: z.string(),
-  time: z.iso.time(), // ISO 8601 or "HH:mm"
+  time: isoDateTimeStringToDateSchema,
   homeTeamId: z.string(),
   awayTeamName: z.string(),
   helperTeamId: z.string().optional(),
