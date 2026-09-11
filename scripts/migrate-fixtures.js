@@ -6,6 +6,7 @@ function fixFixtures() {
   writeFile(resolve("./test/fixtures/plan-2024-2025.json"), JSON.stringify(seasonPlan, null, 2), (err) => {
     if (err)
       throw err;
+    // eslint-disable-next-line no-console
     console.log("Fixture fixed");
   });
 }

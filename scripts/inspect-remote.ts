@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 const databases = [
   "64cf36e4-13b2-4c12-aab0-ffb5f258e270",
   "7f9405f4-0afe-441c-91f2-a8f2b3c27d9a",
