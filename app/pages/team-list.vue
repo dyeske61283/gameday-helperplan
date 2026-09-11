@@ -3,9 +3,7 @@ import { usePlanStore } from "~/stores/plan";
 
 const planStore = usePlanStore();
 
-onMounted(() => {
-  planStore.ensurePlanLoaded();
-});
+usePlanInit();
 
 const searchQuery = ref("");
 const activeAccordions = ref<string[]>([]);
@@ -92,6 +90,25 @@ function getMembersForTeam(teamId: string) {
   );
 }
 
+const toast = useToast();
+
+/**
+ * Save the plan after a mutation. Silently skips in example/read-only mode.
+ */
+async function autoSave(title = "Saved", description = "Changes synced to server.") {
+  if (!planStore.key) {
+    toast.add({ title, description, color: "success" });
+    return;
+  }
+  await planStore.savePlan();
+  if (planStore.error) {
+    toast.add({ title: "Save Failed", description: planStore.error, color: "error" });
+  }
+  else {
+    toast.add({ title, description, color: "success" });
+  }
+}
+
 // Member CRUD
 function openMemberDetails(member: any) {
   selectedMember.value = {
@@ -103,7 +120,7 @@ function openMemberDetails(member: any) {
   isMemberModalOpen.value = true;
 }
 
-function saveMember() {
+async function saveMember() {
   if (!selectedMember.value)
     return;
   planStore.updateMember(selectedMember.value.id, {
@@ -112,9 +129,10 @@ function saveMember() {
     skillIds: selectedMember.value.skillIds,
   });
   isMemberModalOpen.value = false;
+  await autoSave("Member Saved", `${selectedMember.value.name} has been updated.`);
 }
 
-function addMember() {
+async function addMember() {
   const newM = planStore.addMember({
     name: "New Member",
     teamIds: [],
@@ -140,7 +158,7 @@ function openEditTeam(teamId: string) {
   isTeamModalOpen.value = true;
 }
 
-function saveTeam() {
+async function saveTeam() {
   if (isCreatingTeam.value) {
     planStore.addTeam(newTeamName.value);
   }
@@ -148,10 +166,12 @@ function saveTeam() {
     planStore.updateTeam(selectedTeam.value.id, newTeamName.value);
   }
   isTeamModalOpen.value = false;
+  await autoSave("Team Saved");
 }
 
-function deleteTeam(teamId: string) {
+async function deleteTeam(teamId: string) {
   planStore.deleteTeam(teamId);
+  await autoSave("Team Deleted");
 }
 </script>
 

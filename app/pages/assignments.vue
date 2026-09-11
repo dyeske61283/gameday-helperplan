@@ -36,10 +36,7 @@ const selectedMemberId = ref<string | null>(null);
 const customHelperInput = ref("");
 const memberListTab = ref<"team" | "all">("team");
 
-onMounted(() => {
-  planStore.ensurePlanLoaded();
-  planStore.initFromUrl();
-});
+usePlanInit();
 
 // Formatters
 function formatDate(dateStr: string) {
@@ -200,8 +197,35 @@ function getMemberModalConflict(memberId: string) {
     return null;
   return checkMemberConflict(planStore.plan, memberId, activeMatch.value, activeSlot.value?.id);
 }
+/**
+ * Save the plan to the server and show a toast.
+ * Silently skips if no key is set (example/read-only mode).
+ */
+async function autoSave(
+  title = "Saved",
+  description = "Changes synced to server.",
+  color: "success" | "info" | "neutral" | "error" = "success",
+) {
+  if (!planStore.key) {
+    // No encryption key → read-only / example mode, just show local feedback
+    toast.add({ title, description, color });
+    return;
+  }
+  await planStore.savePlan();
+  if (planStore.error) {
+    toast.add({ title: "Save Failed", description: planStore.error, color: "error" });
+  }
+  else {
+    toast.add({ title, description, color });
+  }
+}
 
-function confirmAssignment() {
+async function handleHelperTeamChange(matchId: string, teamId: string) {
+  planStore.assignHelperTeam(matchId, teamId);
+  await autoSave("Duty Team Updated");
+}
+
+async function confirmAssignment() {
   if (!activeMatchId.value || !activeSlot.value)
     return;
 
@@ -213,36 +237,25 @@ function confirmAssignment() {
   );
 
   isAssignmentModalOpen.value = false;
-  toast.add({
-    title: "Slot Updated",
-    description: "Helper duty assignment updated successfully.",
-    color: "success",
-  });
+  await autoSave("Slot Updated", "Helper duty assignment updated successfully.");
 }
 
-function handleClearActiveSlot() {
+async function handleClearActiveSlot() {
   if (!activeMatchId.value || !activeSlot.value)
     return;
   planStore.assignMemberToSlot(activeMatchId.value, activeSlot.value.id, null, null);
   isAssignmentModalOpen.value = false;
+  await autoSave("Slot Cleared");
 }
 
-function handleAutoStaff(matchId: string) {
+async function handleAutoStaff(matchId: string) {
   planStore.autoAssignMatchSlots(matchId);
-  toast.add({
-    title: "Auto-Staff Complete",
-    description: "Unassigned slots filled from team roster.",
-    color: "info",
-  });
+  await autoSave("Auto-Staff Complete", "Unassigned slots filled from team roster.", "info");
 }
 
-function handleClearMatch(matchId: string) {
+async function handleClearMatch(matchId: string) {
   planStore.clearMatchSlots(matchId);
-  toast.add({
-    title: "Slots Cleared",
-    description: "All duty slots for this match have been reset.",
-    color: "neutral",
-  });
+  await autoSave("Slots Cleared", "All duty slots for this match have been reset.", "neutral");
 }
 
 async function handleSavePlan() {
@@ -374,7 +387,7 @@ async function handleSavePlan() {
                 <select
                   :value="match.helperTeamId || ''"
                   class="text-xs font-semibold rounded-lg bg-surface-container-lowest border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
-                  @change="(e: any) => planStore.assignHelperTeam(match.id, e.target.value)"
+                  @change="(e: any) => handleHelperTeamChange(match.id, e.target.value)"
                 >
                   <option v-for="opt in teamOptions" :key="opt.value" :value="opt.value">
                     {{ opt.label }}
@@ -420,7 +433,7 @@ async function handleSavePlan() {
                 variant="subtle"
                 color="secondary"
                 class="rounded-md text-[10px] py-0.5 px-2"
-                @click="planStore.assignHelperTeam(match.id, suggestedTeamId)"
+                @click="handleHelperTeamChange(match.id, suggestedTeamId)"
               >
                 + {{ planStore.teams[suggestedTeamId]?.name || suggestedTeamId }}
               </UButton>

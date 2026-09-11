@@ -7,10 +7,7 @@ const planStore = usePlanStore();
 const searchQuery = ref("");
 const selectedTeamFilter = ref<string>("");
 
-onMounted(() => {
-  planStore.ensurePlanLoaded();
-  planStore.initFromUrl();
-});
+usePlanInit();
 
 // Computed active member match if search matches a member
 const matchedMember = computed(() => {
