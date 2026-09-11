@@ -178,5 +178,72 @@ describe("usePlanStore", () => {
       store.toggleCheckIn("m1", "slot-1");
       expect(store.plan?.matches.m1?.slots[0]?.checkedIn).toBe(false);
     });
+
+    it("should clear match slots", () => {
+      const store = usePlanStore();
+      store.createNewPlan("test-plan-id", "test-key");
+
+      store.plan!.matches.m1 = {
+        id: "m1",
+        time: new Date(),
+        homeTeamId: "A",
+        awayTeamName: "B",
+        slots: [
+          {
+            id: "slot-1",
+            roleId: "timekeeper",
+            assignedMemberId: "mem-1",
+            customHelperName: "Guest",
+            checkedIn: true,
+            updatedAt: new Date(0),
+          },
+        ],
+        updatedAt: new Date(0),
+      };
+
+      store.clearMatchSlots("m1");
+      expect(store.plan?.matches.m1?.slots[0]?.assignedMemberId).toBeNull();
+      expect(store.plan?.matches.m1?.slots[0]?.customHelperName).toBeNull();
+      expect(store.plan?.matches.m1?.slots[0]?.checkedIn).toBe(false);
+    });
+
+    it("should auto-assign unassigned match slots from store", () => {
+      const store = usePlanStore();
+      store.createNewPlan("test-plan-id", "test-key");
+
+      store.addMember({ name: "Volunteer One", teamIds: ["team-helper"] });
+      store.plan!.teams["team-helper"] = {
+        id: "team-helper",
+        name: "Helper Team",
+        isManual: true,
+        updatedAt: new Date(),
+      };
+      store.plan!.config.roles.push({
+        id: "timekeeper",
+        name: "Timekeeper",
+        scope: "match",
+      });
+
+      store.plan!.matches.m1 = {
+        id: "m1",
+        time: new Date("2026-10-15T14:00:00.000Z"),
+        homeTeamId: "team-other",
+        awayTeamName: "Away Team",
+        helperTeamId: "team-helper",
+        slots: [
+          {
+            id: "slot-1",
+            roleId: "timekeeper",
+            assignedMemberId: null,
+            updatedAt: new Date(0),
+          },
+        ],
+        updatedAt: new Date(0),
+      };
+
+      store.autoAssignMatchSlots("m1");
+      expect(store.plan?.matches.m1?.slots[0]?.assignedMemberId).toBeDefined();
+      expect(store.plan?.matches.m1?.slots[0]?.assignedMemberId).not.toBeNull();
+    });
   });
 });
