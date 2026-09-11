@@ -62,8 +62,11 @@ function isAssigned(slot: Slot) {
   return !!slot.assignedMemberId || !!slot.customHelperName;
 }
 
-function handleCheckIn(matchId: string, slotId: string) {
+async function handleCheckIn(matchId: string, slotId: string) {
   planStore.toggleCheckIn(matchId, slotId);
+  if (planStore.plan && planStore.key) {
+    await planStore.savePlan();
+  }
 }
 </script>
 
