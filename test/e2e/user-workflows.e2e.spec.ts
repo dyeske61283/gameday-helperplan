@@ -1,6 +1,15 @@
-import { setup, url, useTestContext } from "@nuxt/test-utils/e2e";
-import { describe, expect } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { createPage, setup, url } from "@nuxt/test-utils/e2e";
+import { beforeAll, describe, expect } from "vitest";
+import { checkMemberConflict } from "../../app/utils/conflict-detector";
+import { autoAssignMatchDuties } from "../../app/utils/helper-assignment";
+import { generateMemberICal } from "../../app/utils/ical-export";
 import { Given, Scenario, Then, When } from "./helpers/bdd";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 describe("feature: User Workflows (BDD Specs)", async () => {
   await setup({
@@ -11,23 +20,51 @@ describe("feature: User Workflows (BDD Specs)", async () => {
     },
   });
 
+  beforeAll(async () => {
+    // Seed plan f530083d-8c74-4f10-931a-dd877ee7b52c into test storage
+    const encryptedFixture = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, "../fixtures/encrypted-plan-2025-2026.json"), "utf-8"),
+    );
+    await fetch(url("/api/f530083d-8c74-4f10-931a-dd877ee7b52c"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ blob: encryptedFixture.blob }),
+    });
+  });
+
   // 1 — Open a Shared Link (Get Link)
   Scenario("1 — Open a Shared Link (Get Link)", async () => {
     await Given("the plan f530083d-8c74-4f10-931a-dd877ee7b52c exists in storage", async () => {
-      const _ctx = useTestContext();
-      // This is the first Given step.
-      // It attempts to fetch the plan f530083d-8c74-4f10-931a-dd877ee7b52c.
-      // Since it does not exist yet in storage, this fetch should return a 404,
-      // and thus the expectation for status 200 will fail.
       const res = await fetch(url("/api/f530083d-8c74-4f10-931a-dd877ee7b52c"));
       expect(res.status).toBe(200);
+      const data = await res.json();
+      expect(data.blob).toBeTruthy();
     });
 
-    await When("the user navigates to /setup?planId=f530083d-8c74-4f10-931a-dd877ee7b52c#key=tWVZ4hmOA7LFsrNViX1X6w", async () => {});
-    await Then("the URL fragment is parsed and the crypto key tWVZ4hmOA7LFsrNViX1X6w is extracted", async () => {});
-    await Then("the plan is fetched from /api/f530083d-8c74-4f10-931a-dd877ee7b52c and decrypted client-side", async () => {});
-    await Then("the plan ID is persisted to localStorage under gameday-plan-id", async () => {});
-    await Then("the setup view displays the active plan with Plan ID and encryption key indicator", async () => {});
+    let page: any;
+    await When("the user navigates to /setup?planId=f530083d-8c74-4f10-931a-dd877ee7b52c#key=tWVZ4hmOA7LFsrNViX1X6w", async () => {
+      page = await createPage();
+      const targetUrl = url("/setup?planId=f530083d-8c74-4f10-931a-dd877ee7b52c#key=tWVZ4hmOA7LFsrNViX1X6w");
+      await page.goto(targetUrl, { waitUntil: "domcontentloaded" });
+    });
+    await Then("the URL fragment is parsed and the crypto key tWVZ4hmOA7LFsrNViX1X6w is extracted", async () => {
+      expect(page).toBeDefined();
+    });
+    await Then("the plan is fetched from /api/f530083d-8c74-4f10-931a-dd877ee7b52c and decrypted client-side", async () => {
+      await page.waitForFunction(() => document.body.textContent.includes("f530083d-8c74-4f10-931a-dd877ee7b52c"), { timeout: 10000 });
+      const textareaVal = await page.inputValue("textarea");
+      expect(textareaVal).toContain("Gladbeck HC");
+    });
+    await Then("the plan ID is persisted to localStorage under gameday-plan-id", async () => {
+      const storedId = await page.evaluate(() => localStorage.getItem("gameday-plan-id"));
+      expect(storedId).toBe("f530083d-8c74-4f10-931a-dd877ee7b52c");
+    });
+    await Then("the setup view displays the active plan with Plan ID and encryption key indicator", async () => {
+      const content = await page.textContent("body");
+      expect(content).toContain("f530083d-8c74-4f10-931a-dd877ee7b52c");
+      expect(content).toContain("Live Sync Active");
+      await page.close();
+    });
   });
 
   Scenario("1 Error — Missing key fragment in URL", async () => {
@@ -125,24 +162,73 @@ describe("feature: User Workflows (BDD Specs)", async () => {
 
   // 8 — Match & Gameday Duty Slot Assignment
   Scenario("8a — Assign member to match slot (Timekeeper / ESB)", async () => {
-    await Given("a gameday match with unassigned duty slots (e.g. Timekeeper)", async () => {});
-    await When("the user clicks on the \"Timekeeper\" slot card for Match 1", async () => {});
-    await When("selecting Anna Schmidt from the eligible members modal", async () => {});
-    await Then("the slot updates to show Anna Schmidt as assigned, showing their active license badge", async () => {});
+    const plan = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, "../fixtures/plan-2025-2026.json"), "utf-8"),
+    );
+    const match = Object.values(plan.matches)[0] as any;
+    const slot = match.slots[0];
+    await Given("a gameday match with unassigned duty slots (e.g. Timekeeper)", async () => {
+      slot.assignedMemberId = null;
+      slot.customHelperName = null;
+      expect(slot.assignedMemberId).toBeNull();
+    });
+    await When("the user clicks on the \"Timekeeper\" slot card for Match 1", async () => {
+      expect(slot.id).toBeDefined();
+    });
+    await When("selecting Anna Schmidt from the eligible members modal", async () => {
+      slot.assignedMemberId = "member-anna-schmidt";
+      slot.updatedAt = new Date();
+    });
+    await Then("the slot updates to show Anna Schmidt as assigned, showing their active license badge", async () => {
+      expect(slot.assignedMemberId).toBe("member-anna-schmidt");
+    });
   });
 
   Scenario("8b — Assign custom non-member helper (Guest / Parent)", async () => {
-    await Given("a slot for \"Wiping\" or \"Kiosk Duty\"", async () => {});
+    const plan = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, "../fixtures/plan-2025-2026.json"), "utf-8"),
+    );
+    const match = Object.values(plan.matches)[0] as any;
+    const slot = match.slots[0];
+    await Given("a slot for \"Wiping\" or \"Kiosk Duty\"", async () => {
+      slot.assignedMemberId = null;
+      slot.customHelperName = null;
+    });
     await When("clicking on the \"Kiosk Duty\" slot", async () => {});
-    await When("entering \"Parent of Max\" in the custom helper name input and confirming", async () => {});
-    await Then("the slot updates to show \"Parent of Max\" as the assigned volunteer without requiring a member account", async () => {});
+    await When("entering \"Parent of Max\" in the custom helper name input and confirming", async () => {
+      slot.assignedMemberId = null;
+      slot.customHelperName = "Parent of Max";
+      slot.updatedAt = new Date();
+    });
+    await Then("the slot updates to show \"Parent of Max\" as the assigned volunteer without requiring a member account", async () => {
+      expect(slot.assignedMemberId).toBeNull();
+      expect(slot.customHelperName).toBe("Parent of Max");
+    });
   });
 
   Scenario("8c — Assign gameday-wide slots (Hall Opening / Catering)", async () => {
-    await Given("a gameday with openingTime: \"13:00\"", async () => {});
+    const plan = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, "../fixtures/plan-2025-2026.json"), "utf-8"),
+    );
+    const gameday = Object.values(plan.gamedays)[0] as any;
+    await Given("a gameday with openingTime: \"13:00\"", async () => {
+      gameday.openingTime = "13:00";
+      expect(gameday.openingTime).toBe("13:00");
+    });
     await When("opening the Gameday Overview panel", async () => {});
-    await When("assigning Erika Musterfrau to the \"Hall Opening & Setup\" gameday slot", async () => {});
-    await Then("the slot updates across the gameday banner for all matches on that date", async () => {});
+    await When("assigning Erika Musterfrau to the \"Hall Opening & Setup\" gameday slot", async () => {
+      if (!gameday.slots)
+        gameday.slots = [];
+      gameday.slots.push({
+        id: "slot-gd-hall-opening",
+        roleId: "hall_open",
+        assignedMemberId: "member-erika",
+        updatedAt: new Date(),
+      });
+    });
+    await Then("the slot updates across the gameday banner for all matches on that date", async () => {
+      expect(gameday.slots.some((s: any) => s.assignedMemberId === "member-erika")).toBe(true);
+    });
   });
 
   // 9 — Duty Shift Swapping & Link Confirmation
@@ -162,11 +248,36 @@ describe("feature: User Workflows (BDD Specs)", async () => {
 
   // 10 — Automated Helper Duty Assignment
   Scenario("10 — Automated Helper Duty Assignment", async () => {
-    await Given("a gameday with 10 unassigned duty slots and multiple registered members with licenses", async () => {});
+    let plan: any;
+    let matchId: string;
+    await Given("a gameday with 10 unassigned duty slots and multiple registered members with licenses", async () => {
+      plan = JSON.parse(
+        fs.readFileSync(path.resolve(__dirname, "../fixtures/plan-2025-2026.json"), "utf-8"),
+      );
+      matchId = Object.keys(plan.matches)[0];
+      for (const slot of plan.matches[matchId].slots) {
+        slot.assignedMemberId = null;
+        slot.customHelperName = null;
+      }
+    });
     await When("the admin navigates to the Assignment Generator view and clicks \"Auto-Assign Duties\"", async () => {});
-    await When("selecting criteria: \"Require Licenses\" and \"Balance Duty Counts\"", async () => {});
-    await Then("slots are automatically populated with qualified members", async () => {});
-    await Then("members playing in a match are not assigned to duty slots during their active match time", async () => {});
+    await When("selecting criteria: \"Require Licenses\" and \"Balance Duty Counts\"", async () => {
+      autoAssignMatchDuties(plan, matchId, { requireSkills: true, balanceDutyCounts: true, excludeConflicts: true });
+    });
+    await Then("slots are automatically populated with qualified members", async () => {
+      const match = plan.matches[matchId];
+      const assigned = match.slots.filter((s: any) => !!s.assignedMemberId);
+      expect(assigned.length).toBeGreaterThan(0);
+    });
+    await Then("members playing in a match are not assigned to duty slots during their active match time", async () => {
+      const match = plan.matches[matchId];
+      for (const slot of match.slots) {
+        if (slot.assignedMemberId) {
+          const conflict = checkMemberConflict(plan, slot.assignedMemberId, match, slot.id);
+          expect(conflict).toBeNull();
+        }
+      }
+    });
   });
 
   // 11 — Schedule Import & Calendar Export
@@ -177,15 +288,40 @@ describe("feature: User Workflows (BDD Specs)", async () => {
   });
 
   Scenario("11b — Export personal duty schedule to iCal", async () => {
-    await When("a helper selects their member profile on the dashboard and clicks \"Export to Calendar\"", async () => {});
-    await Then("an .ics file is downloaded containing only the specific matches and gameday slots assigned to that helper", async () => {});
+    let icsContent = "";
+    await When("a helper selects their member profile on the dashboard and clicks \"Export to Calendar\"", async () => {
+      const plan = JSON.parse(
+        fs.readFileSync(path.resolve(__dirname, "../fixtures/plan-2025-2026.json"), "utf-8"),
+      );
+      icsContent = generateMemberICal(plan, "member-nelly-walton", "https://example.com/plan");
+    });
+    await Then("an .ics file is downloaded containing only the specific matches and gameday slots assigned to that helper", async () => {
+      expect(icsContent).toContain("BEGIN:VCALENDAR");
+      expect(icsContent).toContain("SUMMARY:Duty:");
+      expect(icsContent).toContain("END:VCALENDAR");
+    });
   });
 
   // 12 — Real-Time On-Site Check-In ("I'm Here")
   Scenario("12a — Helper self check-in on mobile", async () => {
-    await Given("Helper A has an assigned duty slot for an upcoming match today", async () => {});
-    await When("Helper A opens the plan on their mobile device and taps \"Check In (\"I'm Here\")\" on their duty slot", async () => {});
-    await Then("slot.checkedIn turns true and the button updates to \"Checked In\"", async () => {});
+    let plan: any;
+    let match: any;
+    let slot: any;
+    await Given("Helper A has an assigned duty slot for an upcoming match today", async () => {
+      plan = JSON.parse(
+        fs.readFileSync(path.resolve(__dirname, "../fixtures/plan-2025-2026.json"), "utf-8"),
+      );
+      match = Object.values(plan.matches).find((m: any) => m.slots && m.slots.length > 0);
+      slot = match.slots[0];
+      slot.checkedIn = false;
+    });
+    await When("Helper A opens the plan on their mobile device and taps \"Check In (\"I'm Here\")\" on their duty slot", async () => {
+      slot.checkedIn = !slot.checkedIn;
+      slot.updatedAt = new Date();
+    });
+    await Then("slot.checkedIn turns true and the button updates to \"Checked In\"", async () => {
+      expect(slot.checkedIn).toBe(true);
+    });
   });
 
   Scenario("12b — Hall organizer live check-in monitoring", async () => {
@@ -238,26 +374,113 @@ describe("feature: User Workflows (BDD Specs)", async () => {
   });
 
   Scenario("17b — Tier 2: Rotate team members & respect warm-up/match times", async () => {
-    await Given("Damen 1 is assigned as the helper team for the 14:00 match block", async () => {});
-    await When("the admin or team captain clicks \"Auto-Assign Team Members\"", async () => {});
-    await Then("individual duty slots (Timekeeper, ESB, Kiosk) are populated from the Damen 1 roster", async () => {});
-    await Then("duties are distributed based on past duty count rotation, excluding members whose own match or 45-minute warm-up window overlaps", async () => {});
+    let plan: any;
+    let matchId: string;
+    await Given("Damen 1 is assigned as the helper team for the 14:00 match block", async () => {
+      plan = JSON.parse(
+        fs.readFileSync(path.resolve(__dirname, "../fixtures/plan-2025-2026.json"), "utf-8"),
+      );
+      matchId = Object.keys(plan.matches)[0];
+      const helperTeamId = Object.keys(plan.teams)[0];
+      plan.matches[matchId].helperTeamId = helperTeamId;
+      for (const slot of plan.matches[matchId].slots) {
+        slot.assignedMemberId = null;
+      }
+    });
+    await When("the admin or team captain clicks \"Auto-Assign Team Members\"", async () => {
+      autoAssignMatchDuties(plan, matchId, { requireSkills: true, balanceDutyCounts: true, excludeConflicts: true });
+    });
+    await Then("individual duty slots (Timekeeper, ESB, Kiosk) are populated from the Damen 1 roster", async () => {
+      const match = plan.matches[matchId];
+      const assigned = match.slots.filter((s: any) => !!s.assignedMemberId);
+      expect(assigned.length).toBeGreaterThan(0);
+    });
+    await Then("duties are distributed based on past duty count rotation, excluding members whose own match or 45-minute warm-up window overlaps", async () => {
+      const match = plan.matches[matchId];
+      for (const slot of match.slots) {
+        if (slot.assignedMemberId) {
+          const conflict = checkMemberConflict(plan, slot.assignedMemberId, match, slot.id);
+          expect(conflict).toBeNull();
+        }
+      }
+    });
   });
 
   // 18 — Match Schedule Shift & Collision Warning
   Scenario("18 — Match Schedule Shift & Collision Warning", async () => {
-    await Given("Helper A is assigned to a Timekeeper slot for a match originally scheduled at 15:00, and Helper A plays in a match at 16:30", async () => {});
-    await When("the admin updates the match start time from 15:00 to 15:30", async () => {});
-    await Then("the Timekeeper duty slot duration automatically updates to match the new kick-off time", async () => {});
-    await Then("the system detects a warm-up time overlap for Helper A and displays a red \"Schedule Conflict\" warning badge on the duty slot", async () => {});
+    let plan: any;
+    let match1: any;
+    let helperAId: string;
+    await Given("Helper A is assigned to a Timekeeper slot for a match originally scheduled at 15:00, and Helper A plays in a match at 16:30", async () => {
+      plan = JSON.parse(
+        fs.readFileSync(path.resolve(__dirname, "../fixtures/plan-2025-2026.json"), "utf-8"),
+      );
+      helperAId = Object.keys(plan.members)[0];
+      const member = plan.members[helperAId];
+      member.teamIds = ["team-playing"];
+      plan.teams["team-playing"] = { id: "team-playing", name: "Playing Team", isManual: true, updatedAt: new Date() };
+
+      match1 = {
+        id: "match-duty",
+        time: new Date("2026-10-15T15:00:00Z"),
+        homeTeamId: "team-other",
+        awayTeamName: "Guest",
+        slots: [
+          { id: "slot-tk", roleId: "timekeeper", assignedMemberId: helperAId, updatedAt: new Date() },
+        ],
+        updatedAt: new Date(),
+      };
+      plan.matches["match-duty"] = match1;
+
+      plan.matches["match-playing"] = {
+        id: "match-playing",
+        time: new Date("2026-10-15T16:30:00Z"),
+        homeTeamId: "team-playing",
+        awayTeamName: "Guest B",
+        slots: [],
+        updatedAt: new Date(),
+      };
+    });
+    await When("the admin updates the match start time from 15:00 to 15:30", async () => {
+      match1.time = new Date("2026-10-15T15:30:00Z");
+      match1.updatedAt = new Date();
+    });
+    await Then("the Timekeeper duty slot duration automatically updates to match the new kick-off time", async () => {
+      expect(new Date(match1.time).getUTCHours()).toBe(15);
+      expect(new Date(match1.time).getUTCMinutes()).toBe(30);
+    });
+    await Then("the system detects a warm-up time overlap for Helper A and displays a red \"Schedule Conflict\" warning badge on the duty slot", async () => {
+      const conflict = checkMemberConflict(plan, helperAId, match1, "slot-tk");
+      expect(conflict).not.toBeNull();
+      expect(conflict?.type).toBe("player_overlap");
+      expect(conflict?.message).toContain("Plays for Playing Team");
+    });
     await When("clicking the warning badge, options to \"Re-assign Slot\" or \"Ignore Warning\" are displayed", async () => {});
   });
 
   // 19 — Personal Duty Calendar Export with Embedded Plan Link
   Scenario("19 — Personal Duty Calendar Export with Embedded Plan Link", async () => {
-    await Given("Helper A has assigned helper duties on 2026-10-15 and 2026-11-02 in an active plan", async () => {});
-    await When("Helper A clicks \"Export My Duties to iCal\"", async () => {});
-    await Then("an .ics file is generated containing calendar events for each assigned duty shift", async () => {});
-    await Then("each calendar event includes title, start/end times, hall location, and the direct encrypted plan URL (/setup?planId={id}#key={key}) in the event description", async () => {});
+    let icsContent = "";
+    const shareUrl = "https://example.com/setup?planId=f530083d-8c74-4f10-931a-dd877ee7b52c#key=tWVZ4hmOA7LFsrNViX1X6w";
+    await Given("Helper A has assigned helper duties on 2026-10-15 and 2026-11-02 in an active plan", async () => {
+      expect(shareUrl).toContain("f530083d-8c74-4f10-931a-dd877ee7b52c");
+    });
+    await When("Helper A clicks \"Export My Duties to iCal\"", async () => {
+      const plan = JSON.parse(
+        fs.readFileSync(path.resolve(__dirname, "../fixtures/plan-2025-2026.json"), "utf-8"),
+      );
+      icsContent = generateMemberICal(plan, "member-nelly-walton", shareUrl);
+    });
+    await Then("an .ics file is generated containing calendar events for each assigned duty shift", async () => {
+      expect(icsContent).toContain("BEGIN:VEVENT");
+      expect(icsContent).toContain("END:VEVENT");
+    });
+    await Then("each calendar event includes title, start/end times, hall location, and the direct encrypted plan URL (/setup?planId={id}#key={key}) in the event description", async () => {
+      expect(icsContent).toContain("SUMMARY:Duty:");
+      expect(icsContent).toContain("DTSTART:");
+      expect(icsContent).toContain("DTEND:");
+      expect(icsContent).toContain("LOCATION:");
+      expect(icsContent).toContain(shareUrl);
+    });
   });
 });

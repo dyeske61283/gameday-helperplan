@@ -117,4 +117,40 @@ describe("setup Wizard", () => {
     expect(component.text()).toContain("Add Members");
     expect(component.find("textarea").exists()).toBe(true);
   });
+
+  it("shows interactive team creator and quick suggestions in Step 3", async () => {
+    const component = await mountSuspended(SetupPage, {
+      global: {
+        mocks: {
+          $t: (key: string) => key,
+        },
+      },
+    });
+
+    const store = usePlanStore();
+    store.createNewPlan("test-plan", "test-key");
+    component.vm.currentStep = 3;
+
+    await nextTick();
+
+    expect(component.text()).toContain("Add Club Teams");
+    expect(component.text()).toContain("Quick Suggestions:");
+    expect(component.text()).toContain("Männer I");
+    expect(component.text()).toContain("Damen I");
+
+    // Add team via quick suggestion
+    store.addTeam("Damen I");
+    await nextTick();
+
+    expect(store.teamsList.some(t => t.name === "Damen I")).toBe(true);
+    expect(component.text()).toContain("Damen I");
+    expect(component.text()).toContain("Created Teams (1):");
+
+    // Delete team
+    const createdTeam = store.teamsList.find(t => t.name === "Damen I")!;
+    store.deleteTeam(createdTeam.id);
+    await nextTick();
+
+    expect(store.teamsList.some(t => t.name === "Damen I")).toBe(false);
+  });
 });
