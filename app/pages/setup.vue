@@ -152,6 +152,7 @@ onMounted(async () => {
   const queryId = route.query.planId as string;
   if (queryId && planStore.key) {
     await planStore.loadPlan(queryId, planStore.key);
+    currentStep.value = 5;
   }
 });
 
