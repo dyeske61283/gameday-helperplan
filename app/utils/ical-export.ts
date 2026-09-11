@@ -1,6 +1,7 @@
 import type { SeasonPlan } from "./plan-types";
 
 export type ICalEvent = {
+  uid?: string;
   title: string;
   description?: string;
   location?: string;
@@ -10,6 +11,18 @@ export type ICalEvent = {
 
 function formatDateToICS(date: Date): string {
   return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+}
+
+/**
+ * Escapes characters per RFC 5545 section 3.3.11.
+ * Newlines must be encoded as literal \n.
+ */
+function escapeICSText(text: string): string {
+  return text
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\r?\n/g, "\\n");
 }
 
 export function generateICS(events: ICalEvent[]): string {
@@ -24,7 +37,7 @@ export function generateICS(events: ICalEvent[]): string {
     const now = formatDateToICS(new Date());
     const start = formatDateToICS(new Date(event.startDate));
     const end = formatDateToICS(new Date(event.endDate));
-    const uid = `duty-${start}-${Math.random().toString(36).substring(2, 9)}@gameday-helperplan`;
+    const uid = event.uid || `duty-${start}-${Math.random().toString(36).substring(2, 9)}@gameday-helperplan`;
 
     lines.push(
       "BEGIN:VEVENT",
@@ -32,15 +45,15 @@ export function generateICS(events: ICalEvent[]): string {
       `DTSTAMP:${now}`,
       `DTSTART:${start}`,
       `DTEND:${end}`,
-      `SUMMARY:${event.title.replace(/[,;\\]/g, "\\$&")}`,
+      `SUMMARY:${escapeICSText(event.title)}`,
     );
 
     if (event.location) {
-      lines.push(`LOCATION:${event.location.replace(/[,;\\]/g, "\\$&")}`);
+      lines.push(`LOCATION:${escapeICSText(event.location)}`);
     }
 
     if (event.description) {
-      lines.push(`DESCRIPTION:${event.description.replace(/\n/g, "\\n").replace(/[,;\\]/g, "\\$&")}`);
+      lines.push(`DESCRIPTION:${escapeICSText(event.description)}`);
     }
 
     lines.push("END:VEVENT");
@@ -57,9 +70,9 @@ export function generateMemberICal(plan: SeasonPlan, memberId: string, shareUrl?
 
   const events: ICalEvent[] = [];
 
-  // Look through matches
+  // 1. Look through match-specific slots
   for (const match of Object.values(plan.matches)) {
-    const assignedSlots = match.slots.filter(s => s.assignedMemberId === memberId);
+    const assignedSlots = (match.slots || []).filter(s => s.assignedMemberId === memberId);
     if (assignedSlots.length === 0)
       continue;
 
@@ -75,11 +88,43 @@ export function generateMemberICal(plan: SeasonPlan, memberId: string, shareUrl?
       const roleName = role?.name || slot.roleId;
 
       events.push({
+        uid: `duty-${memberId}-${match.id}-${slot.id}@gameday-helperplan`,
         title: `Duty: ${roleName} (${homeTeam} vs ${match.awayTeamName})`,
         location: location?.name || "Home Turf",
-        description: `Helper Duty for ${roleName}\\nMatch: ${homeTeam} vs ${match.awayTeamName}${shareUrl ? `\\nPlan Link: ${shareUrl}` : ""}`,
+        description: `Helper Duty for ${roleName}\nMatch: ${homeTeam} vs ${match.awayTeamName}${shareUrl ? `\nPlan Link: ${shareUrl}` : ""}`,
         startDate: matchTime,
         endDate: endTime,
+      });
+    }
+  }
+
+  // 2. Look through gameday-level slots (e.g. Hall Opening, Catering)
+  for (const gameday of Object.values(plan.gamedays)) {
+    if (!gameday.slots)
+      continue;
+    const assignedSlots = gameday.slots.filter(s => s.assignedMemberId === memberId);
+    if (assignedSlots.length === 0)
+      continue;
+
+    const location = plan.config.locations.find(loc => loc.id === gameday.locationId);
+    const dateStr = gameday.date;
+    const openingTime = gameday.openingTime || "09:00";
+    const closingTime = gameday.closingTime || "18:00";
+
+    const startTime = new Date(`${dateStr}T${openingTime}:00Z`);
+    const endTime = new Date(`${dateStr}T${closingTime}:00Z`);
+
+    for (const slot of assignedSlots) {
+      const role = plan.config.roles.find(r => r.id === slot.roleId);
+      const roleName = role?.name || slot.roleId;
+
+      events.push({
+        uid: `duty-${memberId}-gd-${gameday.id}-${slot.id}@gameday-helperplan`,
+        title: `Duty: ${roleName} (Gameday ${dateStr})`,
+        location: location?.name || "Home Turf",
+        description: `Gameday Duty for ${roleName}\nDate: ${dateStr}${shareUrl ? `\nPlan Link: ${shareUrl}` : ""}`,
+        startDate: Number.isNaN(startTime.getTime()) ? new Date() : startTime,
+        endDate: Number.isNaN(endTime.getTime()) ? new Date() : endTime,
       });
     }
   }
