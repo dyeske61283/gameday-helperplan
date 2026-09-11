@@ -1,3 +1,4 @@
+import type { AutoAssignOptions } from "../utils/helper-assignment";
 import type {
   Gameday,
   Match,
@@ -10,6 +11,7 @@ import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import examplePlan from "../../test/fixtures/plan-2025-2026.json";
 import { useDecryption, useEncryption } from "../composables/use-crypto";
+import { autoAssignMatchDuties } from "../utils/helper-assignment";
 
 const STORAGE_KEY = "gameday-plan-id";
 const _FRAGMENT_PREFIX = "key=";
@@ -132,7 +134,7 @@ export const usePlanStore = defineStore("plan", () => {
    * Subscribe to real-time updates for the current plan via SSE.
    */
   function watchPlan() {
-    if (import.meta.server || !plan.value?.id || !key.value)
+    if (import.meta.server || typeof EventSource === "undefined" || !plan.value?.id || !key.value)
       return;
 
     if (eventSource.value) {
@@ -410,55 +412,11 @@ export const usePlanStore = defineStore("plan", () => {
     plan.value.lastUpdated = now;
   }
 
-  function autoAssignMatchSlots(matchId: string) {
+  function autoAssignMatchSlots(matchId: string, options?: AutoAssignOptions) {
     if (!plan.value || !plan.value.matches[matchId])
       return;
 
-    const match = plan.value.matches[matchId];
-    const teamId = match.helperTeamId;
-    const teamMembers = teamId
-      ? membersList.value.filter(m => m.teamIds.includes(teamId))
-      : membersList.value;
-
-    const assignedInMatch = new Set(
-      match.slots?.map(s => s.assignedMemberId).filter((id): id is string => !!id),
-    );
-
-    match.slots?.forEach((slot) => {
-      if (slot.assignedMemberId || slot.customHelperName)
-        return; // already assigned
-
-      const role = roles.value.find(r => r.id === slot.roleId);
-      const reqSkill = role?.requiredSkillId;
-
-      // First try to find a team member with required skill not yet assigned
-      let candidate = teamMembers.find(
-        m => !assignedInMatch.has(m.id) && (!reqSkill || m.skillIds.includes(reqSkill)),
-      );
-
-      // If no qualified team member found and skill required, look in club-wide members
-      if (!candidate && reqSkill) {
-        candidate = membersList.value.find(
-          m => !assignedInMatch.has(m.id) && m.skillIds.includes(reqSkill),
-        );
-      }
-
-      // Fallback to any available team member if no specific skill required
-      if (!candidate && !reqSkill) {
-        candidate = teamMembers.find(m => !assignedInMatch.has(m.id));
-      }
-
-      if (candidate) {
-        slot.assignedMemberId = candidate.id;
-        slot.customHelperName = null;
-        slot.updatedAt = new Date();
-        assignedInMatch.add(candidate.id);
-      }
-    });
-
-    const now = new Date();
-    match.updatedAt = now;
-    plan.value.lastUpdated = now;
+    return autoAssignMatchDuties(plan.value, matchId, options);
   }
 
   function toggleCheckIn(matchId: string, slotId: string, forceValue?: boolean) {
