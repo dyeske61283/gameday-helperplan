@@ -14,6 +14,8 @@ import { useDecryption, useEncryption } from "../composables/use-crypto";
 import { autoAssignMatchDuties, isMemberEligibleForSlot } from "../utils/helper-assignment";
 
 const STORAGE_KEY = "gameday-plan-id";
+const RESUME_KEY = "gameday-plan-resume";
+const MEMBER_KEY = "gameday-selected-member";
 const _FRAGMENT_PREFIX = "key=";
 
 /**
@@ -71,6 +73,8 @@ export const usePlanStore = defineStore("plan", () => {
 
   // Local storage for the last active plan ID
   const lastPlanId = useLocalStorage(STORAGE_KEY, "");
+  const resumeState = useLocalStorage<{ id: string; key: string } | null>(RESUME_KEY, null);
+  const selectedMemberId = useLocalStorage<string | null>(MEMBER_KEY, null);
 
   const { encryptData, generateKey } = useEncryption();
   const { decryptBlob } = useDecryption();
@@ -129,6 +133,7 @@ export const usePlanStore = defineStore("plan", () => {
 
       plan.value = loadedPlan;
       lastPlanId.value = id;
+      resumeState.value = { id, key: decryptionKey };
     }
     catch (err: unknown) {
       if (err instanceof Error)
@@ -212,6 +217,7 @@ export const usePlanStore = defineStore("plan", () => {
       });
 
       lastPlanId.value = plan.value.id;
+      resumeState.value = { id: plan.value.id, key: key.value };
     }
     catch (err: unknown) {
       if (err instanceof Error) {
@@ -410,6 +416,31 @@ export const usePlanStore = defineStore("plan", () => {
     plan.value.lastUpdated = now;
   }
 
+  function claimSlot(matchId: string, slotId: string, memberId = selectedMemberId.value) {
+    if (!plan.value)
+      throw new Error("Plan is unavailable");
+    const match = plan.value.matches[matchId];
+    const member = memberId ? plan.value.members[memberId] : undefined;
+    const slot = match?.slots.find(candidate => candidate.id === slotId);
+    if (!match || !slot)
+      throw new Error("Match or duty slot not found");
+    if (!member)
+      throw new Error("Select a member before claiming a duty");
+    if (slot.assignmentStatus !== "OPEN" || slot.assignedMemberId || slot.customHelperName)
+      throw new Error("This duty has already been claimed");
+    if (!isMemberEligibleForSlot(plan.value, slot, member.id))
+      throw new Error("This member does not have the required capability");
+
+    const now = new Date();
+    slot.assignedMemberId = member.id;
+    slot.assignmentStatus = "ASSIGNED";
+    slot.customHelperName = null;
+    slot.updatedAt = now;
+    match.updatedAt = now;
+    plan.value.lastUpdated = now;
+    selectedMemberId.value = member.id;
+  }
+
   function clearMatchSlots(matchId: string) {
     if (!plan.value || !plan.value.matches[matchId])
       return;
@@ -475,6 +506,8 @@ export const usePlanStore = defineStore("plan", () => {
     plan,
     key,
     lastPlanId,
+    resumeState,
+    selectedMemberId,
     isLoading,
     error,
     isModifiable,
@@ -502,6 +535,7 @@ export const usePlanStore = defineStore("plan", () => {
     deleteMember,
     assignHelperTeam,
     assignMemberToSlot,
+    claimSlot,
     clearMatchSlots,
     autoAssignMatchSlots,
     toggleCheckIn,

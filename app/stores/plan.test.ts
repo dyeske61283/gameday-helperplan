@@ -256,4 +256,46 @@ describe("usePlanStore", () => {
       expect(store.plan?.matches.m1?.slots[0]?.assignedMemberId).not.toBeNull();
     });
   });
+
+  describe("claimSlot", () => {
+    it("claims an open eligible slot without replacing an assignment", () => {
+      const store = usePlanStore();
+      store.createNewPlan("test-plan-id", "test-key");
+      const member = store.addMember({ name: "Capable Helper", skillIds: ["referee"] });
+      store.plan!.config.roles.push({ id: "referee-duty", name: "Referee", scope: "match", requiredSkillId: "referee" });
+      store.plan!.matches.m1 = {
+        id: "m1",
+        time: new Date(),
+        homeTeamId: "A",
+        awayTeamName: "B",
+        slots: [{ id: "slot-1", roleId: "referee-duty", assignedMemberId: null, assignmentStatus: "OPEN", updatedAt: new Date(1) }],
+        updatedAt: new Date(1),
+      };
+
+      store.selectedMemberId = member.id;
+      store.claimSlot("m1", "slot-1", member.id);
+
+      expect(store.plan!.matches.m1!.slots[0]!.assignedMemberId).toBe(member.id);
+      expect(store.plan!.matches.m1!.slots[0]!.assignmentStatus).toBe("ASSIGNED");
+      expect(() => store.claimSlot("m1", "slot-1", member.id)).toThrow("already been claimed");
+    });
+
+    it("rejects an ineligible member", () => {
+      const store = usePlanStore();
+      store.createNewPlan("test-plan-id", "test-key");
+      const member = store.addMember({ name: "Unlicensed Helper" });
+      store.plan!.config.roles.push({ id: "referee-duty", name: "Referee", scope: "match", requiredSkillId: "referee" });
+      store.plan!.matches.m1 = {
+        id: "m1",
+        time: new Date(),
+        homeTeamId: "A",
+        awayTeamName: "B",
+        slots: [{ id: "slot-1", roleId: "referee-duty", assignedMemberId: null, assignmentStatus: "OPEN", updatedAt: new Date(1) }],
+        updatedAt: new Date(1),
+      };
+      store.selectedMemberId = member.id;
+
+      expect(() => store.claimSlot("m1", "slot-1", member.id)).toThrow("required capability");
+    });
+  });
 });

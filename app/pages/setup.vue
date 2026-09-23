@@ -140,20 +140,21 @@ async function handleResume() {
 const dashboardLink = computed(() => {
   if (!planStore.plan?.id)
     return "/dashboard";
-  return `/dashboard?planId=${planStore.plan.id}`;
+  return `/plans/${planStore.plan.id}`;
 });
 
 const assignmentsLink = computed(() => {
   if (!planStore.plan?.id)
     return "/assignments";
-  return `/assignments?planId=${planStore.plan.id}`;
+  return `/plans/${planStore.plan.id}`;
 });
 
 const shareLink = computed(() => {
   if (import.meta.server || !planStore.plan)
     return "";
   const url = new URL(window.location.href);
-  url.searchParams.set("planId", planStore.plan.id);
+  url.pathname = `/plans/${planStore.plan.id}`;
+  url.search = "";
   url.hash = `key=${planStore.key}`;
   return url.toString();
 });
