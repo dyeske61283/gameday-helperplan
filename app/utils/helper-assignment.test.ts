@@ -1,6 +1,6 @@
 import type { SeasonPlan } from "./plan-types";
 import { describe, expect, it } from "vitest";
-import { autoAssignMatchDuties, getMemberDutyCounts } from "./helper-assignment";
+import { autoAssignMatchDuties, completeClosedAssignments, getMemberDutyCounts, isMemberEligibleForSlot } from "./helper-assignment";
 
 describe("assign helpers to slots with restrictions and reducing assignment count average", () => {
   const createTestPlan = (): SeasonPlan => ({
@@ -178,5 +178,32 @@ describe("assign helpers to slots with restrictions and reducing assignment coun
     const result = autoAssignMatchDuties(plan, "m_target");
     expect(result.assignedCount).toBe(0);
     expect(result.unassignedSlotIds).toEqual(["slot_ref", "slot_tk", "slot_kiosk"]);
+  });
+
+  it("uses role skills as the shared capability rule", () => {
+    const plan = createTestPlan();
+    const slot = plan.matches.m_target!.slots[0]!;
+
+    expect(isMemberEligibleForSlot(plan, slot, "m_alice")).toBe(true);
+    expect(isMemberEligibleForSlot(plan, slot, "m_bob")).toBe(false);
+  });
+
+  it("completes assigned duties after the gameday closes", () => {
+    const plan = createTestPlan();
+    const slot = plan.matches.m_target!.slots[0]!;
+    slot.assignedMemberId = "m_alice";
+    slot.assignmentStatus = "ASSIGNED";
+    plan.gamedays.g1 = {
+      id: "g1",
+      date: "2026-10-15",
+      locationId: "hall",
+      matchIds: ["m_target"],
+      slots: [],
+      closingTime: "18:00:00",
+      updatedAt: new Date(),
+    };
+
+    expect(completeClosedAssignments(plan, new Date("2026-10-15T18:01:00"))).toBe(1);
+    expect(slot.assignmentStatus).toBe("COMPLETED");
   });
 });

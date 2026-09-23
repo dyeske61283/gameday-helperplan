@@ -40,13 +40,24 @@ export const ConfigSchema = z.object({
 
 export type Config = z.infer<typeof ConfigSchema>;
 
+export const AssignmentStatusSchema = z.enum(["OPEN", "ASSIGNED", "COMPLETED", "CANCELLED"]);
+export type AssignmentStatus = z.infer<typeof AssignmentStatusSchema>;
+
 export const SlotSchema = z.object({
   id: z.string(), // Unique ID for the slot itself
   roleId: z.string(),
   assignedMemberId: z.string().nullable(),
+  assignmentStatus: AssignmentStatusSchema.optional(),
   customHelperName: z.string().nullable().optional(), // For roles like "Wiping", where a non-member name can be typed
   checkedIn: z.boolean().optional(), // For "I'm Here" check-in status
   updatedAt: unixTimestampToDateSchema,
+}).transform((slot) => {
+  if (slot.assignmentStatus)
+    return slot;
+  return {
+    ...slot,
+    assignmentStatus: slot.assignedMemberId || slot.customHelperName ? "ASSIGNED" as const : "OPEN" as const,
+  };
 });
 
 export type Slot = z.infer<typeof SlotSchema>;

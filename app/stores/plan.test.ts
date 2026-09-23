@@ -32,15 +32,25 @@ describe("usePlanStore", () => {
         club: { id: "1", name: "Old Club" },
         teams: {},
         matches: {
-          m1: { id: "m1", homeTeam: "A", awayTeam: "B" },
+          m1: {
+            id: "m1",
+            homeTeam: "A",
+            awayTeam: "B",
+            slots: [
+              { id: "open", assignedMemberId: null },
+              { id: "assigned", assignedMemberId: "member-1" },
+            ],
+          },
         },
       };
 
       const migratedPlan = migrateIfNeeded(oldPlan as any);
 
-      expect(migratedPlan.schemaVersion).toBe(1);
+      expect(migratedPlan.schemaVersion).toBe(2);
       expect(migratedPlan.matches.m1?.slots).toBeDefined();
       expect(Array.isArray(migratedPlan.matches.m1?.slots)).toBe(true);
+      expect(migratedPlan.matches.m1?.slots[0]?.assignmentStatus).toBe("OPEN");
+      expect(migratedPlan.matches.m1?.slots[1]?.assignmentStatus).toBe("ASSIGNED");
     });
   });
 

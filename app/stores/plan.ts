@@ -11,7 +11,7 @@ import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import examplePlan from "../../test/fixtures/plan-2025-2026.json";
 import { useDecryption, useEncryption } from "../composables/use-crypto";
-import { autoAssignMatchDuties } from "../utils/helper-assignment";
+import { autoAssignMatchDuties, isMemberEligibleForSlot } from "../utils/helper-assignment";
 
 const STORAGE_KEY = "gameday-plan-id";
 const _FRAGMENT_PREFIX = "key=";
@@ -20,19 +20,24 @@ const _FRAGMENT_PREFIX = "key=";
  * Migrate the plan schema if needed.
  */
 export function migrateIfNeeded(loadedPlan: SeasonPlan): SeasonPlan {
-  const CURRENT_SCHEMA_VERSION = 1;
+  const CURRENT_SCHEMA_VERSION = 2;
 
   if (loadedPlan.schemaVersion < CURRENT_SCHEMA_VERSION) {
     console.warn(
       `Migrating plan from version ${loadedPlan.schemaVersion} to ${CURRENT_SCHEMA_VERSION}`,
     );
 
-    // Ensure all matches have a slots array
+    // Normalize legacy occupancy into the explicit assignment lifecycle.
     if (loadedPlan.matches) {
       Object.values(loadedPlan.matches).forEach((match: Match) => {
         if (!match.slots) {
           match.slots = [];
         }
+        match.slots.forEach((slot) => {
+          if (!slot.assignmentStatus) {
+            slot.assignmentStatus = slot.assignedMemberId || slot.customHelperName ? "ASSIGNED" : "OPEN";
+          }
+        });
       });
     }
 
@@ -42,6 +47,11 @@ export function migrateIfNeeded(loadedPlan: SeasonPlan): SeasonPlan {
         if (!gameday.slots) {
           gameday.slots = [];
         }
+        gameday.slots.forEach((slot) => {
+          if (!slot.assignmentStatus) {
+            slot.assignmentStatus = slot.assignedMemberId || slot.customHelperName ? "ASSIGNED" : "OPEN";
+          }
+        });
       });
     }
 
@@ -228,7 +238,7 @@ export const usePlanStore = defineStore("plan", () => {
       },
       lastUpdated: now,
       skills: {},
-      schemaVersion: 1,
+      schemaVersion: 2,
       rev: 0,
       season: `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`,
       members: {},
@@ -388,8 +398,12 @@ export const usePlanStore = defineStore("plan", () => {
     if (!slot)
       return;
 
+    if (memberId && !isMemberEligibleForSlot(plan.value, slot, memberId))
+      return;
+
     slot.assignedMemberId = memberId;
     slot.customHelperName = customHelperName ?? null;
+    slot.assignmentStatus = memberId || customHelperName ? "ASSIGNED" : "OPEN";
     const now = new Date();
     slot.updatedAt = now;
     match.updatedAt = now;
@@ -404,6 +418,7 @@ export const usePlanStore = defineStore("plan", () => {
     match.slots?.forEach((slot) => {
       slot.assignedMemberId = null;
       slot.customHelperName = null;
+      slot.assignmentStatus = "OPEN";
       slot.checkedIn = false;
       slot.updatedAt = new Date();
     });
