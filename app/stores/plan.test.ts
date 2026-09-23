@@ -277,7 +277,8 @@ describe("usePlanStore", () => {
 
       expect(store.plan!.matches.m1!.slots[0]!.assignedMemberId).toBe(member.id);
       expect(store.plan!.matches.m1!.slots[0]!.assignmentStatus).toBe("ASSIGNED");
-      expect(() => store.claimSlot("m1", "slot-1", member.id)).toThrow("already been claimed");
+      const otherMember = store.addMember({ name: "Other Helper" });
+      expect(() => store.claimSlot("m1", "slot-1", otherMember.id)).toThrow("already been claimed");
     });
 
     it("rejects an ineligible member", () => {
@@ -296,6 +297,12 @@ describe("usePlanStore", () => {
       store.selectedMemberId = member.id;
 
       expect(() => store.claimSlot("m1", "slot-1", member.id)).toThrow("required capability");
+    });
+
+    it("rejects unknown match and slot IDs", () => {
+      const store = usePlanStore();
+      store.createNewPlan("test-plan-id", "test-key");
+      expect(() => store.claimSlot("missing-match", "missing-slot", "missing-member")).toThrow("not found");
     });
   });
 });
