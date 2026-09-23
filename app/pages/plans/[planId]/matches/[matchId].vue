@@ -20,6 +20,12 @@ function canClaim(slot: Slot) {
 }
 
 async function claim(slot: Slot) {
+  const previous = {
+    assignedMemberId: slot.assignedMemberId,
+    assignmentStatus: slot.assignmentStatus,
+    customHelperName: slot.customHelperName,
+    updatedAt: slot.updatedAt,
+  };
   try {
     planStore.claimSlot(match.value!.id, slot.id, planStore.selectedMemberId || undefined);
     await planStore.savePlan();
@@ -28,6 +34,10 @@ async function claim(slot: Slot) {
     toast.add({ title: "Duty claimed", color: "success" });
   }
   catch (error) {
+    slot.assignedMemberId = previous.assignedMemberId;
+    slot.assignmentStatus = previous.assignmentStatus;
+    slot.customHelperName = previous.customHelperName;
+    slot.updatedAt = previous.updatedAt;
     toast.add({ title: "Could not claim duty", description: (error as Error).message, color: "error" });
   }
 }
@@ -64,7 +74,7 @@ async function claim(slot: Slot) {
       <div v-if="!selectedMember" class="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm">
         Select a member below before claiming a duty.
       </div>
-      <label class="block space-y-2"><span class="text-sm font-semibold">I am</span><select v-model="planStore.selectedMemberId" class="w-full rounded-lg border p-2"><option :value="null">Select a member</option><option v-for="member in planStore.membersList" :key="member.id" :value="member.id">{{ member.name }}</option></select></label>
+      <label class="block space-y-2"><span class="text-sm font-semibold">I am</span><select v-model="planStore.selectedMemberId" class="w-full rounded-lg border p-2"><option :value="null">Select a member</option><option v-for="member in planStore.membersList" :key="member.id" :value="member.id">{{ member.name }}{{ match.helperTeamId && member.teamIds.includes(match.helperTeamId) ? ' · duty team' : '' }}</option></select></label>
       <div v-if="match.slots.length" class="space-y-3">
         <div v-for="slot in match.slots" :key="slot.id" class="flex items-center justify-between gap-4 rounded-xl border p-4">
           <div>

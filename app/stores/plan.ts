@@ -11,7 +11,7 @@ import { defineStore } from "pinia";
 import { computed, ref } from "vue";
 import examplePlan from "../../test/fixtures/plan-2025-2026.json";
 import { useDecryption, useEncryption } from "../composables/use-crypto";
-import { autoAssignMatchDuties, isMemberEligibleForSlot } from "../utils/helper-assignment";
+import { autoAssignMatchDuties, completeClosedAssignments, isMemberEligibleForSlot } from "../utils/helper-assignment";
 
 const STORAGE_KEY = "gameday-plan-id";
 const RESUME_KEY = "gameday-plan-resume";
@@ -130,6 +130,7 @@ export const usePlanStore = defineStore("plan", () => {
 
       // Run migration logic
       loadedPlan = migrateIfNeeded(loadedPlan);
+      completeClosedAssignments(loadedPlan);
 
       plan.value = loadedPlan;
       lastPlanId.value = id;
@@ -173,6 +174,7 @@ export const usePlanStore = defineStore("plan", () => {
         if (!plan.value || updatedPlan.rev > plan.value.rev) {
           console.warn("Real-time update received: Rev", updatedPlan.rev);
           updatedPlan = migrateIfNeeded(updatedPlan);
+          completeClosedAssignments(updatedPlan);
           plan.value = updatedPlan;
         }
       }
@@ -203,6 +205,7 @@ export const usePlanStore = defineStore("plan", () => {
     error.value = null;
 
     try {
+      completeClosedAssignments(plan.value);
       plan.value.rev++;
       plan.value.lastUpdated = new Date();
 

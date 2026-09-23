@@ -31,8 +31,11 @@ export function usePlanInit() {
         await planStore.loadPlan(queryId, keyFromStore);
       }
     }
-    else if (planStore.plan) {
+    else if (planStore.plan && (!queryId || planStore.plan.id === queryId)) {
       // Already loaded during this session (e.g. navigated from setup) – keep it
+    }
+    else if (queryId) {
+      planStore.plan = null;
     }
     else if (planStore.resumeState?.id && planStore.resumeState.key) {
       // Session resumed from localStorage (e.g. browser refresh on /dashboard)

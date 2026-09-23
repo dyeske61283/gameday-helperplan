@@ -25,7 +25,7 @@ export default withNuxt(
         "error",
         {
           case: "kebabCase",
-          ignore: ["README.md", "CHANGELOG.md", "LICENSE", /\[.*\]/],
+          ignore: ["README.md", "CHANGELOG.md", "LICENSE", "[planId]", "[matchId]"],
         },
       ],
     },

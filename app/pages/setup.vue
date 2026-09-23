@@ -122,11 +122,12 @@ async function handleLoad() {
 }
 
 async function handleResume() {
-  const lastId = planStore.lastPlanId;
-  const currentKey = planStore.key;
+  const lastId = planStore.resumeState?.id;
+  const currentKey = planStore.resumeState?.key;
 
   if (lastId && currentKey) {
-    currentStep.value = 5;
+    await planStore.loadPlan(lastId, currentKey);
+    currentStep.value = planStore.error ? 1 : 5;
   }
   else {
     toast.add({
