@@ -1,4 +1,4 @@
-import type { Member, SeasonPlan } from "./plan-types";
+import type { Member, SeasonPlan, Slot } from "./plan-types";
 import { checkMemberConflict } from "./conflict-detector";
 
 export type AutoAssignOptions = {
@@ -26,6 +26,46 @@ export type AutoAssignResult = {
   unassignedSlotIds: string[];
 };
 
+export function isMemberEligibleForSlot(plan: SeasonPlan, slot: Slot, memberId: string): boolean {
+  const requiredSkillId = plan.config.roles.find(role => role.id === slot.roleId)?.requiredSkillId;
+  if (!requiredSkillId)
+    return true;
+  const member = plan.members[memberId];
+  if (!member)
+    return false;
+  return !requiredSkillId || member.skillIds.includes(requiredSkillId);
+}
+
+export function completeClosedAssignments(plan: SeasonPlan, now = new Date()): number {
+  let completedCount = 0;
+  const close = (slots: Slot[], date: string, closingTime?: string) => {
+    if (!closingTime)
+      return;
+    const closingAt = new Date(`${date}T${closingTime}`);
+    if (Number.isNaN(closingAt.getTime()) || closingAt > now)
+      return;
+    for (const slot of slots) {
+      if (slot.assignmentStatus === "ASSIGNED") {
+        slot.assignmentStatus = "COMPLETED";
+        slot.updatedAt = now;
+        completedCount++;
+      }
+    }
+  };
+
+  for (const gameday of Object.values(plan.gamedays)) {
+    close(gameday.slots, gameday.date, gameday.closingTime);
+    for (const matchId of gameday.matchIds) {
+      const match = plan.matches[matchId];
+      if (match)
+        close(match.slots, gameday.date, gameday.closingTime);
+    }
+  }
+  if (completedCount)
+    plan.lastUpdated = now;
+  return completedCount;
+}
+
 /**
  * Calculates current duty count for every member across all matches in the plan.
  */
@@ -38,7 +78,7 @@ export function getMemberDutyCounts(plan: SeasonPlan): Map<string, number> {
 
   for (const match of Object.values(plan.matches)) {
     for (const slot of match.slots || []) {
-      if (slot.assignedMemberId) {
+      if (slot.assignedMemberId && slot.assignmentStatus !== "CANCELLED") {
         const current = counts.get(slot.assignedMemberId) || 0;
         counts.set(slot.assignedMemberId, current + 1);
       }
@@ -48,7 +88,7 @@ export function getMemberDutyCounts(plan: SeasonPlan): Map<string, number> {
   // Also include gameday-level slots
   for (const gameday of Object.values(plan.gamedays)) {
     for (const slot of gameday.slots || []) {
-      if (slot.assignedMemberId) {
+      if (slot.assignedMemberId && slot.assignmentStatus !== "CANCELLED") {
         const current = counts.get(slot.assignedMemberId) || 0;
         counts.set(slot.assignedMemberId, current + 1);
       }
@@ -111,7 +151,7 @@ export function autoAssignMatchDuties(
   });
 
   for (const slot of sortedSlots) {
-    if (slot.assignedMemberId || slot.customHelperName) {
+    if ((slot.assignmentStatus && slot.assignmentStatus !== "OPEN") || slot.assignedMemberId || slot.customHelperName) {
       continue; // Already assigned
     }
 
@@ -124,7 +164,7 @@ export function autoAssignMatchDuties(
         return false;
 
       // License requirement check
-      if (requireSkills && reqSkill && !member.skillIds.includes(reqSkill)) {
+      if (requireSkills && !isMemberEligibleForSlot(plan, slot, member.id)) {
         return false;
       }
 
@@ -182,6 +222,7 @@ export function autoAssignMatchDuties(
     if (chosen) {
       slot.assignedMemberId = chosen.id;
       slot.customHelperName = null;
+      slot.assignmentStatus = "ASSIGNED";
       slot.updatedAt = new Date();
       assignedInMatch.add(chosen.id);
       dutyCounts.set(chosen.id, (dutyCounts.get(chosen.id) || 0) + 1);

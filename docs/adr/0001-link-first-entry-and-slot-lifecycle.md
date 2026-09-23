@@ -12,3 +12,4 @@ We considered `/plans/<planId>?matchId=<matchId>`, but rejected it because it ma
 - Match IDs use nested paths even though the client must decrypt the plan before resolving them; unknown IDs produce a stable not-found state.
 - Local resume is user-triggered rather than automatic.
 - Existing plans require migration from inferred occupancy to explicit slot status.
+- The migration is applied when example, persisted, or real-time plans enter the store; schema version 2 is written on the next save.

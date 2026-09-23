@@ -462,15 +462,16 @@ function processSeason(seasonName, helperPlanFilename, matchesFilename, teamsFil
         { field: "video", roleId: "video" },
       ];
 
-      rolesToProcess.forEach(({ field, roleId }) => {
+      rolesToProcess.forEach(({ field, roleId }, slotIndex) => {
         if (helperMatch[field] !== undefined && helperMatch[field] !== null) {
           const val = helperMatch[field].trim();
           if (val) {
-            const slotId = `slot-${crypto.randomUUID()}`;
+            const slotId = `${matchId}-slot-${roleId}-${slotIndex}`;
             const slot = {
               id: slotId,
               roleId,
               assignedMemberId: null,
+              assignmentStatus: "OPEN",
               customHelperName: null,
               checkedIn: false,
               updatedAt: Date.now(),
@@ -491,9 +492,10 @@ function processSeason(seasonName, helperPlanFilename, matchesFilename, teamsFil
       // Add catering slot if specified
       if (helperMatch.catering && helperMatch.catering.toLowerCase() === "ja") {
         slots.push({
-          id: `slot-${crypto.randomUUID()}`,
+          id: `${matchId}-slot-catering`,
           roleId: "catering",
           assignedMemberId: null,
+          assignmentStatus: "OPEN",
           customHelperName: "Verkauf",
           checkedIn: false,
           updatedAt: Date.now(),
@@ -527,7 +529,7 @@ function processSeason(seasonName, helperPlanFilename, matchesFilename, teamsFil
   // Final SeasonPlan
   const finalPlan = {
     id: crypto.randomUUID(),
-    schemaVersion: 1,
+    schemaVersion: 2,
     rev: 1,
     lastUpdated: Date.now(),
     club: clubInfo,
