@@ -30,8 +30,8 @@ function prevStep() {
 }
 
 async function finalizePlan() {
+  await planStore.finalizePlan();
   nextStep();
-  planStore.finalizePlan();
 }
 
 function handleManualClub() {
@@ -136,6 +136,18 @@ async function handleResume() {
     });
   }
 }
+
+const dashboardLink = computed(() => {
+  if (!planStore.plan?.id)
+    return "/dashboard";
+  return `/dashboard?planId=${planStore.plan.id}`;
+});
+
+const assignmentsLink = computed(() => {
+  if (!planStore.plan?.id)
+    return "/assignments";
+  return `/assignments?planId=${planStore.plan.id}`;
+});
 
 const shareLink = computed(() => {
   if (import.meta.server || !planStore.plan)
@@ -373,7 +385,7 @@ defineExpose({
 
       <div class="flex flex-wrap gap-4">
         <UButton
-          to="/assignments"
+          :to="assignmentsLink"
           icon="i-lucide-id-card-lanyard"
           size="lg"
           color="primary"
@@ -383,7 +395,7 @@ defineExpose({
         </UButton>
 
         <UButton
-          to="/dashboard"
+          :to="dashboardLink"
           icon="i-lucide-layout-dashboard"
           size="lg"
           variant="outline"
