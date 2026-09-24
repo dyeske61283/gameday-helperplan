@@ -23,9 +23,6 @@ export default defineNuxtConfig({
       standalone: false,
     },
   },
-  routeRules: {
-    "/": { prerender: true },
-  },
   nitro: {
     storage: {
       plans: {

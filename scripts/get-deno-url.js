@@ -90,7 +90,9 @@ async function getUrlFromDenoV2() {
           }
 
           if (revision.status === "building" || revision.status === "queued") {
-            pollRevisionStatus(revision.id, headers);
+            const ready = await pollRevisionStatus(revision.id, headers);
+            if (!ready)
+              return null;
           }
         }
 
@@ -131,38 +133,30 @@ main();
  * @param {number} maxRetries - Stop after this many attempts
  * @param {number} delay - Milliseconds between checks
  */
-function pollRevisionStatus(revisionId, headers, maxRetries = 10, delay = 3000) {
-  let attempts = 0;
+async function pollRevisionStatus(revisionId, headers, maxRetries = 10, delay = 3000) {
   const url = `${API_BASE}/v2/revisions/${revisionId}`;
-  const executePoll = async () => {
+  for (let attempts = 0; attempts < maxRetries; attempts++) {
     try {
-      const response = await fetch(url, {
-        headers,
-      });
+      const response = await fetch(url, { headers });
       /** @type {Revision} */
       const data = await response.json();
 
       if (data.status === "succeeded") {
         console.log("Success!", data);
-        return data;
+        return true;
       }
+      if (data.status === "failed" || data.status === "skipped")
+        return false;
 
-      // If not finished, check if we have retries left
-      attempts++;
-      if (attempts < maxRetries) {
-        console.log(`Status is ${data.status}. Retrying in ${delay}ms... (Attempt ${attempts})`);
-        setTimeout(executePoll, delay);
-      }
-      else {
-        console.error("Max retries reached. Resource is still not ready.");
-      }
+      console.log(`Status is ${data.status}. Retrying in ${delay}ms... (Attempt ${attempts + 1})`);
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
     catch (error) {
       console.error("Fetch failed:", error);
-      // attempts++;
-      // if (attempts < maxRetries) setTimeout(executePoll, delay);
+      return false;
     }
-  };
+  }
 
-  executePoll();
+  console.error("Max retries reached. Resource is still not ready.");
+  return false;
 }
