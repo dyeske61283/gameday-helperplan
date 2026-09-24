@@ -13,6 +13,8 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const seededPlanId = "f530083d-8c74-4f10-931a-dd877ee7b52c";
 const seededPlanLink = process.env.E2E_PLAN_URL || `/setup?planId=${seededPlanId}#key=tWVZ4hmOA7LFsrNViX1X6w`;
+const testHost = process.env.TEST_HOST;
+const testUrl = (path: string) => testHost ? new URL(path, testHost).toString() : url(path);
 const seededSetupLink = process.env.E2E_PLAN_URL
   ? (() => {
       const link = new URL(process.env.E2E_PLAN_URL);
@@ -36,7 +38,7 @@ describe("feature: User Workflows (BDD Specs)", async () => {
     const encryptedFixture = JSON.parse(
       fs.readFileSync(path.resolve(__dirname, "../fixtures/encrypted-plan-2025-2026.json"), "utf-8"),
     );
-    await fetch(url("/api/f530083d-8c74-4f10-931a-dd877ee7b52c"), {
+    await fetch(testUrl(`/api/${seededPlanId}`), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ blob: encryptedFixture.blob }),
@@ -46,7 +48,7 @@ describe("feature: User Workflows (BDD Specs)", async () => {
   // 1 — Open a Shared Link (Get Link)
   Scenario("1 — Open a Shared Link (Get Link)", async () => {
     await Given("the plan f530083d-8c74-4f10-931a-dd877ee7b52c exists in storage", async () => {
-      const res = await fetch(url("/api/f530083d-8c74-4f10-931a-dd877ee7b52c"));
+      const res = await fetch(testUrl(`/api/${seededPlanId}`));
       expect(res.status).toBe(200);
       const data = await res.json();
       expect(data.blob).toBeTruthy();
@@ -55,7 +57,7 @@ describe("feature: User Workflows (BDD Specs)", async () => {
     let page: any;
     await When("the user navigates to the seeded plan link", async () => {
       page = await createPage();
-      const targetUrl = seededSetupLink.startsWith("http") ? seededSetupLink : url(seededSetupLink);
+      const targetUrl = seededSetupLink.startsWith("http") ? seededSetupLink : testUrl(seededSetupLink);
       await page.goto(targetUrl, { waitUntil: "domcontentloaded" });
     });
     await Then("the URL fragment is parsed and the crypto key tWVZ4hmOA7LFsrNViX1X6w is extracted", async () => {
