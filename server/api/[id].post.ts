@@ -11,14 +11,21 @@ export default defineEventHandler(async (event) => {
     blob: z.string(),
   }).parse);
 
+  const chunkSize = 48 * 1024;
+  const chunks = plan.blob.match(new RegExp(`.{1,${chunkSize}}`, "g")) || [""];
   const storedPlan: StoredPlan = {
-    blob: plan.blob,
+    blob: chunks.length > 1 ? "" : plan.blob,
     modifiedAt: Date.now(),
     meta: {},
+    ...(chunks.length > 1 ? { chunkCount: chunks.length } : {}),
   };
 
   const storage = useStorage<StoredPlan>(STORAGE_PREFIX);
   try {
+    if (chunks.length > 1) {
+      const chunkStorage = useStorage<string>(STORAGE_PREFIX);
+      await Promise.all(chunks.map((chunk, index) => chunkStorage.setItem(`${planId}:chunk:${index}`, chunk)));
+    }
     await storage.setItem(planId, storedPlan);
   }
   catch (error) {

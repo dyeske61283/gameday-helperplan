@@ -26,6 +26,17 @@ describe("api endpoints", async () => {
     expect(res).toMatchObject({ blob: "test-plan-content", meta: {} });
   });
 
+  it("stores and retrieves blobs larger than one KV value", async () => {
+    const largeBlob = "x".repeat(100_000);
+    await $fetch(`/api/${validId}`, {
+      method: "POST",
+      body: { blob: largeBlob },
+    });
+
+    const res = await $fetch(`/api/${validId}`);
+    expect(res.blob).toBe(largeBlob);
+  });
+
   it("get /api/[id] returns 404 for non-existent plan", async () => {
     try {
       await $fetch(`/api/${nonExistentId}`);

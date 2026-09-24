@@ -26,6 +26,16 @@ export default eventHandler(async (event) => {
     }
   }
 
+  if (plan?.chunkCount) {
+    const chunkStorage = useStorage<string>(storageName);
+    const chunks = await Promise.all(
+      Array.from({ length: plan.chunkCount }, (_, index) => chunkStorage.getItem(`${id}:chunk:${index}`)),
+    );
+    if (chunks.includes(null))
+      throw createError({ statusCode: 500, statusMessage: "Stored plan is incomplete" });
+    plan.blob = chunks.join("");
+  }
+
   if (!plan) {
     return Response.json({ error: "Plan not found" }, { status: 404 });
   }
