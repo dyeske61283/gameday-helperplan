@@ -1,7 +1,7 @@
 import type { StoredPlan } from "../types/stored-plan.ts";
 import z from "zod";
 import env from "../../utils/env.ts";
-import { STORAGE_PREFIX } from "../types/stored-plan.ts";
+import { PLAN_BLOB_CHUNK_SIZE, STORAGE_PREFIX } from "../types/stored-plan.ts";
 
 export default defineEventHandler(async (event) => {
   const { id: planId } = await getValidatedRouterParams(event, z.object({
@@ -11,8 +11,7 @@ export default defineEventHandler(async (event) => {
     blob: z.string(),
   }).parse);
 
-  const chunkSize = 48 * 1024;
-  const chunks = plan.blob.match(new RegExp(`.{1,${chunkSize}}`, "g")) || [""];
+  const chunks = plan.blob.match(new RegExp(`.{1,${PLAN_BLOB_CHUNK_SIZE}}`, "g")) || [""];
   const storedPlan: StoredPlan = {
     blob: chunks.length > 1 ? "" : plan.blob,
     modifiedAt: Date.now(),

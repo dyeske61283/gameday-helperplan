@@ -1,6 +1,7 @@
 import { $fetch, fetch, setup } from "@nuxt/test-utils/e2e";
 import { describe, expect, it } from "vitest";
 import { useDecryption, useEncryption } from "../../app/composables/use-crypto";
+import { PLAN_BLOB_CHUNK_SIZE } from "../../server/types/stored-plan";
 import env from "../../utils/env";
 
 await setup({
@@ -26,15 +27,17 @@ describe("api endpoints", async () => {
     expect(res).toMatchObject({ blob: "test-plan-content", meta: {} });
   });
 
-  it("stores and retrieves blobs larger than one KV value", async () => {
-    const largeBlob = "x".repeat(100_000);
-    await $fetch(`/api/${validId}`, {
-      method: "POST",
-      body: { blob: largeBlob },
-    });
+  it.each([
+    ["exactly one chunk", PLAN_BLOB_CHUNK_SIZE],
+    ["one byte over one chunk", PLAN_BLOB_CHUNK_SIZE + 1],
+    ["one byte over two chunks", PLAN_BLOB_CHUNK_SIZE * 2 + 1],
+  ])("stores and retrieves blobs %s", async (_label, size) => {
+    const planId = globalThis.crypto.randomUUID();
+    const blob = "x".repeat(size);
+    await $fetch(`/api/${planId}`, { method: "POST", body: { blob } });
 
-    const res = await $fetch(`/api/${validId}`);
-    expect(res.blob).toBe(largeBlob);
+    const res = await $fetch(`/api/${planId}`);
+    expect(res.blob).toBe(blob);
   });
 
   it("get /api/[id] returns 404 for non-existent plan", async () => {

@@ -26,15 +26,21 @@ export default eventHandler(async (event) => {
     }
   }
 
-  if (plan?.chunkCount) {
+  async function hydrateChunks(storedPlan: StoredPlan, planId: string) {
+    if (!storedPlan.chunkCount)
+      return storedPlan;
     const chunkStorage = useStorage<string>(storageName);
     const chunks = await Promise.all(
-      Array.from({ length: plan.chunkCount }, (_, index) => chunkStorage.getItem(`${id}:chunk:${index}`)),
+      Array.from({ length: storedPlan.chunkCount }, (_, index) => chunkStorage.getItem(`${planId}:chunk:${index}`)),
     );
     if (chunks.includes(null))
       throw createError({ statusCode: 500, statusMessage: "Stored plan is incomplete" });
-    plan.blob = chunks.join("");
+    storedPlan.blob = chunks.join("");
+    return storedPlan;
   }
+
+  if (plan)
+    plan = await hydrateChunks(plan, id);
 
   if (!plan) {
     return Response.json({ error: "Plan not found" }, { status: 404 });
@@ -76,7 +82,7 @@ export default eventHandler(async (event) => {
               await eventStream.close();
               return;
             }
-            await eventStream.push(latestPlan.blob);
+            await eventStream.push((await hydrateChunks(latestPlan, id)).blob);
           }
           catch (error) {
             isClosed = true;
