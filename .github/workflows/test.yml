@@ -36,7 +36,7 @@ jobs:
 
       - name: Seed E2E plan
         run: |
-          OUTPUT=$(pnpm seed:plan)
+          OUTPUT=$(SEED_BASE_URL="$TEST_HOST" pnpm seed:plan)
           echo "$OUTPUT"
           PLAN_URL=$(printf '%s\n' "$OUTPUT" | sed -n 's/^SEED_PLAN_URL=//p')
           echo "E2E_PLAN_URL=$PLAN_URL" >> "$GITHUB_ENV"
