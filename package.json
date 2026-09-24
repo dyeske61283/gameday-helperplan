@@ -17,6 +17,7 @@
     "test:workflow": "vitest run --project=workflow",
     "test:e2e": "vitest run --project=e2e",
     "test:a11y": "node scripts/accessibility-test.js",
+    "seed:plan": "node scripts/seed-plan.mjs",
     "prepare": "husky"
   },
   "dependencies": {

@@ -7,13 +7,22 @@ import { checkMemberConflict } from "../../app/utils/conflict-detector";
 import { autoAssignMatchDuties } from "../../app/utils/helper-assignment";
 import { generateMemberICal } from "../../app/utils/ical-export";
 import { Given, Scenario, Then, When } from "./helpers/bdd";
+/* eslint-disable node/no-process-env */
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const seededPlanId = "f530083d-8c74-4f10-931a-dd877ee7b52c";
+const seededPlanLink = process.env.E2E_PLAN_URL || `/setup?planId=${seededPlanId}#key=tWVZ4hmOA7LFsrNViX1X6w`;
+const seededSetupLink = process.env.E2E_PLAN_URL
+  ? (() => {
+      const link = new URL(process.env.E2E_PLAN_URL);
+      return `${link.origin}/setup?planId=${link.pathname.split("/").pop()}${link.hash}`;
+    })()
+  : seededPlanLink;
 
 describe("feature: User Workflows (BDD Specs)", async () => {
   await setup({
-    // eslint-disable-next-line node/no-process-env
+
     host: process.env.TEST_HOST,
     dev: true,
     nuxtConfig: {
@@ -21,6 +30,8 @@ describe("feature: User Workflows (BDD Specs)", async () => {
   });
 
   beforeAll(async () => {
+    if (process.env.E2E_PLAN_URL)
+      return;
     // Seed plan f530083d-8c74-4f10-931a-dd877ee7b52c into test storage
     const encryptedFixture = JSON.parse(
       fs.readFileSync(path.resolve(__dirname, "../fixtures/encrypted-plan-2025-2026.json"), "utf-8"),
@@ -42,9 +53,9 @@ describe("feature: User Workflows (BDD Specs)", async () => {
     });
 
     let page: any;
-    await When("the user navigates to /setup?planId=f530083d-8c74-4f10-931a-dd877ee7b52c#key=tWVZ4hmOA7LFsrNViX1X6w", async () => {
+    await When("the user navigates to the seeded plan link", async () => {
       page = await createPage();
-      const targetUrl = url("/setup?planId=f530083d-8c74-4f10-931a-dd877ee7b52c#key=tWVZ4hmOA7LFsrNViX1X6w");
+      const targetUrl = seededSetupLink.startsWith("http") ? seededSetupLink : url(seededSetupLink);
       await page.goto(targetUrl, { waitUntil: "domcontentloaded" });
     });
     await Then("the URL fragment is parsed and the crypto key tWVZ4hmOA7LFsrNViX1X6w is extracted", async () => {
