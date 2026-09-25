@@ -5,12 +5,34 @@ const planStore = usePlanStore();
 const route = useRoute();
 const toast = useToast();
 const clip = useClipboard();
-
+const currentStep = ref(1);
 const jsonInput = ref("");
 const isSyncing = computed(() => !!planStore.plan && !!planStore.key);
 
 const membersInput = ref("");
 const manualClubName = ref("");
+const newWizardTeamName = ref("");
+
+function handleAddWizardTeam() {
+  if (!newWizardTeamName.value.trim())
+    return;
+  planStore.addTeam(newWizardTeamName.value.trim());
+  newWizardTeamName.value = "";
+}
+
+function nextStep() {
+  currentStep.value++;
+}
+
+function prevStep() {
+  if (currentStep.value > 0)
+    currentStep.value--;
+}
+
+async function finalizePlan() {
+  await planStore.finalizePlan();
+  nextStep();
+}
 
 function handleManualClub() {
   const id = `manual-${crypto.randomUUID().substring(0, 8)}`;
@@ -23,10 +45,10 @@ function handleManualClub() {
       name: manualClubName.value,
       contactEmail: "",
       homepage: "",
-      lastUpdated: Date.now(),
+      lastUpdated: new Date(),
     };
   }
-  planStore.nextStep();
+  nextStep();
 }
 
 function handleImportMembers() {
@@ -42,7 +64,7 @@ function handleImportMembers() {
       skillIds: [],
       teamIds: [],
       isManual: false,
-      updatedAt: Date.now(),
+      updatedAt: new Date(),
     };
   });
 
@@ -52,7 +74,7 @@ function handleImportMembers() {
     color: "success",
   });
 
-  planStore.finalizePlan();
+  finalizePlan();
 }
 
 // Synchronize jsonInput with planStore.plan
@@ -100,12 +122,12 @@ async function handleLoad() {
 }
 
 async function handleResume() {
-  const lastId = planStore.lastPlanId;
-  planStore.initFromUrl();
-  const currentKey = planStore.key;
+  const lastId = planStore.resumeState?.id;
+  const currentKey = planStore.resumeState?.key;
 
   if (lastId && currentKey) {
     await planStore.loadPlan(lastId, currentKey);
+    currentStep.value = planStore.error ? 1 : 5;
   }
   else {
     toast.add({
@@ -116,11 +138,25 @@ async function handleResume() {
   }
 }
 
+const dashboardLink = computed(() => {
+  if (!planStore.plan?.id)
+    return "/dashboard";
+  return `/plans/${planStore.plan.id}`;
+});
+
+const assignmentsLink = computed(() => {
+  if (!planStore.plan?.id)
+    return "/assignments";
+  return `/plans/${planStore.plan.id}`;
+});
+
 const shareLink = computed(() => {
   if (import.meta.server || !planStore.plan)
     return "";
   const url = new URL(window.location.href);
-  url.searchParams.set("planId", planStore.plan.id);
+  url.pathname = `/plans/${planStore.plan.id}`;
+  url.search = "";
+  url.hash = `key=${planStore.key}`;
   return url.toString();
 });
 
@@ -130,19 +166,22 @@ onMounted(async () => {
   const queryId = route.query.planId as string;
   if (queryId && planStore.key) {
     await planStore.loadPlan(queryId, planStore.key);
+    currentStep.value = 5;
   }
 });
 
 onUnmounted(() => {
   planStore.stopWatching();
 });
+
+defineExpose({ currentStep });
 </script>
 
 <template>
   <UContainer class="py-12 md:py-24">
-    <div v-if="planStore.currentStep < 5" class="space-y-12">
+    <div v-if="currentStep < 5" class="space-y-12">
       <!-- Wizard Step 1: Start Setup -->
-      <div v-if="planStore.currentStep === 1" class="space-y-12">
+      <div v-if="currentStep === 1" class="space-y-12">
         <div class="text-center space-y-4">
           <h1 class="headline-lg text-on-surface">
             Set up your Gameday Plan
@@ -156,7 +195,7 @@ onUnmounted(() => {
           <UButton
             size="xl"
             icon="i-lucide-arrow-right"
-            @click="planStore.nextStep()"
+            @click="nextStep()"
           >
             Start Setup
           </UButton>
@@ -180,15 +219,15 @@ onUnmounted(() => {
           <UButton
             icon="i-lucide-arrow-left"
             variant="ghost"
-            @click="planStore.prevStep()"
+            @click="prevStep()"
           >
             Back
           </UButton>
-          <span class="text-sm font-medium text-on-surface-variant">Step {{ planStore.currentStep }}</span>
+          <span class="text-sm font-medium text-on-surface-variant">Step {{ currentStep }}</span>
         </div>
 
         <!-- Step 4: Members (Bulk Add) -->
-        <div v-if="planStore.currentStep === 4" class="space-y-6 max-w-2xl mx-auto">
+        <div v-if="currentStep === 4" class="space-y-6 max-w-2xl mx-auto">
           <div class="text-center space-y-2">
             <h2 class="headline-md">
               Add Members
@@ -207,7 +246,7 @@ onUnmounted(() => {
           />
 
           <div class="flex justify-center gap-4">
-            <UButton variant="ghost" @click="planStore.finalizePlan()">
+            <UButton variant="ghost" @click="finalizePlan()">
               Skip for now
             </UButton>
             <UButton size="xl" @click="handleImportMembers">
@@ -217,7 +256,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Step 2: Club Info -->
-        <div v-if="planStore.currentStep === 2" class="space-y-6 max-w-2xl mx-auto">
+        <div v-if="currentStep === 2" class="space-y-6 max-w-2xl mx-auto">
           <div class="space-y-2">
             <h2 class="headline-md">
               Club Information
@@ -239,14 +278,88 @@ onUnmounted(() => {
         </div>
 
         <!-- Step 3: Teams -->
-        <div v-if="planStore.currentStep === 3" class="space-y-6 max-w-2xl mx-auto text-center">
-          <h2 class="headline-md">
-            Manual Team Setup
-          </h2>
-          <p>Manual team entry coming soon...</p>
-          <UButton size="xl" @click="planStore.nextStep()">
-            Continue to Members
-          </UButton>
+        <div v-if="currentStep === 3" class="space-y-6 max-w-2xl mx-auto">
+          <div class="space-y-2">
+            <h2 class="headline-md">
+              Add Club Teams
+            </h2>
+            <p class="body-md text-on-surface-variant">
+              Add the teams for your club (e.g., adult teams, youth teams).
+            </p>
+          </div>
+
+          <!-- Add Team Input -->
+          <div class="flex gap-2">
+            <UInput
+              v-model="newWizardTeamName"
+              placeholder="e.g. Männer I, Damen I, w. B-Jugend"
+              size="lg"
+              class="grow"
+              @keyup.enter="handleAddWizardTeam"
+            />
+            <UButton
+              size="lg"
+              color="primary"
+              :disabled="!newWizardTeamName.trim()"
+              @click="handleAddWizardTeam"
+            >
+              Add Team
+            </UButton>
+          </div>
+
+          <!-- Quick Suggestions -->
+          <div class="space-y-1.5">
+            <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Quick Suggestions:</span>
+            <div class="flex flex-wrap gap-2">
+              <UButton
+                v-for="suggestion in ['Männer I', 'Männer II', 'Damen I', 'm. A-Jugend', 'w. B-Jugend', 'gem. E-Jugend', 'Minis']"
+                :key="suggestion"
+                size="xs"
+                variant="subtle"
+                color="neutral"
+                class="rounded-full"
+                @click="planStore.addTeam(suggestion)"
+              >
+                + {{ suggestion }}
+              </UButton>
+            </div>
+          </div>
+
+          <!-- Added Teams List -->
+          <div class="space-y-2 pt-2">
+            <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Created Teams ({{ planStore.teamsList.length }}):</span>
+            <div v-if="planStore.teamsList.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div
+                v-for="team in planStore.teamsList"
+                :key="team.id"
+                class="flex items-center justify-between p-3 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-surface"
+              >
+                <div class="flex items-center gap-2">
+                  <UIcon name="i-lucide-shield" class="text-primary w-4 h-4" />
+                  <span class="text-sm font-semibold text-on-surface">{{ team.name }}</span>
+                </div>
+                <UButton
+                  size="xs"
+                  variant="ghost"
+                  color="error"
+                  icon="i-lucide-trash-2"
+                  @click="planStore.deleteTeam(team.id)"
+                />
+              </div>
+            </div>
+            <div v-else class="p-6 text-center text-xs text-neutral-400 border border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl">
+              No teams added yet. Type a team name above or click a suggestion.
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center pt-4 border-t border-neutral-200 dark:border-neutral-800">
+            <UButton variant="ghost" @click="nextStep()">
+              Skip for now
+            </UButton>
+            <UButton size="xl" @click="nextStep()">
+              Continue to Members
+            </UButton>
+          </div>
         </div>
       </div>
     </div>
@@ -272,11 +385,32 @@ onUnmounted(() => {
 
       <div class="flex flex-wrap gap-4">
         <UButton
+          :to="assignmentsLink"
+          icon="i-lucide-id-card-lanyard"
+          size="lg"
+          color="primary"
+          class="rounded-full"
+        >
+          Manage Duties
+        </UButton>
+
+        <UButton
+          :to="dashboardLink"
+          icon="i-lucide-layout-dashboard"
+          size="lg"
+          variant="outline"
+          class="rounded-full"
+        >
+          View Schedule
+        </UButton>
+
+        <UButton
           icon="i-lucide-save"
           size="lg"
           color="secondary"
           :disabled="!planStore.plan"
           :loading="planStore.isLoading"
+          class="rounded-full"
           @click="handleSave"
         >
           Save Plan
@@ -285,15 +419,16 @@ onUnmounted(() => {
         <UButton
           icon="i-lucide-refresh-cw"
           size="lg"
-          variant="outline"
+          variant="ghost"
           :disabled="!planStore.plan"
           :loading="planStore.isLoading"
+          class="rounded-full"
           @click="handleLoad"
         >
           Reload
         </UButton>
 
-        <UButton to="/" icon="i-lucide-arrow-left" size="lg" variant="ghost">
+        <UButton to="/" icon="i-lucide-arrow-left" size="lg" variant="ghost" class="rounded-full">
           {{ $t('common.back_to_home') }}
         </UButton>
       </div>

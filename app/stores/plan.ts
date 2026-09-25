@@ -1,43 +1,60 @@
-import type * as planTypes from "../utils/plan-types";
+import type { AutoAssignOptions } from "../utils/helper-assignment";
+import type {
+  Gameday,
+  Match,
+  Member,
+  SeasonPlan,
+  Team,
+} from "../utils/plan-types";
 import { useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
-import { computed, ref, watch } from "vue";
+import { computed, ref } from "vue";
+import examplePlan from "../../test/fixtures/plan-2025-2026.json";
 import { useDecryption, useEncryption } from "../composables/use-crypto";
+import { autoAssignMatchDuties, completeClosedAssignments, isMemberEligibleForSlot } from "../utils/helper-assignment";
 
 const STORAGE_KEY = "gameday-plan-id";
-const FRAGMENT_PREFIX = "key=";
+const RESUME_KEY = "gameday-plan-resume";
+const MEMBER_KEY = "gameday-selected-member";
+const _FRAGMENT_PREFIX = "key=";
 
 /**
  * Migrate the plan schema if needed.
  */
-export function migrateIfNeeded(
-  loadedPlan: planTypes.SeasonPlan,
-): planTypes.SeasonPlan {
-  const CURRENT_SCHEMA_VERSION = 1;
+export function migrateIfNeeded(loadedPlan: SeasonPlan): SeasonPlan {
+  const CURRENT_SCHEMA_VERSION = 2;
 
   if (loadedPlan.schemaVersion < CURRENT_SCHEMA_VERSION) {
     console.warn(
       `Migrating plan from version ${loadedPlan.schemaVersion} to ${CURRENT_SCHEMA_VERSION}`,
     );
 
-    // Ensure all matches have a slots array
+    // Normalize legacy occupancy into the explicit assignment lifecycle.
     if (loadedPlan.matches) {
-      Object.values(loadedPlan.matches).forEach((match: planTypes.Match) => {
+      Object.values(loadedPlan.matches).forEach((match: Match) => {
         if (!match.slots) {
           match.slots = [];
         }
+        match.slots.forEach((slot) => {
+          if (!slot.assignmentStatus) {
+            slot.assignmentStatus = slot.assignedMemberId || slot.customHelperName ? "ASSIGNED" : "OPEN";
+          }
+        });
       });
     }
 
     // Ensure all gamedays have a slots array
     if (loadedPlan.gamedays) {
-      Object.values(loadedPlan.gamedays).forEach(
-        (gameday: planTypes.Gameday) => {
-          if (!gameday.slots) {
-            gameday.slots = [];
+      Object.values(loadedPlan.gamedays).forEach((gameday: Gameday) => {
+        if (!gameday.slots) {
+          gameday.slots = [];
+        }
+        gameday.slots.forEach((slot) => {
+          if (!slot.assignmentStatus) {
+            slot.assignmentStatus = slot.assignedMemberId || slot.customHelperName ? "ASSIGNED" : "OPEN";
           }
-        },
-      );
+        });
+      });
     }
 
     loadedPlan.schemaVersion = CURRENT_SCHEMA_VERSION;
@@ -47,36 +64,55 @@ export function migrateIfNeeded(
 }
 
 export const usePlanStore = defineStore("plan", () => {
-  const plan = ref<planTypes.SeasonPlan | null>(null);
+  const plan = ref<SeasonPlan | null>(null);
   const key = ref<string | null>(null);
-  const currentStep = ref(1);
   const readOnly = ref(false);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
   const eventSource = ref<EventSource | null>(null);
+  let completionTimer: ReturnType<typeof setInterval> | undefined;
 
   // Local storage for the last active plan ID
   const lastPlanId = useLocalStorage(STORAGE_KEY, "");
+  const resumeState = useLocalStorage<{ id: string; key: string } | null>(RESUME_KEY, null);
+  const selectedMemberId = useLocalStorage<string | null>(MEMBER_KEY, null);
 
   const { encryptData, generateKey } = useEncryption();
   const { decryptBlob } = useDecryption();
 
-  const _isModifiable = computed(() => !readOnly.value && !!plan.value);
+  // Computed Getters & Domain Views
+  const isModifiable = computed(() => !readOnly.value && !!plan.value);
+  const teams = computed(() => plan.value?.teams ?? {});
+  const members = computed(() => plan.value?.members ?? {});
+  const matches = computed(() => plan.value?.matches ?? {});
+  const gamedays = computed(() => plan.value?.gamedays ?? {});
+  const roles = computed(() => plan.value?.config?.roles ?? []);
+  const locations = computed(() => plan.value?.config?.locations ?? []);
+  const teamsList = computed(() => Object.values(teams.value));
+  const membersList = computed(() => Object.values(members.value));
+  const gamedaysList = computed(() =>
+    Object.values(gamedays.value).sort((a, b) => a.date.localeCompare(b.date)),
+  );
 
   /**
-   * Sync key with URL fragment
+   * Load the example plan fixture into state
    */
-  watch(key, (newKey) => {
-    if (import.meta.server)
-      return;
+  function loadExamplePlan(): SeasonPlan {
+    const cloned = JSON.parse(JSON.stringify(examplePlan)) as SeasonPlan;
+    const migrated = migrateIfNeeded(cloned);
+    plan.value = migrated;
+    return migrated;
+  }
 
-    if (newKey) {
-      globalThis.location.hash = `${FRAGMENT_PREFIX}${newKey}`;
+  /**
+   * Ensure plan is loaded, falling back to example plan if null
+   */
+  function ensurePlanLoaded(): SeasonPlan {
+    if (!plan.value) {
+      return loadExamplePlan();
     }
-    else {
-      globalThis.location.hash = "";
-    }
-  });
+    return plan.value;
+  }
 
   async function loadPlan(id: string, decryptionKey: string) {
     isLoading.value = true;
@@ -91,14 +127,15 @@ export const usePlanStore = defineStore("plan", () => {
       }
 
       const decryptedData = await decryptBlob(response.blob, decryptionKey);
-      let loadedPlan = JSON.parse(decryptedData) as planTypes.SeasonPlan;
+      let loadedPlan = JSON.parse(decryptedData) as SeasonPlan;
 
       // Run migration logic
       loadedPlan = migrateIfNeeded(loadedPlan);
+      completeClosedAssignments(loadedPlan);
 
       plan.value = loadedPlan;
       lastPlanId.value = id;
-      currentStep.value = 5;
+      resumeState.value = { id, key: decryptionKey };
     }
     catch (err: unknown) {
       if (err instanceof Error)
@@ -114,7 +151,7 @@ export const usePlanStore = defineStore("plan", () => {
    * Subscribe to real-time updates for the current plan via SSE.
    */
   function watchPlan() {
-    if (import.meta.server || !plan.value?.id || !key.value)
+    if (import.meta.server || typeof EventSource === "undefined" || !plan.value?.id || !key.value)
       return;
 
     if (eventSource.value) {
@@ -125,6 +162,10 @@ export const usePlanStore = defineStore("plan", () => {
     const decryptionKey = key.value;
 
     eventSource.value = new EventSource(`/api/${id}`);
+    completionTimer = setInterval(() => {
+      if (plan.value)
+        completeClosedAssignments(plan.value);
+    }, 60_000);
 
     eventSource.value.onmessage = async (event) => {
       try {
@@ -133,13 +174,12 @@ export const usePlanStore = defineStore("plan", () => {
           return;
 
         const decryptedData = await decryptBlob(encryptedBlob, decryptionKey);
-        let updatedPlan = JSON.parse(decryptedData) as planTypes.SeasonPlan;
+        let updatedPlan = JSON.parse(decryptedData) as SeasonPlan;
 
-        // Only update if the incoming revision is newer than our local one
-        // This prevents overwriting unsaved local changes or re-applying our own save
         if (!plan.value || updatedPlan.rev > plan.value.rev) {
           console.warn("Real-time update received: Rev", updatedPlan.rev);
           updatedPlan = migrateIfNeeded(updatedPlan);
+          completeClosedAssignments(updatedPlan);
           plan.value = updatedPlan;
         }
       }
@@ -150,7 +190,6 @@ export const usePlanStore = defineStore("plan", () => {
 
     eventSource.value.onerror = (err) => {
       console.error("SSE connection error:", err);
-      // EventSource automatically retries by default
     };
   }
 
@@ -158,6 +197,10 @@ export const usePlanStore = defineStore("plan", () => {
     if (eventSource.value) {
       eventSource.value.close();
       eventSource.value = null;
+    }
+    if (completionTimer) {
+      clearInterval(completionTimer);
+      completionTimer = undefined;
     }
   }
 
@@ -170,10 +213,11 @@ export const usePlanStore = defineStore("plan", () => {
     isLoading.value = true;
     error.value = null;
 
+    const expectedRevision = plan.value.rev;
     try {
-      // Increment revision and update timestamp
+      completeClosedAssignments(plan.value);
       plan.value.rev++;
-      plan.value.lastUpdated = Date.now();
+      plan.value.lastUpdated = new Date();
 
       const serializedPlan = JSON.stringify(plan.value);
       const encryptedBlob = await encryptData(serializedPlan, key.value);
@@ -182,16 +226,21 @@ export const usePlanStore = defineStore("plan", () => {
         method: "POST",
         body: {
           blob: encryptedBlob,
+          expectedRevision,
+          revision: plan.value.rev,
         },
       });
 
       lastPlanId.value = plan.value.id;
+      resumeState.value = { id: plan.value.id, key: key.value };
     }
     catch (err: unknown) {
       if (err instanceof Error) {
         error.value = err.message || "Failed to save plan";
       }
       console.error("Error saving plan:", err);
+      if (plan.value?.rev === expectedRevision + 1)
+        plan.value.rev = expectedRevision;
     }
     finally {
       isLoading.value = false;
@@ -200,6 +249,7 @@ export const usePlanStore = defineStore("plan", () => {
 
   function createNewPlan(id: string, newKey: string) {
     key.value = newKey;
+    const now = new Date();
     plan.value = {
       id,
       club: {
@@ -207,11 +257,11 @@ export const usePlanStore = defineStore("plan", () => {
         name: "",
         contactEmail: "",
         homepage: "",
-        lastUpdated: 0,
+        lastUpdated: now,
       },
-      lastUpdated: Date.now(),
+      lastUpdated: now,
       skills: {},
-      schemaVersion: 1,
+      schemaVersion: 2,
       rev: 0,
       season: `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`,
       members: {},
@@ -249,17 +299,6 @@ export const usePlanStore = defineStore("plan", () => {
       },
     };
     lastPlanId.value = id;
-    currentStep.value = 1;
-  }
-
-  function nextStep() {
-    currentStep.value++;
-  }
-
-  function prevStep() {
-    if (currentStep.value > 1) {
-      currentStep.value--;
-    }
   }
 
   async function finalizePlan() {
@@ -274,27 +313,209 @@ export const usePlanStore = defineStore("plan", () => {
     lastPlanId.value = id;
 
     await savePlan();
-    currentStep.value = 5;
   }
+
+  // --- Domain Methods: Teams ---
+
+  function addTeam(name: string): Team {
+    const currentPlan = ensurePlanLoaded();
+    const newId = `team-${crypto.randomUUID().substring(0, 8)}`;
+    const now = new Date();
+    const newTeam: Team = {
+      id: newId,
+      name,
+      isManual: true,
+      updatedAt: now,
+    };
+    currentPlan.teams[newId] = newTeam;
+    currentPlan.lastUpdated = now;
+    return newTeam;
+  }
+
+  function updateTeam(teamId: string, name: string) {
+    if (!plan.value || !plan.value.teams[teamId])
+      return;
+    const now = new Date();
+    plan.value.teams[teamId].name = name;
+    plan.value.teams[teamId].updatedAt = now;
+    plan.value.lastUpdated = now;
+  }
+
+  function deleteTeam(teamId: string) {
+    if (!plan.value)
+      return;
+    delete plan.value.teams[teamId];
+    // Remove team from all members
+    Object.values(plan.value.members).forEach((m) => {
+      m.teamIds = m.teamIds.filter(tId => tId !== teamId);
+    });
+    plan.value.lastUpdated = new Date();
+  }
+
+  // --- Domain Methods: Members ---
+
+  function addMember(data: Partial<Omit<Member, "id" | "updatedAt">> & { name: string }): Member {
+    const currentPlan = ensurePlanLoaded();
+    const newId = `member-${crypto.randomUUID().substring(0, 8)}`;
+    const now = new Date();
+    const newMember: Member = {
+      id: newId,
+      name: data.name,
+      teamIds: data.teamIds ? [...data.teamIds] : [],
+      skillIds: data.skillIds ? [...data.skillIds] : [],
+      isManual: data.isManual ?? true,
+      updatedAt: now,
+    };
+    currentPlan.members[newId] = newMember;
+    currentPlan.lastUpdated = now;
+    return newMember;
+  }
+
+  function updateMember(memberId: string, updates: Partial<Omit<Member, "id">>) {
+    if (!plan.value || !plan.value.members[memberId])
+      return;
+    const member = plan.value.members[memberId];
+    if (updates.name !== undefined)
+      member.name = updates.name;
+    if (updates.teamIds !== undefined)
+      member.teamIds = [...updates.teamIds];
+    if (updates.skillIds !== undefined)
+      member.skillIds = [...updates.skillIds];
+    if (updates.isManual !== undefined)
+      member.isManual = updates.isManual;
+    const now = new Date();
+    member.updatedAt = now;
+    plan.value.lastUpdated = now;
+  }
+
+  function deleteMember(memberId: string) {
+    if (!plan.value)
+      return;
+    delete plan.value.members[memberId];
+    plan.value.lastUpdated = new Date();
+  }
+
+  // --- Domain Methods: Matches & Helpers ---
 
   function assignHelperTeam(matchId: string, teamId: string) {
     if (!plan.value || !plan.value.matches[matchId])
       return;
 
     plan.value.matches[matchId].helperTeamId = teamId;
-    plan.value.matches[matchId].updatedAt = Date.now();
+    const now = new Date();
+    plan.value.matches[matchId].updatedAt = now;
+    plan.value.lastUpdated = now;
+  }
+
+  function assignMemberToSlot(
+    matchId: string,
+    slotId: string,
+    memberId: string | null,
+    customHelperName?: string | null,
+  ) {
+    if (!plan.value || !plan.value.matches[matchId])
+      return;
+
+    const match = plan.value.matches[matchId];
+    const slot = match.slots?.find(s => s.id === slotId);
+    if (!slot)
+      return;
+
+    if (memberId && !isMemberEligibleForSlot(plan.value, slot, memberId))
+      return;
+
+    slot.assignedMemberId = memberId;
+    slot.customHelperName = customHelperName ?? null;
+    slot.assignmentStatus = memberId || customHelperName ? "ASSIGNED" : "OPEN";
+    const now = new Date();
+    slot.updatedAt = now;
+    match.updatedAt = now;
+    plan.value.lastUpdated = now;
+  }
+
+  function claimSlot(matchId: string, slotId: string, memberId = selectedMemberId.value) {
+    if (!plan.value)
+      throw new Error("Plan is unavailable");
+    const match = plan.value.matches[matchId];
+    const member = memberId ? plan.value.members[memberId] : undefined;
+    const slot = match?.slots.find(candidate => candidate.id === slotId);
+    if (!match || !slot)
+      throw new Error("Match or duty slot not found");
+    if (!member)
+      throw new Error("Select a member before claiming a duty");
+    if (slot.assignmentStatus !== "OPEN" || slot.assignedMemberId || slot.customHelperName)
+      throw new Error("This duty has already been claimed");
+    if (!isMemberEligibleForSlot(plan.value, slot, member.id))
+      throw new Error("This member does not have the required capability");
+
+    const now = new Date();
+    slot.assignedMemberId = member.id;
+    slot.assignmentStatus = "ASSIGNED";
+    slot.customHelperName = null;
+    slot.updatedAt = now;
+    match.updatedAt = now;
+    plan.value.lastUpdated = now;
+    selectedMemberId.value = member.id;
+  }
+
+  function clearMatchSlots(matchId: string) {
+    if (!plan.value || !plan.value.matches[matchId])
+      return;
+
+    const match = plan.value.matches[matchId];
+    match.slots?.forEach((slot) => {
+      slot.assignedMemberId = null;
+      slot.customHelperName = null;
+      slot.assignmentStatus = "OPEN";
+      slot.checkedIn = false;
+      slot.updatedAt = new Date();
+    });
+    const now = new Date();
+    match.updatedAt = now;
+    plan.value.lastUpdated = now;
+  }
+
+  function autoAssignMatchSlots(matchId: string, options?: AutoAssignOptions) {
+    if (!plan.value || !plan.value.matches[matchId])
+      return;
+
+    return autoAssignMatchDuties(plan.value, matchId, options);
+  }
+
+  function toggleCheckIn(matchId: string, slotId: string, forceValue?: boolean) {
+    if (!plan.value || !plan.value.matches[matchId])
+      return;
+
+    const match = plan.value.matches[matchId];
+    const slot = match.slots?.find(s => s.id === slotId);
+    if (!slot)
+      return;
+
+    slot.checkedIn = forceValue !== undefined ? forceValue : !slot.checkedIn;
+    const now = new Date();
+    slot.updatedAt = now;
+    match.updatedAt = now;
+    plan.value.lastUpdated = now;
   }
 
   /**
    * Extract key from URL fragment
    */
   function initFromUrl() {
-    if (import.meta.server)
+    // Ensure this only runs in the browser
+    if (!import.meta.client || !globalThis.location.hash)
       return;
 
-    const hash = globalThis.location.hash.substring(1);
-    if (hash.startsWith(FRAGMENT_PREFIX)) {
-      key.value = hash.substring(FRAGMENT_PREFIX.length);
+    // Parse parameters from URL fragment (e.g., key=abc&plan=123)
+    const hashParams = new URLSearchParams(globalThis.location.hash.substring(1));
+    const keyFromUrl = hashParams.get("key");
+
+    if (keyFromUrl) {
+      key.value = keyFromUrl;
+
+      // Remove the fragment from the URL without triggering a page refresh
+      const cleanUrl = globalThis.location.pathname + globalThis.location.search;
+      globalThis.history.replaceState(null, "", cleanUrl);
     }
   }
 
@@ -302,17 +523,39 @@ export const usePlanStore = defineStore("plan", () => {
     plan,
     key,
     lastPlanId,
-    currentStep,
+    resumeState,
+    selectedMemberId,
     isLoading,
     error,
+    isModifiable,
+    teams,
+    members,
+    matches,
+    gamedays,
+    roles,
+    locations,
+    teamsList,
+    membersList,
+    gamedaysList,
+    loadExamplePlan,
+    ensurePlanLoaded,
     loadPlan,
     watchPlan,
     stopWatching,
     savePlan,
     createNewPlan,
+    addTeam,
+    updateTeam,
+    deleteTeam,
+    addMember,
+    updateMember,
+    deleteMember,
     assignHelperTeam,
-    nextStep,
-    prevStep,
+    assignMemberToSlot,
+    claimSlot,
+    clearMatchSlots,
+    autoAssignMatchSlots,
+    toggleCheckIn,
     finalizePlan,
     initFromUrl,
   };

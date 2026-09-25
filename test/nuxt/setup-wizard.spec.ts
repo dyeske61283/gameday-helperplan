@@ -29,7 +29,7 @@ describe("setup Wizard", () => {
 
     const store = usePlanStore();
     store.plan = null;
-    store.currentStep = 1;
+    component.vm.currentStep = 1;
 
     await nextTick();
 
@@ -48,7 +48,7 @@ describe("setup Wizard", () => {
 
     const store = usePlanStore();
     store.plan = null;
-    store.currentStep = 1;
+    component.vm.currentStep = 1;
 
     await nextTick();
 
@@ -58,7 +58,7 @@ describe("setup Wizard", () => {
     if (startBtn) {
       await startBtn.trigger("click");
       await nextTick();
-      expect(store.currentStep).toBe(2);
+      expect(component.vm.currentStep).toBe(2);
     }
     else {
       throw new Error("'Start Setup' button not found");
@@ -76,7 +76,7 @@ describe("setup Wizard", () => {
 
     const store = usePlanStore();
     store.plan = null;
-    store.currentStep = 2;
+    component.vm.currentStep = 2;
 
     await nextTick();
 
@@ -94,7 +94,7 @@ describe("setup Wizard", () => {
 
     const store = usePlanStore();
     store.plan = {
-      club: { id: "123", name: "Test Club", contactEmail: "", homepage: "", lastUpdated: 1234 },
+      club: { id: "123", name: "Test Club", contactEmail: "", homepage: "", lastUpdated: new Date(0) },
       teams: {},
       matches: {},
       config: {
@@ -103,18 +103,54 @@ describe("setup Wizard", () => {
       },
       gamedays: {},
       id: "",
-      lastUpdated: 1234,
+      lastUpdated: new Date(0),
       members: {},
       rev: 0,
       schemaVersion: 1,
       season: "",
       skills: {},
     };
-    store.currentStep = 4;
+    component.vm.currentStep = 4;
 
     await nextTick();
 
     expect(component.text()).toContain("Add Members");
     expect(component.find("textarea").exists()).toBe(true);
+  });
+
+  it("shows interactive team creator and quick suggestions in Step 3", async () => {
+    const component = await mountSuspended(SetupPage, {
+      global: {
+        mocks: {
+          $t: (key: string) => key,
+        },
+      },
+    });
+
+    const store = usePlanStore();
+    store.createNewPlan("test-plan", "test-key");
+    component.vm.currentStep = 3;
+
+    await nextTick();
+
+    expect(component.text()).toContain("Add Club Teams");
+    expect(component.text()).toContain("Quick Suggestions:");
+    expect(component.text()).toContain("Männer I");
+    expect(component.text()).toContain("Damen I");
+
+    // Add team via quick suggestion
+    store.addTeam("Damen I");
+    await nextTick();
+
+    expect(store.teamsList.some(t => t.name === "Damen I")).toBe(true);
+    expect(component.text()).toContain("Damen I");
+    expect(component.text()).toContain("Created Teams (1):");
+
+    // Delete team
+    const createdTeam = store.teamsList.find(t => t.name === "Damen I")!;
+    store.deleteTeam(createdTeam.id);
+    await nextTick();
+
+    expect(store.teamsList.some(t => t.name === "Damen I")).toBe(false);
   });
 });

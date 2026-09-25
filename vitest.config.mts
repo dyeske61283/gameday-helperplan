@@ -1,6 +1,17 @@
+import type { Plugin } from "vitest/config";
 import { defineVitestProject } from "@nuxt/test-utils/config";
 import { defineConfig } from "vitest/config";
-import env from "./utils/env";
+import env from "./utils/env.ts";
+
+const ignoreBunTest: Plugin = {
+  name: "ignore-bun-test",
+  enforce: "pre",
+  resolveId(id) {
+    if (id === "bun:test") {
+      return { id: "bun:test", external: true };
+    }
+  },
+};
 
 export default defineConfig({
   test: {
@@ -21,7 +32,7 @@ export default defineConfig({
             happyDOM: {
               settings: {
                 fetch: {
-                  disableSameOriginPolicy: !!env.TEST_HOST, // Disable same-origin policy if TEST_HOST is set (indicating tests are running against a deployed URL)
+                  disableSameOriginPolicy: !!env.TEST_HOST,
                 },
               },
             },
@@ -34,21 +45,20 @@ export default defineConfig({
           include: ["test/nuxt/*.{test,spec}.ts"],
           environment: "nuxt",
           testTimeout: 5000,
-          environmentOptions: {
-          },
+        },
+      }),
+      await defineVitestProject({
+        plugins: [ignoreBunTest],
+        test: {
+          name: "e2e",
+          include: ["test/e2e/**/*.{test,spec}.ts"],
+          environment: "node",
+          testTimeout: 30000,
+          hookTimeout: 30000,
+          fileParallelism: false,
         },
       }),
     ],
   },
-  plugins: [
-    {
-      name: "ignore-bun-test",
-      enforce: "pre",
-      resolveId(id) {
-        if (id === "bun:test") {
-          return { id: "bun:test", external: true };
-        }
-      },
-    },
-  ],
+  plugins: [ignoreBunTest],
 });
