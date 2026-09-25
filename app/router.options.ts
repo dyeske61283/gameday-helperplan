@@ -15,8 +15,7 @@ export default {
           return { el: escapedHash, behavior: "smooth" };
         }
       }
-      // eslint-disable-next-line unused-imports/no-unused-vars
-      catch (e) {
+      catch {
         return false;
       }
     }

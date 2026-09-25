@@ -17,7 +17,7 @@ const hasResume = computed(() => !!planStore.resumeState?.id && !!planStore.resu
       <p class="text-on-surface-variant">
         Did you receive a link?
       </p>
-      <UButton v-if="hasResume" :to="`/plans/${planStore.resumeState!.id}`" size="lg" class="rounded-full">
+      <UButton v-if="hasResume" :to="`/plans/${planStore.resumeState!.id}#key=${planStore.resumeState!.key}`" size="lg" class="rounded-full">
         Resume plan
       </UButton>
       <p v-else class="text-sm text-on-surface-variant">

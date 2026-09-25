@@ -52,6 +52,20 @@ describe("usePlanStore", () => {
       expect(migratedPlan.matches.m1?.slots[0]?.assignmentStatus).toBe("OPEN");
       expect(migratedPlan.matches.m1?.slots[1]?.assignmentStatus).toBe("ASSIGNED");
     });
+
+    it("migrates both match and gameday slot assignment status", () => {
+      const oldPlan = {
+        schemaVersion: 1,
+        matches: { m1: { slots: [{ assignedMemberId: null }] } },
+        gamedays: { g1: { slots: [{ assignedMemberId: "member-1" }] } },
+      };
+
+      const migratedPlan = migrateIfNeeded(oldPlan as any);
+
+      expect(migratedPlan.schemaVersion).toBe(2);
+      expect(migratedPlan.matches.m1?.slots[0]?.assignmentStatus).toBe("OPEN");
+      expect(migratedPlan.gamedays.g1?.slots[0]?.assignmentStatus).toBe("ASSIGNED");
+    });
   });
 
   describe("example plan loading", () => {

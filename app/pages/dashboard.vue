@@ -5,7 +5,6 @@ import { generateMemberICal } from "../utils/ical-export";
 
 const planStore = usePlanStore();
 const searchQuery = ref("");
-const selectedTeamFilter = ref<string>("");
 
 usePlanInit();
 
@@ -20,9 +19,7 @@ const matchedMember = computed(() => {
 // Filtered Gamedays
 const filteredGamedays = computed(() => {
   const query = searchQuery.value.trim().toLowerCase();
-  const teamFilter = selectedTeamFilter.value;
-
-  if (!query && !teamFilter) {
+  if (!query) {
     return planStore.gamedaysList;
   }
 
@@ -30,15 +27,6 @@ const filteredGamedays = computed(() => {
     const matches = gameday.matchIds
       .map(id => planStore.matches[id])
       .filter((m): m is Match => !!m);
-
-    // Team Filter match
-    if (teamFilter) {
-      const hasTeam = matches.some(
-        m => m.homeTeamId === teamFilter || m.helperTeamId === teamFilter,
-      );
-      if (!hasTeam)
-        return false;
-    }
 
     if (!query)
       return true;
@@ -96,6 +84,12 @@ const totalAssignedSlots = computed(() => {
   }
   return count;
 });
+
+async function handleCheckIn(matchId: string, slotId: string) {
+  planStore.toggleCheckIn(matchId, slotId);
+  if (planStore.plan && planStore.key)
+    await planStore.savePlan();
+}
 </script>
 
 <template>
@@ -204,6 +198,12 @@ const totalAssignedSlots = computed(() => {
         :key="gameday.id"
         :gameday="gameday"
         :filter-member-id="matchedMember?.id"
+        :location="planStore.locations.find(location => location.id === gameday.locationId)"
+        :matches="planStore.matches"
+        :roles="planStore.roles"
+        :teams="planStore.teams"
+        :members="planStore.members"
+        :on-check-in="handleCheckIn"
       />
     </div>
 
@@ -220,7 +220,7 @@ const totalAssignedSlots = computed(() => {
         class="mt-4"
         variant="ghost"
         color="primary"
-        @click="searchQuery = ''; selectedTeamFilter = ''"
+        @click="searchQuery = ''"
       >
         Clear filters
       </UButton>

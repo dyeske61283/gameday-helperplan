@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import type { Gameday, Match, Slot } from "../utils/plan-types";
-import { usePlanStore } from "../stores/plan";
+import type { Gameday, Location, Match, Member, Role, Slot, Team } from "../utils/plan-types";
 
 const props = defineProps<{
   gameday: Gameday;
   filterMemberId?: string;
+  location?: Location;
+  matches: Record<string, Match>;
+  roles: Role[];
+  teams: Record<string, Team>;
+  members: Record<string, Member>;
+  onCheckIn: (matchId: string, slotId: string) => Promise<void>;
 }>();
-
-const planStore = usePlanStore();
-
-const location = computed(() => {
-  return planStore.locations.find(l => l.id === props.gameday.locationId);
-});
+const { t } = useI18n();
 
 const gamedayMatches = computed<Match[]>(() => {
   return props.gameday.matchIds
-    .map(id => planStore.matches[id])
+    .map(id => props.matches[id])
     .filter((m): m is Match => !!m);
 });
 
@@ -47,15 +47,15 @@ function formatMatchTime(timeVal: Date | string) {
 }
 
 function getRoleName(roleId: string) {
-  const role = planStore.roles.find(r => r.id === roleId);
+  const role = props.roles.find(r => r.id === roleId);
   return role?.name || roleId;
 }
 
 function getMemberName(slot: Slot) {
-  if (slot.assignedMemberId && planStore.members[slot.assignedMemberId]) {
-    return planStore.members[slot.assignedMemberId]?.name || "Unassigned";
+  if (slot.assignedMemberId && props.members[slot.assignedMemberId]) {
+    return props.members[slot.assignedMemberId]?.name || t("common.unassigned");
   }
-  return slot.customHelperName || "Unassigned";
+  return slot.customHelperName || t("common.unassigned");
 }
 
 function isAssigned(slot: Slot) {
@@ -63,10 +63,7 @@ function isAssigned(slot: Slot) {
 }
 
 async function handleCheckIn(matchId: string, slotId: string) {
-  planStore.toggleCheckIn(matchId, slotId);
-  if (planStore.plan && planStore.key) {
-    await planStore.savePlan();
-  }
+  await props.onCheckIn(matchId, slotId);
 }
 </script>
 
@@ -96,12 +93,12 @@ async function handleCheckIn(matchId: string, slotId: string) {
             <span v-else>{{ location.name }}</span>
           </span>
           <span v-if="gameday.openingTime" class="ml-2">
-            Opens: {{ gameday.openingTime }}
+            {{ t("dashboard.opens") }}: {{ gameday.openingTime }}
           </span>
         </div>
       </div>
       <UBadge variant="soft" color="primary" size="sm">
-        {{ gamedayMatches.length }} {{ gamedayMatches.length === 1 ? 'Match' : 'Matches' }}
+        {{ gamedayMatches.length }} {{ gamedayMatches.length === 1 ? t("dashboard.match") : t("dashboard.matches") }}
       </UBadge>
     </div>
 
@@ -119,7 +116,7 @@ async function handleCheckIn(matchId: string, slotId: string) {
               {{ formatMatchTime(match.time) }}
             </div>
             <div class="font-bold text-on-surface">
-              <span>{{ planStore.teams[match.homeTeamId]?.name || match.homeTeamId }}</span>
+              <span>{{ teams[match.homeTeamId]?.name || match.homeTeamId }}</span>
               <span class="mx-2 text-neutral-400 font-normal">vs</span>
               <span class="text-neutral-600 dark:text-neutral-300">{{ match.awayTeamName }}</span>
             </div>
@@ -128,9 +125,9 @@ async function handleCheckIn(matchId: string, slotId: string) {
           <!-- Helper Team Pill -->
           <div v-if="match.helperTeamId" class="flex items-center gap-1.5 text-xs text-on-surface-variant">
             <UIcon name="i-lucide-shield" class="w-4 h-4 text-primary" />
-            <span>Duty Team:</span>
+            <span>{{ t("dashboard.duty_team") }}:</span>
             <span class="font-semibold text-primary">
-              {{ planStore.teams[match.helperTeamId]?.name || match.helperTeamId }}
+              {{ teams[match.helperTeamId]?.name || match.helperTeamId }}
             </span>
           </div>
         </div>
@@ -176,10 +173,10 @@ async function handleCheckIn(matchId: string, slotId: string) {
                   :name="slot.checkedIn ? 'i-lucide-check-circle' : 'i-lucide-user-check'"
                   class="w-3 h-3 mr-1"
                 />
-                {{ slot.checkedIn ? 'Here' : "Check In" }}
+                {{ slot.checkedIn ? t("dashboard.here") : t("dashboard.check_in") }}
               </UButton>
               <UBadge v-else size="xs" color="warning" variant="subtle">
-                Needed
+                {{ t("dashboard.needed") }}
               </UBadge>
             </div>
           </div>

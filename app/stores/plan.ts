@@ -70,6 +70,7 @@ export const usePlanStore = defineStore("plan", () => {
   const isLoading = ref(false);
   const error = ref<string | null>(null);
   const eventSource = ref<EventSource | null>(null);
+  let completionTimer: ReturnType<typeof setInterval> | undefined;
 
   // Local storage for the last active plan ID
   const lastPlanId = useLocalStorage(STORAGE_KEY, "");
@@ -161,6 +162,10 @@ export const usePlanStore = defineStore("plan", () => {
     const decryptionKey = key.value;
 
     eventSource.value = new EventSource(`/api/${id}`);
+    completionTimer = setInterval(() => {
+      if (plan.value)
+        completeClosedAssignments(plan.value);
+    }, 60_000);
 
     eventSource.value.onmessage = async (event) => {
       try {
@@ -193,6 +198,10 @@ export const usePlanStore = defineStore("plan", () => {
       eventSource.value.close();
       eventSource.value = null;
     }
+    if (completionTimer) {
+      clearInterval(completionTimer);
+      completionTimer = undefined;
+    }
   }
 
   async function savePlan() {
@@ -204,6 +213,7 @@ export const usePlanStore = defineStore("plan", () => {
     isLoading.value = true;
     error.value = null;
 
+    const expectedRevision = plan.value.rev;
     try {
       completeClosedAssignments(plan.value);
       plan.value.rev++;
@@ -216,6 +226,8 @@ export const usePlanStore = defineStore("plan", () => {
         method: "POST",
         body: {
           blob: encryptedBlob,
+          expectedRevision,
+          revision: plan.value.rev,
         },
       });
 
@@ -227,6 +239,8 @@ export const usePlanStore = defineStore("plan", () => {
         error.value = err.message || "Failed to save plan";
       }
       console.error("Error saving plan:", err);
+      if (plan.value?.rev === expectedRevision + 1)
+        plan.value.rev = expectedRevision;
     }
     finally {
       isLoading.value = false;

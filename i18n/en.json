@@ -136,6 +136,16 @@
     "tasks": "Tasks",
     "go_to_dashboard": "Go to Dashboard",
     "continue": "Continue",
-    "back": "Back"
+    "back": "Back",
+    "unassigned": "Unassigned"
+  },
+  "dashboard": {
+    "opens": "Opens",
+    "match": "Match",
+    "matches": "Matches",
+    "duty_team": "Duty Team",
+    "here": "Here",
+    "check_in": "Check In",
+    "needed": "Needed"
   }
 }

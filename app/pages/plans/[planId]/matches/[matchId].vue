@@ -71,8 +71,16 @@ async function claim(slot: Slot) {
           {{ new Date(match.time).toLocaleString() }}
         </p>
       </header>
-      <div v-if="!selectedMember" class="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm">
-        Select a member below before claiming a duty.
+      <div class="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
+        <p class="font-semibold">
+          Claiming as
+        </p>
+        <p v-if="!selectedMember">
+          Select your member profile before claiming a duty.
+        </p>
+        <p v-else>
+          {{ selectedMember.name }}. You can change this selection at any time.
+        </p>
       </div>
       <label class="block space-y-2"><span class="text-sm font-semibold">I am</span><select v-model="planStore.selectedMemberId" class="w-full rounded-lg border p-2"><option :value="null">Select a member</option><option v-for="member in planStore.membersList" :key="member.id" :value="member.id">{{ member.name }}{{ match.helperTeamId && member.teamIds.includes(match.helperTeamId) ? ' · duty team' : '' }}</option></select></label>
       <div v-if="match.slots.length" class="space-y-3">

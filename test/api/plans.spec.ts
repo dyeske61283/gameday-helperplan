@@ -51,5 +51,6 @@ describe("example plans validation", () => {
     // Verify location resolves
     const gamedaysList = Object.values(plan.gamedays);
     expect(gamedaysList.some(gd => gd.locationId === "emmy-noether-halle")).toBe(true);
+    expect(gamedaysList.some(gd => gd.slots.length > 0)).toBe(true);
   });
 });

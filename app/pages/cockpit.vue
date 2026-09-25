@@ -6,7 +6,13 @@ usePlanInit();
 const duties = computed(() => {
   if (!planStore.selectedMemberId)
     return [];
-  return Object.values(planStore.matches).flatMap(match => match.slots.filter(slot => slot.assignedMemberId === planStore.selectedMemberId).map(slot => ({ match, slot })));
+  const matchDuties = Object.values(planStore.matches).flatMap(match => match.slots
+    .filter(slot => slot.assignedMemberId === planStore.selectedMemberId)
+    .map(slot => ({ match, slot, gameday: undefined })));
+  const gamedayDuties = Object.values(planStore.gamedays).flatMap(gameday => gameday.slots
+    .filter(slot => slot.assignedMemberId === planStore.selectedMemberId)
+    .map(slot => ({ match: undefined, slot, gameday })));
+  return [...matchDuties, ...gamedayDuties];
 });
 </script>
 
@@ -26,12 +32,12 @@ const duties = computed(() => {
       You have no personal duties.
     </div>
     <div v-else class="space-y-3">
-      <NuxtLink v-for="{ match, slot } in duties" :key="slot.id" :to="`/plans/${planStore.plan?.id}/matches/${match.id}`" class="block rounded-xl border p-4 hover:border-primary">
+      <NuxtLink v-for="{ match, slot, gameday } in duties" :key="slot.id" :to="match ? `/plans/${planStore.plan?.id}/matches/${match.id}` : `/plans/${planStore.plan?.id}`" class="block rounded-xl border p-4 hover:border-primary">
         <p class="font-semibold">
           {{ planStore.roles.find(role => role.id === slot.roleId)?.name || slot.roleId }}
         </p>
         <p class="text-sm text-neutral-500">
-          {{ planStore.teams[match.homeTeamId]?.name || match.homeTeamId }} vs {{ match.awayTeamName }}
+          {{ match ? `${planStore.teams[match.homeTeamId]?.name || match.homeTeamId} vs ${match.awayTeamName}` : `Gameday duty · ${gameday?.date}` }}
         </p>
       </NuxtLink>
     </div>

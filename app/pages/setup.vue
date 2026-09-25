@@ -174,9 +174,7 @@ onUnmounted(() => {
   planStore.stopWatching();
 });
 
-defineExpose({
-  currentStep,
-});
+defineExpose({ currentStep });
 </script>
 
 <template>

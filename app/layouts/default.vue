@@ -3,14 +3,14 @@
 </script>
 
 <template>
-  <div>
+  <div class="min-h-screen overflow-x-hidden flex flex-col">
     <UHeader title="Helperplan" :toggle="false">
       <template #right>
         <LanguageSwitcher />
         <UColorModeButton />
       </template>
     </UHeader>
-    <UMain>
+    <UMain class="flex-1 min-h-0">
       <slot />
     </UMain>
   </div>
