@@ -275,7 +275,7 @@ describe("feature: User Workflows (BDD Specs)", async () => {
     });
     await When("the admin navigates to the Assignment Generator view and clicks \"Auto-Assign Duties\"", async () => {});
     await When("selecting criteria: \"Require Licenses\" and \"Balance Duty Counts\"", async () => {
-      autoAssignMatchDuties(plan, matchId, { requireSkills: true, balanceDutyCounts: true, excludeConflicts: true });
+      autoAssignMatchDuties(plan, matchId, { balanceDutyCounts: true, excludeConflicts: true });
     });
     await Then("slots are automatically populated with qualified members", async () => {
       const match = plan.matches[matchId];
@@ -401,7 +401,7 @@ describe("feature: User Workflows (BDD Specs)", async () => {
       }
     });
     await When("the admin or team captain clicks \"Auto-Assign Team Members\"", async () => {
-      autoAssignMatchDuties(plan, matchId, { requireSkills: true, balanceDutyCounts: true, excludeConflicts: true });
+      autoAssignMatchDuties(plan, matchId, { balanceDutyCounts: true, excludeConflicts: true });
     });
     await Then("individual duty slots (Timekeeper, ESB, Kiosk) are populated from the Damen 1 roster", async () => {
       const match = plan.matches[matchId];

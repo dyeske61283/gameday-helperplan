@@ -3,7 +3,6 @@ export type StoredPlan = {
   modifiedAt: number;
   meta: object;
   chunkCount?: number;
-  revision?: number;
 };
 
 export const STORAGE_PREFIX = "plans" as const;

@@ -25,7 +25,16 @@ const duties = computed(() => {
         Your claimed helper duties.
       </p>
     </header>
-    <div v-if="!planStore.selectedMemberId" class="rounded-xl border border-dashed p-8 text-center">
+    <div v-if="planStore.error" class="rounded-xl border border-dashed p-8 text-center space-y-3">
+      <p>We could not load your plan.</p>
+      <p class="text-sm text-neutral-500">
+        {{ planStore.error }}
+      </p>
+      <UButton to="/">
+        Return to start
+      </UButton>
+    </div>
+    <div v-else-if="!planStore.selectedMemberId" class="rounded-xl border border-dashed p-8 text-center">
       Select a member from a match to see personal duties.
     </div>
     <div v-else-if="!duties.length" class="rounded-xl border border-dashed p-8 text-center">

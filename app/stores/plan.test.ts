@@ -5,11 +5,11 @@ import { migrateIfNeeded, usePlanStore } from "./plan.ts";
 // Mock dependencies
 vi.mock("../composables/use-crypto", () => ({
   useEncryption: () => ({
-    encryptData: vi.fn(),
+    encryptData: vi.fn(async (data: string) => data),
     generateKey: vi.fn(),
   }),
   useDecryption: () => ({
-    decryptBlob: vi.fn(),
+    decryptBlob: vi.fn(async (blob: string) => blob),
   }),
 }));
 
@@ -317,6 +317,41 @@ describe("usePlanStore", () => {
       const store = usePlanStore();
       store.createNewPlan("test-plan-id", "test-key");
       expect(() => store.claimSlot("missing-match", "missing-slot", "missing-member")).toThrow("not found");
+    });
+
+    it("keeps a claimed duty after save and reload", async () => {
+      let savedBlob = "";
+      vi.stubGlobal("$fetch", vi.fn(async (_url: string, options?: { method?: string; body?: { blob: string } }) => {
+        if (options?.method === "POST") {
+          savedBlob = options.body!.blob;
+          return {};
+        }
+        return { blob: savedBlob };
+      }));
+
+      const store = usePlanStore();
+      store.createNewPlan("test-plan-id", "test-key");
+      const member = store.addMember({ name: "Capable Helper", skillIds: ["referee"] });
+      store.plan!.config.roles.push({ id: "referee-duty", name: "Referee", scope: "match", requiredSkillId: "referee" });
+      store.plan!.matches.m1 = {
+        id: "m1",
+        time: new Date(),
+        homeTeamId: "A",
+        awayTeamName: "B",
+        slots: [{ id: "slot-1", roleId: "referee-duty", assignedMemberId: null, assignmentStatus: "OPEN", updatedAt: new Date(1) }],
+        updatedAt: new Date(1),
+      };
+
+      store.claimSlot("m1", "slot-1", member.id);
+      await store.savePlan();
+      store.plan = null;
+      await store.loadPlan("test-plan-id", "test-key");
+
+      expect(store.plan).not.toBeNull();
+      const loadedPlan = store.plan!;
+      expect(loadedPlan.matches.m1?.slots[0]?.assignedMemberId).toBe(member.id);
+      expect(loadedPlan.matches.m1?.slots[0]?.assignmentStatus).toBe("ASSIGNED");
+      vi.unstubAllGlobals();
     });
   });
 });

@@ -213,7 +213,7 @@ export const usePlanStore = defineStore("plan", () => {
     isLoading.value = true;
     error.value = null;
 
-    const expectedRevision = plan.value.rev;
+    const previousRevision = plan.value.rev;
     try {
       completeClosedAssignments(plan.value);
       plan.value.rev++;
@@ -226,8 +226,6 @@ export const usePlanStore = defineStore("plan", () => {
         method: "POST",
         body: {
           blob: encryptedBlob,
-          expectedRevision,
-          revision: plan.value.rev,
         },
       });
 
@@ -239,8 +237,8 @@ export const usePlanStore = defineStore("plan", () => {
         error.value = err.message || "Failed to save plan";
       }
       console.error("Error saving plan:", err);
-      if (plan.value?.rev === expectedRevision + 1)
-        plan.value.rev = expectedRevision;
+      if (plan.value?.rev === previousRevision + 1)
+        plan.value.rev = previousRevision;
     }
     finally {
       isLoading.value = false;

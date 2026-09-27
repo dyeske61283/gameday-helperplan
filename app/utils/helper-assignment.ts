@@ -3,12 +3,6 @@ import { checkMemberConflict } from "./conflict-detector";
 
 export type AutoAssignOptions = {
   /**
-   * Require members to possess the requiredSkillId for roles that define one.
-   * Default: true
-   */
-  requireSkills?: boolean;
-
-  /**
    * Balance total duty counts across all season matches so members rotate evenly.
    * Default: true
    */
@@ -118,7 +112,6 @@ export function autoAssignMatchDuties(
   }
 
   const {
-    requireSkills = true,
     balanceDutyCounts = true,
     excludeConflicts = true,
   } = options;
@@ -164,7 +157,7 @@ export function autoAssignMatchDuties(
         return false;
 
       // License requirement check
-      if (requireSkills && !isMemberEligibleForSlot(plan, slot, member.id)) {
+      if (!isMemberEligibleForSlot(plan, slot, member.id)) {
         return false;
       }
 

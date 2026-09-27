@@ -29,6 +29,8 @@ export function usePlanInit() {
       // Coming from a fresh shared link – load from server
       if (!planStore.plan || planStore.plan.id !== queryId) {
         await planStore.loadPlan(queryId, keyFromStore);
+        if (planStore.plan?.id !== queryId)
+          planStore.plan = null;
       }
     }
     else if (planStore.plan && (!queryId || planStore.plan.id === queryId)) {
@@ -37,6 +39,8 @@ export function usePlanInit() {
     else if (queryId) {
       if (planStore.resumeState?.id === queryId && planStore.resumeState.key) {
         await planStore.loadPlan(queryId, planStore.resumeState.key);
+        if (planStore.plan?.id !== queryId)
+          planStore.plan = null;
       }
       else {
         planStore.plan = null;

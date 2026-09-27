@@ -3,6 +3,7 @@
 <script setup lang="ts">
 import type { Slot } from "../../../../utils/plan-types";
 import { usePlanStore } from "../../../../stores/plan";
+import { isMemberEligibleForSlot } from "../../../../utils/helper-assignment";
 
 const route = useRoute();
 const planStore = usePlanStore();
@@ -13,10 +14,8 @@ const match = computed(() => planStore.matches[route.params.matchId as string]);
 const selectedMember = computed(() => planStore.selectedMemberId ? planStore.members[planStore.selectedMemberId] : undefined);
 const roleName = (slot: Slot) => planStore.roles.find(role => role.id === slot.roleId)?.name || slot.roleId;
 function canClaim(slot: Slot) {
-  return !!selectedMember.value && slot.assignmentStatus === "OPEN" && (() => {
-    const role = planStore.roles.find(candidate => candidate.id === slot.roleId);
-    return !role?.requiredSkillId || selectedMember.value!.skillIds.includes(role.requiredSkillId);
-  })();
+  return !!planStore.plan && !!selectedMember.value && slot.assignmentStatus === "OPEN"
+    && isMemberEligibleForSlot(planStore.plan, slot, selectedMember.value.id);
 }
 
 async function claim(slot: Slot) {
