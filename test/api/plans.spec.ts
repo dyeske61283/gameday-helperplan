@@ -1,12 +1,21 @@
+import type { SeasonPlan } from "../../app/utils/plan-types";
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import {
-  SeasonPlanSchema,
-
-} from "../../app/utils/plan-types";
+import { SeasonPlanSchema } from "../../app/utils/plan-types";
 
 const FIXTURES_DIR = path.join(import.meta.dirname, "../fixtures");
+
+function expectSeededDutyDefaults(plan: SeasonPlan) {
+  expect(Object.keys(plan.skills).sort()).toEqual(["esb", "referee", "steward"]);
+
+  const roles = Object.fromEntries(plan.config.roles.map(role => [role.id, role]));
+  expect(roles.timekeeper.requiredSkillId).toBe("esb");
+  expect(roles.secretary.requiredSkillId).toBe("esb");
+  expect(roles.steward_entrance.requiredSkillId).toBe("steward");
+  expect(roles.referee_1.requiredSkillId).toBe("referee");
+  expect(roles.referee_2.requiredSkillId).toBe("referee");
+}
 
 describe("example plans validation", () => {
   it("should successfully load and validate 2024/2025 plan fixture", () => {
@@ -15,6 +24,7 @@ describe("example plans validation", () => {
 
     const rawPlan = JSON.parse(fs.readFileSync(planPath, "utf8"));
     const plan = SeasonPlanSchema.parse(rawPlan);
+    expectSeededDutyDefaults(plan);
 
     // Specific structural checks
     expect(plan.season).toBe("2024/2025");
@@ -39,6 +49,7 @@ describe("example plans validation", () => {
 
     const rawPlan = JSON.parse(fs.readFileSync(planPath, "utf8"));
     const plan = SeasonPlanSchema.parse(rawPlan);
+    expectSeededDutyDefaults(plan);
 
     // Specific structural checks
     expect(plan.season).toBe("2025/2026");
