@@ -1,5 +1,6 @@
 import type { AutoAssignOptions } from "../utils/helper-assignment";
 import type {
+  Club,
   Gameday,
   Match,
   Member,
@@ -376,6 +377,17 @@ export const usePlanStore = defineStore("plan", () => {
     plan.value.lastUpdated = new Date();
   }
 
+  function updatePlanDetails(updates: { club?: Partial<Club>; season?: string }) {
+    if (!plan.value)
+      return;
+    const now = new Date();
+    if (updates.club)
+      plan.value.club = { ...plan.value.club, ...updates.club, lastUpdated: now };
+    if (updates.season !== undefined)
+      plan.value.season = updates.season;
+    plan.value.lastUpdated = now;
+  }
+
   // --- Domain Methods: Members ---
 
   function addMember(data: Partial<Omit<Member, "id" | "updatedAt">> & { name: string }): Member {
@@ -571,6 +583,7 @@ export const usePlanStore = defineStore("plan", () => {
     addTeam,
     updateTeam,
     deleteTeam,
+    updatePlanDetails,
     addMember,
     configureRoles,
     updateMember,

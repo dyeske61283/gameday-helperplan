@@ -12,15 +12,14 @@ import { Given, Scenario, Then, When } from "./helpers/bdd";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const seededPlanId = "f530083d-8c74-4f10-931a-dd877ee7b52c";
-const seededPlanLink = process.env.E2E_PLAN_URL || `/setup?planId=${seededPlanId}#key=tWVZ4hmOA7LFsrNViX1X6w`;
 const testHost = process.env.TEST_HOST;
 const testUrl = (path: string) => testHost ? new URL(path, testHost).toString() : url(path);
 const seededSetupLink = process.env.E2E_PLAN_URL
   ? (() => {
       const link = new URL(process.env.E2E_PLAN_URL);
-      return `${link.origin}/setup?planId=${link.pathname.split("/").pop()}${link.hash}`;
+      return `${link.origin}/plans/${link.pathname.split("/").pop()}/setup${link.hash}`;
     })()
-  : seededPlanLink;
+  : `/plans/${seededPlanId}/setup#key=tWVZ4hmOA7LFsrNViX1X6w`;
 
 describe("feature: User Workflows (BDD Specs)", async () => {
   await setup({
@@ -65,8 +64,8 @@ describe("feature: User Workflows (BDD Specs)", async () => {
     });
     await Then("the plan is fetched from /api/f530083d-8c74-4f10-931a-dd877ee7b52c and decrypted client-side", async () => {
       await page.waitForFunction(() => document.body.textContent.includes("f530083d-8c74-4f10-931a-dd877ee7b52c"), { timeout: 10000 });
-      const textareaVal = await page.inputValue("textarea");
-      expect(textareaVal).toContain("Gladbeck HC");
+      const clubName = await page.inputValue("input");
+      expect(clubName).toContain("Gladbeck HC");
     });
     await Then("the plan ID is persisted to localStorage under gameday-plan-id", async () => {
       const storedId = await page.evaluate(() => localStorage.getItem("gameday-plan-id"));
@@ -75,7 +74,13 @@ describe("feature: User Workflows (BDD Specs)", async () => {
     await Then("the setup view displays the active plan with Plan ID and encryption key indicator", async () => {
       const content = await page.textContent("body");
       expect(content).toContain("f530083d-8c74-4f10-931a-dd877ee7b52c");
-      expect(content).toContain("Live Sync Active");
+      expect(content).toContain("Plan setup");
+      await page.locator("input").first().fill("Gladbeck HC Edited");
+      await page.getByRole("button", { name: "Save changes" }).click();
+      await page.getByText("All changes saved").waitFor();
+      await page.getByRole("button", { name: "Reload from server" }).click();
+      await page.locator("input").first().waitFor();
+      expect(await page.locator("input").first().inputValue()).toBe("Gladbeck HC Edited");
       await page.close();
     });
   });
