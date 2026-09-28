@@ -81,6 +81,19 @@ describe("feature: User Workflows (BDD Specs)", async () => {
       await page.getByRole("button", { name: "Reload from server" }).click();
       await page.locator("input").first().waitFor();
       expect(await page.locator("input").first().inputValue()).toBe("Gladbeck HC Edited");
+
+      await page.route("**/api/**", async (route) => {
+        if (route.request().method() === "POST")
+          await route.fulfill({ status: 503, body: "storage unavailable" });
+        else
+          await route.continue();
+      });
+      await page.locator("input").first().fill("Failed Save Attempt");
+      await page.getByRole("button", { name: "Save changes" }).click();
+      await page.getByText("Save failed", { exact: true }).waitFor();
+      await page.unroute("**/api/**");
+      await page.getByRole("button", { name: "Save changes" }).click();
+      await page.getByText("All changes saved", { exact: true }).waitFor();
       await page.close();
     });
   });
@@ -131,25 +144,6 @@ describe("feature: User Workflows (BDD Specs)", async () => {
     await When("clicking \"Save Plan\"", async () => {});
     await Then("the payload is encrypted with the current key and POSTed to /api/{planId}", async () => {});
     await Then("the plan revision number (rev) increments and a success notification is shown", async () => {});
-  });
-
-  Scenario("4b — Recover from an existing-plan save failure", async () => {
-    const page = await createPage();
-    await page.goto(seededSetupLink.startsWith("http") ? seededSetupLink : testUrl(seededSetupLink), { waitUntil: "domcontentloaded" });
-    await page.getByText("Plan setup", { exact: true }).waitFor();
-    await page.route("**/api/**", async (route) => {
-      if (route.request().method() === "POST")
-        await route.fulfill({ status: 503, body: "storage unavailable" });
-      else
-        await route.continue();
-    });
-    await page.locator("input").first().fill("Failed Save Attempt");
-    await page.getByRole("button", { name: "Save changes" }).click();
-    await page.getByText("Save failed", { exact: true }).waitFor();
-    await page.unroute("**/api/**");
-    await page.getByRole("button", { name: "Save changes" }).click();
-    await page.getByText("All changes saved", { exact: true }).waitFor();
-    await page.close();
   });
 
   Scenario("4 Error — Invalid JSON handling", async () => {
