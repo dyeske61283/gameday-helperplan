@@ -20,7 +20,10 @@ const hasResume = computed(() => !!planStore.resumeState?.id && !!planStore.resu
       <UButton v-if="hasResume" :to="`/plans/${planStore.resumeState!.id}#key=${planStore.resumeState!.key}`" size="lg" class="rounded-full">
         Resume plan
       </UButton>
-      <p v-else class="text-sm text-on-surface-variant">
+      <UButton to="/setup" variant="outline" size="lg" class="rounded-full">
+        Set up a new plan
+      </UButton>
+      <p v-if="!hasResume" class="text-sm text-on-surface-variant">
         A shared plan link is required to get started.
       </p>
     </main>
