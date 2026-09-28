@@ -7,78 +7,87 @@
  * 1. Deno Deploy V2 API (primary)
  */
 
-/** @typedef {{ id: string, status: 'succeeded' | 'queued' | 'failed' | 'building' | 'skipped', failure_reason?: string, labels?: Record<string, string>, timelines?: Array<{ hostnames?: string[] }> }} Revision */
+/** @typedef {{ id: string, status: 'succeeded' | 'queued' | 'failed' | 'building' | 'skipped', failure_reason?: string, timelines?: Array<{ hostnames?: string[] }> }} Revision */
 
 import process from "node:process";
 
-const APP_ID = process.env.DENO_PROJECT_ID;
 const DEPLOY_TOKEN = process.env.DENO_DEPLOY_TOKEN;
 const GITHUB_SHA = process.env.GITHUB_SHA;
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
 
 const API_BASE = "https://api.deno.com";
 
-async function getRevisionForCommit(headers) {
-  let nextUrl = `${API_BASE}/v2/apps/${APP_ID}/revisions?limit=100`;
-  while (nextUrl) {
-    const response = await fetch(nextUrl, { headers });
-    if (!response.ok)
-      throw new Error(`Deno API revisions fetch failed: ${response.status}`);
+async function getRevisionIdFromGitHub(headers) {
+  const deploymentsUrl = new URL(`https://api.github.com/repos/${GITHUB_REPOSITORY}/deployments`);
+  deploymentsUrl.searchParams.set("sha", GITHUB_SHA);
+  deploymentsUrl.searchParams.set("environment", "test");
+  deploymentsUrl.searchParams.set("per_page", "10");
 
-    /** @type {Array.<Revision>} */
-    const revisions = await response.json();
-    const revision = revisions.find(item => item.labels?.["custom.sha"] === GITHUB_SHA || item.labels?.sha === GITHUB_SHA);
-    if (revision)
-      return revision;
+  const deploymentsResponse = await fetch(deploymentsUrl, { headers });
+  if (!deploymentsResponse.ok)
+    throw new Error(`GitHub deployments fetch failed: ${deploymentsResponse.status}`);
 
-    const nextPath = response.headers.get("link")?.match(/<([^>]+)>;\s*rel="next"/)?.[1];
-    nextUrl = nextPath ? new URL(nextPath, API_BASE).toString() : "";
+  /** @type {Array<{ statuses_url: string }>} */
+  const deployments = await deploymentsResponse.json();
+  for (const deployment of deployments) {
+    const statusesResponse = await fetch(deployment.statuses_url, { headers });
+    if (!statusesResponse.ok)
+      continue;
+
+    /** @type {Array<{ state: string, target_url?: string }>} */
+    const statuses = await statusesResponse.json();
+    const targetUrl = statuses.find(status => status.state === "success")?.target_url;
+    const revisionId = targetUrl?.match(/\/builds\/([^/?#]+)/)?.[1];
+    if (revisionId)
+      return revisionId;
   }
 
   return null;
 }
 
 async function main() {
-  if (!DEPLOY_TOKEN || !APP_ID || !GITHUB_SHA) {
-    console.error("DENO_PROJECT_ID, DENO_DEPLOY_TOKEN, and GITHUB_SHA are required");
+  if (!DEPLOY_TOKEN || !GITHUB_SHA || !GITHUB_TOKEN || !GITHUB_REPOSITORY) {
+    console.error("DENO_DEPLOY_TOKEN, GITHUB_SHA, GITHUB_TOKEN, and GITHUB_REPOSITORY are required");
     process.exit(1);
   }
 
-  const headers = {
+  const denoHeaders = {
     Authorization: DEPLOY_TOKEN.startsWith("Bearer ") ? DEPLOY_TOKEN : `Bearer ${DEPLOY_TOKEN}`,
     Accept: "application/json",
+  };
+  const githubHeaders = {
+    "Authorization": `Bearer ${GITHUB_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
   };
 
   const maxRevisionLookups = 40;
   const delay = 3000;
-  let revision = null;
+  let revisionId = null;
 
   for (let attempt = 0; attempt < maxRevisionLookups; attempt++) {
     try {
-      revision = await getRevisionForCommit(headers);
+      revisionId = await getRevisionIdFromGitHub(githubHeaders);
     }
     catch (error) {
       console.error(error instanceof Error ? error.message : error);
       process.exit(1);
     }
 
-    if (revision)
+    if (revisionId)
       break;
 
-    console.log(`Revision for ${GITHUB_SHA} is not visible yet. Retrying in ${delay}ms... (Attempt ${attempt + 1}/${maxRevisionLookups})`);
+    console.log(`Deno deployment for ${GITHUB_SHA} is not ready yet. Retrying in ${delay}ms... (Attempt ${attempt + 1}/${maxRevisionLookups})`);
     await new Promise(resolve => setTimeout(resolve, delay));
   }
 
-  if (!revision) {
-    console.error(`Could not find a Deno revision for commit ${GITHUB_SHA} after ${maxRevisionLookups} attempts.`);
+  if (!revisionId) {
+    console.error(`Could not find a successful Deno deployment for commit ${GITHUB_SHA} after ${maxRevisionLookups} attempts.`);
     process.exit(1);
   }
 
-  if (revision.status === "failed" || revision.status === "skipped") {
-    console.error("Deno deployment failed or was skipped:", revision.failure_reason ?? "no reason given");
-    process.exit(1);
-  }
-
-  const ready = await pollRevisionStatus(revision.id, headers, revision.status === "succeeded" ? 1 : 40);
+  const ready = await pollRevisionStatus(revisionId, denoHeaders);
   if (!ready)
     process.exit(1);
 

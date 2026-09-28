@@ -24,9 +24,10 @@ jobs:
       - name: Get Deno Deploy URL
         id: get-url
         env:
-          DENO_PROJECT_ID: ${{ secrets.DENO_PROJECT_ID }}
           DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
           GITHUB_SHA: ${{ github.sha }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
         run: |
           OUTPUT=$(node scripts/get-deno-url.js)
           echo "$OUTPUT"
