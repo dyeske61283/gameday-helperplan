@@ -1,8 +1,10 @@
 import type { AutoAssignOptions } from "../utils/helper-assignment";
 import type {
+  Club,
   Gameday,
   Match,
   Member,
+  NewPlanMetadata,
   SeasonPlan,
   Team,
 } from "../utils/plan-types";
@@ -74,7 +76,19 @@ export const usePlanStore = defineStore("plan", () => {
 
   // Local storage for the last active plan ID
   const lastPlanId = useLocalStorage(STORAGE_KEY, "");
-  const resumeState = useLocalStorage<{ id: string; key: string } | null>(RESUME_KEY, null);
+  const resumeState = useLocalStorage<{ id: string; key: string } | null>(RESUME_KEY, null, {
+    serializer: {
+      read: (value) => {
+        try {
+          return JSON.parse(value) as { id: string; key: string };
+        }
+        catch {
+          return null;
+        }
+      },
+      write: value => JSON.stringify(value),
+    },
+  });
   const selectedMemberId = useLocalStorage<string | null>(MEMBER_KEY, null);
 
   const { encryptData, generateKey } = useEncryption();
@@ -204,10 +218,10 @@ export const usePlanStore = defineStore("plan", () => {
     }
   }
 
-  async function savePlan() {
+  async function savePlan(): Promise<boolean> {
     if (!plan.value || !key.value) {
       error.value = "Missing plan or encryption key";
-      return;
+      return false;
     }
 
     isLoading.value = true;
@@ -231,6 +245,7 @@ export const usePlanStore = defineStore("plan", () => {
 
       lastPlanId.value = plan.value.id;
       resumeState.value = { id: plan.value.id, key: key.value };
+      return true;
     }
     catch (err: unknown) {
       if (err instanceof Error) {
@@ -239,20 +254,21 @@ export const usePlanStore = defineStore("plan", () => {
       console.error("Error saving plan:", err);
       if (plan.value?.rev === previousRevision + 1)
         plan.value.rev = previousRevision;
+      return false;
     }
     finally {
       isLoading.value = false;
     }
   }
 
-  function createNewPlan(id: string, newKey: string) {
+  function createNewPlan(id: string, newKey: string, metadata?: NewPlanMetadata) {
     key.value = newKey;
     const now = new Date();
     plan.value = {
       id,
       club: {
         id: "1",
-        name: "",
+        name: metadata?.clubName ?? "",
         contactEmail: "",
         homepage: "",
         lastUpdated: now,
@@ -260,8 +276,8 @@ export const usePlanStore = defineStore("plan", () => {
       lastUpdated: now,
       skills: {},
       schemaVersion: 2,
-      rev: 0,
-      season: `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`,
+      rev: 1,
+      season: metadata?.season ?? `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`,
       members: {},
       teams: {},
       matches: {},
@@ -296,7 +312,18 @@ export const usePlanStore = defineStore("plan", () => {
         ],
       },
     };
-    lastPlanId.value = id;
+  }
+
+  function configureRoles(names: string[]) {
+    if (!plan.value)
+      return;
+    plan.value.config.roles = names.map((name, index) => ({
+      id: `role-${index + 1}`,
+      name,
+      requiredSkillId: "",
+      scope: "match" as const,
+    }));
+    plan.value.lastUpdated = new Date();
   }
 
   async function finalizePlan() {
@@ -348,6 +375,17 @@ export const usePlanStore = defineStore("plan", () => {
       m.teamIds = m.teamIds.filter(tId => tId !== teamId);
     });
     plan.value.lastUpdated = new Date();
+  }
+
+  function updatePlanDetails(updates: { club?: Partial<Club>; season?: string }) {
+    if (!plan.value)
+      return;
+    const now = new Date();
+    if (updates.club)
+      plan.value.club = { ...plan.value.club, ...updates.club, lastUpdated: now };
+    if (updates.season !== undefined)
+      plan.value.season = updates.season;
+    plan.value.lastUpdated = now;
   }
 
   // --- Domain Methods: Members ---
@@ -545,7 +583,9 @@ export const usePlanStore = defineStore("plan", () => {
     addTeam,
     updateTeam,
     deleteTeam,
+    updatePlanDetails,
     addMember,
+    configureRoles,
     updateMember,
     deleteMember,
     assignHelperTeam,

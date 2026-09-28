@@ -1,5 +1,6 @@
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { NewPlanMetadataSchema } from "../utils/plan-types";
 import { migrateIfNeeded, usePlanStore } from "./plan.ts";
 
 // Mock dependencies
@@ -22,6 +23,27 @@ vi.mock("@vueuse/core", () => ({
 describe("usePlanStore", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+  });
+
+  it("validates the required new-plan metadata", () => {
+    expect(NewPlanMetadataSchema.safeParse({ clubName: "", season: "2026/2027" }).success).toBe(false);
+    expect(NewPlanMetadataSchema.parse({ clubName: " TSV Musterstadt ", season: " 2026/2027 " })).toEqual({
+      clubName: "TSV Musterstadt",
+      season: "2026/2027",
+    });
+  });
+
+  it("returns false and preserves the draft when saving fails", async () => {
+    vi.stubGlobal("$fetch", vi.fn().mockRejectedValue(new Error("storage unavailable")));
+    const store = usePlanStore();
+    store.createNewPlan("test-plan-id", "test-key", { clubName: "Club", season: "2026/2027" });
+    const beforeRevision = store.plan!.rev;
+
+    await expect(store.savePlan()).resolves.toBe(false);
+    expect(store.error).toBe("storage unavailable");
+    expect(store.plan!.club.name).toBe("Club");
+    expect(store.plan!.rev).toBe(beforeRevision);
+    vi.unstubAllGlobals();
   });
 
   describe("migrateIfNeeded", () => {
@@ -106,6 +128,22 @@ describe("usePlanStore", () => {
       store.deleteTeam(newTeam.id);
       expect(store.teams[newTeam.id]).toBeUndefined();
       expect(store.members[member.id]?.teamIds).not.toContain(newTeam.id);
+    });
+
+    it("updates club details without replacing the plan aggregate", () => {
+      const store = usePlanStore();
+      store.createNewPlan("test-plan", "test-key");
+      const original = store.plan;
+
+      store.updatePlanDetails({
+        club: { name: "Updated Club", contactEmail: "club@example.com" },
+        season: "2026/2027",
+      });
+
+      expect(store.plan).toBe(original);
+      expect(store.plan?.club.name).toBe("Updated Club");
+      expect(store.plan?.club.contactEmail).toBe("club@example.com");
+      expect(store.plan?.season).toBe("2026/2027");
     });
   });
 

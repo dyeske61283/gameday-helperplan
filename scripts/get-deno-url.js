@@ -2,125 +2,85 @@
 /* eslint-disable node/no-process-env */
 // @ts-check
 /**
- * This script identifies the Deno Deploy deployment URL for a specific branch using V2 API.
+ * This script identifies the Deno Deploy deployment URL for a specific commit using V2 API.
  * Strategies:
  * 1. Deno Deploy V2 API (primary)
  */
 
-/** @typedef {{ slug: 'git-branch' | 'preview', partition: { "git.branch_sanitized"?: string, "deno.revision.id"?: string }, "domains": { "domain": string}[] }} Timeline */
-/** @typedef {{ id: string, status: 'succeeded' | 'queued' | 'failed' | 'building' | 'skipped', failure_reason?: string }} Revision */
+/** @typedef {{ id: string, status: 'succeeded' | 'queued' | 'failed' | 'building' | 'skipped', failure_reason?: string, timelines?: Array<{ hostnames?: string[] }> }} Revision */
 
 import process from "node:process";
 
-const APP_ID = process.env.DENO_PROJECT_ID;
 const DEPLOY_TOKEN = process.env.DENO_DEPLOY_TOKEN;
-const BRANCH_NAME = process.env.BRANCH_NAME;
+const GITHUB_SHA = process.env.GITHUB_SHA;
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
+const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
 
 const API_BASE = "https://api.deno.com";
 
-const trimEndRegEx = /-+$/;
-const trimFrontRegEx = /^-+/;
+async function getRevisionIdFromGitHub(headers) {
+  const response = await fetch(`https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/status`, { headers });
+  if (!response.ok)
+    throw new Error(`GitHub commit status fetch failed: ${response.status}`);
 
-/**
- * Strategy 1: Deno Deploy V2 API
- */
-async function getUrlFromDenoV2() {
-  if (!DEPLOY_TOKEN || !APP_ID) {
-    console.error("Deploy Token or APP_ID not set");
-    return null;
-  }
-
-  if (!BRANCH_NAME) {
-    console.error("Branch name undefined cannot determine correct deployment to test against");
-    return null;
-  }
-
-  const slugifiedBranchName = BRANCH_NAME.toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-") // Replace spaces with -
-    .replace(/[^\w-]+/g, "") // Remove all non-word chars
-    .replace(/-{2,}/g, "-") // Replace multiple - with single -
-    .replace(trimFrontRegEx, "") // Trim - from start
-    .replace(trimEndRegEx, ""); // Trim - from end
-
-  const headers = {
-    Authorization: DEPLOY_TOKEN.startsWith("Bearer ") ? DEPLOY_TOKEN : `Bearer ${DEPLOY_TOKEN}`,
-    Accept: "application/json",
-  };
-
-  const limit = 10;
-
-  try {
-    // 1. Get recent revisions for the app
-    // {{baseUrl}}/v2/apps/:app/revisions?limit=5
-    const revisionsUrl = `${API_BASE}/v2/apps/${APP_ID}/revisions?limit=${limit}`;
-    const revRes = await fetch(revisionsUrl, { headers });
-    if (!revRes.ok) {
-      console.error(`Deno API revisions fetch failed: ${revRes.status}`);
-      return null;
-    }
-
-    /** @type {Array.<Revision>} */
-    const revisions = await revRes.json();
-    if (!revisions.length) {
-      console.error(`Something is off with the revisions reponse: ${revisions}`);
-      return null;
-    }
-    // 2. Find timeline that matches our branch for a single revision
-    for (const revision of revisions) {
-      // {{baseUrl}}/v2/revisions/:revision/timelines
-      const timelinesResponse = await fetch(`${API_BASE}/v2/revisions/${revision.id}/timelines`, { headers });
-
-      /** @type {Array.<Timeline>} */
-      const timelinesForRevision = await timelinesResponse.json();
-
-      const timelineOfBranch = timelinesForRevision.find(v => v.slug === "git-branch" && v.partition["git.branch_sanitized"]);
-
-      const denosBranchStringLength = timelineOfBranch?.partition["git.branch_sanitized"]?.length;
-      const cutBranchname = slugifiedBranchName.slice(0, denosBranchStringLength);
-
-      if (cutBranchname === timelineOfBranch?.partition["git.branch_sanitized"]) {
-        console.log(`Branch ${BRANCH_NAME}(Slugged to: ${slugifiedBranchName}) is apparently hosted on ${timelineOfBranch.domains[0].domain} through revision ${revision.id} and denos branch name is ${timelineOfBranch.partition["git.branch_sanitized"]}`);
-
-        // check, if we need to wait...
-        if (revision.status !== "succeeded") {
-          if (revision.status === "failed" || revision.status === "skipped") {
-            console.error("Deno deployment failed or was skipped: ", revision.failure_reason ?? "no reason given");
-            return null;
-          }
-
-          if (revision.status === "building" || revision.status === "queued") {
-            const ready = await pollRevisionStatus(revision.id, headers);
-            if (!ready)
-              return null;
-          }
-        }
-
-        return timelineOfBranch.domains[0].domain;
-      }
-    }
-
-    // did not find it...
-    console.error("Did not manage to find the url within the first revisions...");
-    return null;
-  }
-  catch (error) {
-    if (error instanceof Error) {
-      console.warn(`Deno V2 API strategy failed with error: ${error.message}`);
-    }
-    else {
-      console.warn(error);
-    }
-  }
-  return null;
+  /** @type {{ statuses: Array<{ context: string, state: string, target_url?: string }> }} */
+  const data = await response.json();
+  const targetUrl = data.statuses.find(status => status.context === "deploy/duesen/helperplan" && status.state === "success")?.target_url;
+  return targetUrl?.match(/\/builds\/([^/?#]+)/)?.[1] ?? null;
 }
 
 async function main() {
-  const url = await getUrlFromDenoV2();
-  if (!url) {
-    console.error("Could not identify a working deployment URL.");
+  if (!DEPLOY_TOKEN || !GITHUB_SHA || !GITHUB_TOKEN || !GITHUB_REPOSITORY) {
+    console.error("DENO_DEPLOY_TOKEN, GITHUB_SHA, GITHUB_TOKEN, and GITHUB_REPOSITORY are required");
     process.exit(1);
   }
+
+  const denoHeaders = {
+    Authorization: DEPLOY_TOKEN.startsWith("Bearer ") ? DEPLOY_TOKEN : `Bearer ${DEPLOY_TOKEN}`,
+    Accept: "application/json",
+  };
+  const githubHeaders = {
+    "Authorization": `Bearer ${GITHUB_TOKEN}`,
+    "Accept": "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+
+  const maxRevisionLookups = 40;
+  const delay = 3000;
+  let revisionId = null;
+
+  for (let attempt = 0; attempt < maxRevisionLookups; attempt++) {
+    try {
+      revisionId = await getRevisionIdFromGitHub(githubHeaders);
+    }
+    catch (error) {
+      console.error(error instanceof Error ? error.message : error);
+      process.exit(1);
+    }
+
+    if (revisionId)
+      break;
+
+    console.log(`Deno deployment for ${GITHUB_SHA} is not ready yet. Retrying in ${delay}ms... (Attempt ${attempt + 1}/${maxRevisionLookups})`);
+    await new Promise(resolve => setTimeout(resolve, delay));
+  }
+
+  if (!revisionId) {
+    console.error(`Could not find a successful Deno deployment for commit ${GITHUB_SHA} after ${maxRevisionLookups} attempts.`);
+    process.exit(1);
+  }
+
+  const ready = await pollRevisionStatus(revisionId, denoHeaders);
+  if (!ready)
+    process.exit(1);
+
+  const hostname = ready.timelines?.flatMap(timeline => timeline.hostnames ?? [])[0];
+  const url = hostname && (hostname.startsWith("http://") || hostname.startsWith("https://") ? hostname : `https://${hostname}`);
+  if (!url) {
+    console.error(`Deno revision ${ready.id} succeeded but has no routed hostname.`);
+    process.exit(1);
+  }
+
   console.log(`DEPLOYMENT_URL_OUTPUT=${url}`);
   return 0;
 }
@@ -132,6 +92,7 @@ main();
  * @param {HeadersInit} headers - The headers to send along
  * @param {number} maxRetries - Stop after this many attempts
  * @param {number} delay - Milliseconds between checks
+ * @returns {Promise<Revision | null>} The succeeded revision, or null when deployment fails.
  */
 async function pollRevisionStatus(revisionId, headers, maxRetries = 10, delay = 3000) {
   const url = `${API_BASE}/v2/revisions/${revisionId}`;
@@ -143,10 +104,12 @@ async function pollRevisionStatus(revisionId, headers, maxRetries = 10, delay = 
 
       if (data.status === "succeeded") {
         console.log("Success!", data);
-        return true;
+        return data;
       }
-      if (data.status === "failed" || data.status === "skipped")
+      if (data.status === "failed" || data.status === "skipped") {
+        console.error("Deno deployment failed or was skipped:", data.failure_reason ?? "no reason given");
         return false;
+      }
 
       console.log(`Status is ${data.status}. Retrying in ${delay}ms... (Attempt ${attempts + 1})`);
       await new Promise(resolve => setTimeout(resolve, delay));
