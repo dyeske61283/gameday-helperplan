@@ -133,6 +133,25 @@ describe("feature: User Workflows (BDD Specs)", async () => {
     await Then("the plan revision number (rev) increments and a success notification is shown", async () => {});
   });
 
+  Scenario("4b — Recover from an existing-plan save failure", async () => {
+    const page = await createPage();
+    await page.goto(seededSetupLink.startsWith("http") ? seededSetupLink : testUrl(seededSetupLink), { waitUntil: "domcontentloaded" });
+    await page.getByText("Plan setup", { exact: true }).waitFor();
+    await page.route("**/api/**", async (route) => {
+      if (route.request().method() === "POST")
+        await route.fulfill({ status: 503, body: "storage unavailable" });
+      else
+        await route.continue();
+    });
+    await page.locator("input").first().fill("Failed Save Attempt");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await page.getByText("Save failed", { exact: true }).waitFor();
+    await page.unroute("**/api/**");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await page.getByText("All changes saved", { exact: true }).waitFor();
+    await page.close();
+  });
+
   Scenario("4 Error — Invalid JSON handling", async () => {
     await When("typing invalid JSON string into the editor and clicking \"Save Plan\"", async () => {});
     await Then("an error toast appears (\"Invalid JSON\") and the local plan state is not corrupted", async () => {});
@@ -140,11 +159,22 @@ describe("feature: User Workflows (BDD Specs)", async () => {
 
   // 5 — Share a Plan Link
   Scenario("5 — Share a Plan Link", async () => {
-    await Given("a plan is loaded in advanced mode", async () => {});
-    await When("clicking the copy button next to the \"Shareable Link\" input", async () => {});
-    await Then("the full URL containing ?planId={id} and #key={key} is copied to clipboard", async () => {});
-    await When("opening that copied URL in a secondary browser context", async () => {});
-    await Then("the secondary browser automatically decrypts and displays the identical plan", async () => {});
+    const page = await createPage();
+    await page.goto(seededSetupLink.startsWith("http") ? seededSetupLink : testUrl(seededSetupLink), { waitUntil: "domcontentloaded" });
+    await page.getByText("Plan setup", { exact: true }).waitFor();
+    const clubName = await page.locator("input").first().inputValue();
+    const shareUrl = await page.getByRole("textbox", { name: "Share link" }).inputValue();
+    expect(new URL(shareUrl).pathname).toMatch(/^\/plans\/[\w-]+$/);
+    await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.getByRole("button", { name: "Copy share link" }).click();
+    await page.getByRole("status").getByText("Share link copied.").waitFor();
+
+    const freshPage = await createPage();
+    await freshPage.goto(shareUrl, { waitUntil: "domcontentloaded" });
+    await freshPage.getByRole("heading", { name: clubName }).waitFor();
+    expect(new URL(freshPage.url()).pathname).toBe(new URL(shareUrl).pathname);
+    await freshPage.close();
+    await page.close();
   });
 
   // 6 — Real-Time Live Sync via SSE

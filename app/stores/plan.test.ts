@@ -82,6 +82,30 @@ describe("usePlanStore", () => {
     vi.unstubAllGlobals();
   });
 
+  it("defers newer SSE plans while an editor is dirty", async () => {
+    let source: { onmessage?: (event: MessageEvent) => Promise<void>; close: () => void } | undefined;
+    vi.stubGlobal("EventSource", class {
+      constructor() {
+        return source = { onmessage: undefined, close() {} };
+      }
+    });
+    const store = usePlanStore();
+    store.createNewPlan("test-plan-id", "test-key", { clubName: "Original", season: "2026/2027" });
+    store.setEditing(true);
+    store.watchPlan();
+
+    const update = structuredClone(toRaw(store.plan!));
+    update.rev = 2;
+    update.club.name = "Remote edit";
+    await source?.onmessage?.({ data: JSON.stringify(update) } as MessageEvent);
+
+    expect(store.plan?.club.name).toBe("Original");
+    expect(store.pendingUpdate?.club.name).toBe("Remote edit");
+    store.applyPendingUpdate();
+    expect(store.plan?.club.name).toBe("Remote edit");
+    vi.unstubAllGlobals();
+  });
+
   describe("migrateIfNeeded", () => {
     it("should migrate an old plan to the current version", () => {
       const oldPlan = {

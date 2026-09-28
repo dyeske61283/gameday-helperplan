@@ -13,7 +13,7 @@ usePlanInit();
 
 const planLink = computed(() => planStore.key ? createPlanLink(String(route.params.planId), planStore.key) : `/plans/${route.params.planId}${route.hash}`);
 const scheduleLink = computed(() => planLink.value);
-const shareUrl = computed(() => planStore.key ? createPlanLink(String(route.params.planId), planStore.key, `/plans/${route.params.planId}/setup`) : "");
+const shareUrl = computed(() => planStore.key ? createPlanLink(String(route.params.planId), planStore.key) : "");
 const draft = ref<SeasonPlan | null>(null);
 const clubName = ref("");
 const season = ref("");
@@ -44,6 +44,7 @@ function syncDrafts() {
 watch(() => planStore.plan, syncDrafts, { immediate: true });
 function markDirty() {
   isDirty.value = true;
+  planStore.setEditing(true);
 }
 
 const teams = computed(() => Object.values(draft.value?.teams ?? {}));
@@ -132,6 +133,7 @@ async function save() {
   }
   else {
     isDirty.value = false;
+    planStore.setEditing(false);
     toast.add({ title: "Plan saved", description: "Changes synced to the shared plan.", color: "success" });
   }
 }
@@ -140,6 +142,7 @@ async function reload() {
   if (!planStore.plan || !planStore.key)
     return;
   isDirty.value = false;
+  planStore.applyPendingUpdate();
   await planStore.loadPlan(planStore.plan.id, planStore.key);
   if (planStore.error)
     toast.add({ title: "Reload failed", description: planStore.error, color: "error" });
@@ -204,6 +207,17 @@ useHead({ title: "Edit plan" });
 
       <div v-if="planStore.error" class="rounded-lg bg-error/10 p-4 text-error">
         {{ planStore.error }}
+      </div>
+      <div v-if="planStore.pendingUpdate" role="alert" class="rounded-lg bg-warning/10 p-4 text-warning">
+        A newer shared plan version arrived while you were editing.
+        <div class="mt-3 flex gap-2">
+          <UButton size="sm" variant="outline" @click="reload">
+            Use newer version
+          </UButton>
+          <UButton size="sm" variant="ghost" @click="planStore.setEditing(true)">
+            Keep my changes
+          </UButton>
+        </div>
       </div>
       <section class="space-y-4 rounded-xl border p-5">
         <h2 class="text-xl font-bold">

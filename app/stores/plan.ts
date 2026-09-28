@@ -71,6 +71,8 @@ export const usePlanStore = defineStore("plan", () => {
   const readOnly = ref(false);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
+  const pendingUpdate = ref<SeasonPlan | null>(null);
+  const isEditing = ref(false);
   const eventSource = ref<EventSource | null>(null);
   let completionTimer: ReturnType<typeof setInterval> | undefined;
 
@@ -194,7 +196,10 @@ export const usePlanStore = defineStore("plan", () => {
           console.warn("Real-time update received: Rev", updatedPlan.rev);
           updatedPlan = migrateIfNeeded(updatedPlan);
           completeClosedAssignments(updatedPlan);
-          plan.value = updatedPlan;
+          if (isEditing.value)
+            pendingUpdate.value = updatedPlan;
+          else
+            plan.value = updatedPlan;
         }
       }
       catch (err) {
@@ -205,6 +210,19 @@ export const usePlanStore = defineStore("plan", () => {
     eventSource.value.onerror = (err) => {
       console.error("SSE connection error:", err);
     };
+  }
+
+  function setEditing(value: boolean) {
+    isEditing.value = value;
+    if (!value)
+      pendingUpdate.value = null;
+  }
+
+  function applyPendingUpdate() {
+    if (pendingUpdate.value)
+      plan.value = pendingUpdate.value;
+    pendingUpdate.value = null;
+    isEditing.value = false;
   }
 
   function stopWatching() {
@@ -246,6 +264,7 @@ export const usePlanStore = defineStore("plan", () => {
 
       if (plan.value === livePlan)
         plan.value = planToSave;
+      pendingUpdate.value = null;
       lastPlanId.value = planToSave.id;
       resumeState.value = { id: planToSave.id, key: key.value };
       return true;
@@ -564,6 +583,7 @@ export const usePlanStore = defineStore("plan", () => {
     selectedMemberId,
     isLoading,
     error,
+    pendingUpdate,
     isModifiable,
     teams,
     members,
@@ -579,6 +599,8 @@ export const usePlanStore = defineStore("plan", () => {
     loadPlan,
     watchPlan,
     stopWatching,
+    setEditing,
+    applyPendingUpdate,
     savePlan,
     createNewPlan,
     addTeam,
