@@ -1,5 +1,5 @@
 import { createPage, setup, url } from "@nuxt/test-utils/e2e";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("new plan setup", async () => {
   await setup({ dev: true });
@@ -17,13 +17,19 @@ describe("new plan setup", async () => {
     await page.locator("textarea").nth(0).fill("Max Mustermann");
     await page.getByRole("button", { name: "Add Members & Finish" }).click();
 
-    await page.waitForURL(/\/plans\/[0-9a-f-]+/);
-    await page.getByRole("heading", { name: "TSV Browser Test" }).waitFor();
-    const planUrl = page.url().split("#")[0];
+    await page.getByRole("heading", { name: "Plan ready" }).waitFor();
+    const shareUrl = await page.getByRole("textbox", { name: "Share link" }).inputValue();
+    expect(new URL(shareUrl).hash).toMatch(/^#key=[\w-]+$/);
+    await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.getByRole("button", { name: "Copy share link" }).click();
+    await page.getByRole("status").getByText("Share link copied.").waitFor();
     const resume = await page.evaluate(() => JSON.parse(localStorage.getItem("gameday-plan-resume") || "null"));
-    await page.goto(`${planUrl}#key=${resume.key}`, { waitUntil: "domcontentloaded" });
-    await page.reload({ waitUntil: "domcontentloaded" });
-    await page.getByRole("heading", { name: "TSV Browser Test" }).waitFor();
+    expect(resume).toMatchObject({ id: new URL(shareUrl).pathname.split("/").pop(), key: expect.any(String) });
+    const freshPage = await createPage();
+    await freshPage.goto(shareUrl, { waitUntil: "domcontentloaded" });
+    await freshPage.getByRole("heading", { name: "TSV Browser Test" }).waitFor();
+    expect(new URL(freshPage.url()).pathname).toBe(new URL(shareUrl).pathname);
+    await freshPage.close();
     await page.close();
   }, 90000);
 });

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { usePlanStore } from "../stores/plan";
+import { createPlanLink } from "../utils/plan-links";
 import { NewPlanMetadataSchema } from "../utils/plan-types";
 
 const planStore = usePlanStore();
@@ -12,6 +13,8 @@ const membersText = ref("");
 const rolesText = ref("Timekeeper\nScorekeeper\nFloor Manager");
 const error = ref("");
 const isSaving = ref(false);
+const finalizedPlan = ref<{ id: string; key: string } | null>(null);
+const shareState = ref<"idle" | "copied" | "failed">("idle");
 
 useHead({ title: "Set up a plan" });
 
@@ -65,13 +68,27 @@ async function createPlan() {
       error.value = planStore.error || "Could not save the plan.";
       return;
     }
-    await navigateTo(`/plans/${id}#key=${key}`);
+    finalizedPlan.value = { id, key };
   }
   catch (cause) {
     error.value = cause instanceof Error ? cause.message : "Could not save the plan.";
   }
   finally {
     isSaving.value = false;
+  }
+}
+
+const shareUrl = computed(() => finalizedPlan.value ? createPlanLink(finalizedPlan.value.id, finalizedPlan.value.key) : "");
+
+async function copyShareUrl() {
+  if (!shareUrl.value)
+    return;
+  try {
+    await navigator.clipboard.writeText(shareUrl.value);
+    shareState.value = "copied";
+  }
+  catch {
+    shareState.value = "failed";
   }
 }
 
@@ -97,6 +114,32 @@ async function resumePlan() {
       </header>
 
       <UAlert v-if="error" color="error" :title="error" role="alert" />
+
+      <section v-if="finalizedPlan" aria-labelledby="ready-heading" class="space-y-5 rounded-xl border border-success/40 p-5">
+        <div>
+          <h2 id="ready-heading" class="text-xl font-semibold">
+            Plan ready
+          </h2>
+          <p class="text-on-surface-variant">
+            Your encrypted plan is saved. Share this link or open the schedule.
+          </p>
+        </div>
+        <div class="flex flex-col gap-2 sm:flex-row">
+          <UInput :model-value="shareUrl" readonly aria-label="Share link" class="grow" />
+          <UButton @click="copyShareUrl">
+            Copy share link
+          </UButton>
+          <UButton :to="shareUrl" variant="outline">
+            Open schedule
+          </UButton>
+        </div>
+        <p v-if="shareState === 'copied'" role="status" class="text-sm text-success">
+          Share link copied.
+        </p>
+        <p v-else-if="shareState === 'failed'" role="alert" class="text-sm text-error">
+          Could not copy the share link. Copy it from the field above.
+        </p>
+      </section>
 
       <section v-if="step === 1" aria-labelledby="start-heading" class="space-y-5">
         <h2 id="start-heading" class="text-xl font-semibold">

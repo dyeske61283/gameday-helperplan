@@ -2,6 +2,7 @@
 <!-- eslint-disable unicorn/filename-case -->
 <script setup lang="ts">
 import { usePlanStore } from "../../../stores/plan";
+import { createPlanLink } from "../../../utils/plan-links";
 
 const route = useRoute();
 const planStore = usePlanStore();
@@ -10,6 +11,7 @@ usePlanInit();
 
 const planLink = computed(() => `/plans/${route.params.planId}${planStore.key ? `#key=${planStore.key}` : route.hash}`);
 const scheduleLink = computed(() => `/plans/${route.params.planId}${planStore.key ? `#key=${planStore.key}` : route.hash}`);
+const shareUrl = computed(() => planStore.key ? createPlanLink(String(route.params.planId), planStore.key, `/plans/${route.params.planId}/setup`) : "");
 const clubName = ref("");
 const season = ref("");
 const contactEmail = ref("");
@@ -20,6 +22,7 @@ const newTeamName = ref("");
 const newMemberName = ref("");
 const isDirty = ref(false);
 const syncingDrafts = ref(false);
+const shareState = ref<"idle" | "copied" | "failed">("idle");
 
 function syncDrafts() {
   if (!planStore.plan || isDirty.value)
@@ -117,6 +120,18 @@ async function reload() {
     toast.add({ title: "Reload failed", description: planStore.error, color: "error" });
 }
 
+async function copyShareUrl() {
+  if (!shareUrl.value)
+    return;
+  try {
+    await navigator.clipboard.writeText(shareUrl.value);
+    shareState.value = "copied";
+  }
+  catch {
+    shareState.value = "failed";
+  }
+}
+
 useHead({ title: "Edit plan" });
 </script>
 
@@ -165,7 +180,6 @@ useHead({ title: "Edit plan" });
       <div v-if="planStore.error" class="rounded-lg bg-error/10 p-4 text-error">
         {{ planStore.error }}
       </div>
-
       <section class="space-y-4 rounded-xl border p-5">
         <h2 class="text-xl font-bold">
           Plan details
@@ -233,6 +247,24 @@ useHead({ title: "Edit plan" });
             No members yet.
           </p>
         </div>
+      </section>
+
+      <section v-if="shareUrl" aria-labelledby="share-heading" class="space-y-3 rounded-xl border border-primary/30 p-5">
+        <h2 id="share-heading" class="text-xl font-bold">
+          Share this plan
+        </h2>
+        <div class="flex flex-col gap-2 sm:flex-row">
+          <UInput :model-value="shareUrl" readonly aria-label="Share link" class="grow" />
+          <UButton @click="copyShareUrl">
+            Copy share link
+          </UButton>
+        </div>
+        <p v-if="shareState === 'copied'" role="status" class="text-sm text-success">
+          Share link copied.
+        </p>
+        <p v-else-if="shareState === 'failed'" role="alert" class="text-sm text-error">
+          Could not copy the share link. Copy it from the field above.
+        </p>
       </section>
 
       <footer class="flex items-center justify-between border-t pt-6">
