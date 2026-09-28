@@ -94,6 +94,17 @@ describe("feature: User Workflows (BDD Specs)", async () => {
       await workflowPage.unroute("**/api/**");
       await workflowPage.getByRole("button", { name: "Save changes" }).click();
       await workflowPage.getByText("All changes saved", { exact: true }).waitFor();
+
+      const clubName = await workflowPage.locator("input").first().inputValue();
+      const shareUrl = await workflowPage.getByRole("textbox", { name: "Share link" }).inputValue();
+      expect(new URL(shareUrl).pathname).toMatch(/^\/plans\/[\w-]+$/);
+      await workflowPage.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+      await workflowPage.getByRole("button", { name: "Copy share link" }).click();
+      await workflowPage.getByRole("status").getByText("Share link copied.").waitFor();
+      await workflowPage.goto(shareUrl, { waitUntil: "domcontentloaded" });
+      await workflowPage.getByRole("heading", { name: clubName }).waitFor();
+      expect(new URL(workflowPage.url()).pathname).toBe(new URL(shareUrl).pathname);
+      await workflowPage.close();
     });
   });
 
@@ -148,21 +159,6 @@ describe("feature: User Workflows (BDD Specs)", async () => {
   Scenario("4 Error — Invalid JSON handling", async () => {
     await When("typing invalid JSON string into the editor and clicking \"Save Plan\"", async () => {});
     await Then("an error toast appears (\"Invalid JSON\") and the local plan state is not corrupted", async () => {});
-  });
-
-  // 5 — Share a Plan Link
-  Scenario("5 — Share a Plan Link", async () => {
-    await workflowPage.getByText("Plan setup", { exact: true }).waitFor();
-    const clubName = await workflowPage.locator("input").first().inputValue();
-    const shareUrl = await workflowPage.getByRole("textbox", { name: "Share link" }).inputValue();
-    expect(new URL(shareUrl).pathname).toMatch(/^\/plans\/[\w-]+$/);
-    await workflowPage.context().grantPermissions(["clipboard-read", "clipboard-write"]);
-    await workflowPage.getByRole("button", { name: "Copy share link" }).click();
-    await workflowPage.getByRole("status").getByText("Share link copied.").waitFor();
-    await workflowPage.goto(shareUrl, { waitUntil: "domcontentloaded" });
-    await workflowPage.getByRole("heading", { name: clubName }).waitFor();
-    expect(new URL(workflowPage.url()).pathname).toBe(new URL(shareUrl).pathname);
-    await workflowPage.close();
   });
 
   // 6 — Real-Time Live Sync via SSE
