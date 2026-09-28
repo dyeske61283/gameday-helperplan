@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import type { Match } from "../utils/plan-types";
 import { usePlanStore } from "../stores/plan";
+import { buildCalendarLayout } from "../utils/calendar-layout";
 import { generateMemberICal } from "../utils/ical-export";
 
 const planStore = usePlanStore();
 const searchQuery = ref("");
+const viewMode = ref<"timeline" | "calendar">("timeline");
 
 usePlanInit();
 
@@ -55,6 +57,14 @@ const filteredGamedays = computed(() => {
     });
   });
 });
+
+const calendarLayout = computed(() => buildCalendarLayout(filteredGamedays.value));
+
+function showTimeline(gamedayId?: string) {
+  viewMode.value = "timeline";
+  if (gamedayId)
+    window.location.hash = `gameday-${gamedayId}`;
+}
 
 // Export iCal handler
 function handleExportICal() {
@@ -192,9 +202,21 @@ async function handleCheckIn(matchId: string, slotId: string) {
     </div>
 
     <!-- Gamedays Chronological Timeline -->
-    <div v-if="filteredGamedays.length > 0" class="space-y-6">
+    <div v-if="filteredGamedays.length > 0" class="flex justify-end">
+      <div class="inline-flex rounded-xl border border-neutral-200 dark:border-neutral-800 p-1" role="group" aria-label="Schedule view">
+        <UButton :variant="viewMode === 'timeline' ? 'soft' : 'ghost'" icon="i-lucide-list" size="sm" @click="viewMode = 'timeline'">
+          Timeline
+        </UButton>
+        <UButton :variant="viewMode === 'calendar' ? 'soft' : 'ghost'" icon="i-lucide-calendar-days" size="sm" @click="viewMode = 'calendar'">
+          Calendar
+        </UButton>
+      </div>
+    </div>
+
+    <div v-if="viewMode === 'timeline' && filteredGamedays.length > 0" class="space-y-6">
       <GamedayCard
         v-for="gameday in filteredGamedays"
+        :id="`gameday-${gameday.id}`"
         :key="gameday.id"
         :gameday="gameday"
         :filter-member-id="matchedMember?.id"
@@ -205,6 +227,34 @@ async function handleCheckIn(matchId: string, slotId: string) {
         :members="planStore.members"
         :on-check-in="handleCheckIn"
       />
+    </div>
+
+    <div v-else-if="viewMode === 'calendar' && (calendarLayout.months.length || calendarLayout.invalid.length)" class="space-y-6">
+      <section v-for="month in calendarLayout.months" :key="month.key" class="space-y-3">
+        <h2 class="text-xl font-bold capitalize">
+          {{ month.label }}
+        </h2>
+        <div class="grid grid-cols-7 gap-1 text-center text-xs text-neutral-500 sm:gap-2">
+          <span v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']" :key="day" class="py-1 font-semibold">
+            {{ day }}
+          </span>
+          <span v-for="emptyDay in month.leadingEmptyDays" :key="`empty-${emptyDay}`" aria-hidden="true" />
+          <div v-for="day in month.days" :id="`calendar-${day.date}`" :key="day.date" class="min-h-24 rounded-xl border border-primary/40 bg-primary/5 p-2 text-left text-on-surface hover:border-primary hover:bg-primary/10 sm:min-h-28">
+            <span class="font-bold">{{ day.dayNumber }}</span>
+            <span v-for="gameday in day.gamedays" :key="gameday.id" class="mt-2 block truncate rounded-md bg-primary px-2 py-1 text-xs text-white">
+              <a :href="`#gameday-${gameday.id}`" class="block focus:outline-2 focus:outline-offset-2 focus:outline-primary" @click.prevent="showTimeline(gameday.id)">
+                {{ gameday.matchIds.length }} {{ gameday.matchIds.length === 1 ? 'match' : 'matches' }}
+              </a>
+            </span>
+          </div>
+        </div>
+      </section>
+      <div v-if="calendarLayout.invalid.length" class="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
+        <p>{{ calendarLayout.invalid.length }} gameday{{ calendarLayout.invalid.length === 1 ? '' : 's' }} have an invalid date and cannot be placed on the calendar.</p>
+        <UButton class="mt-3" size="sm" variant="outline" color="warning" @click="showTimeline()">
+          Show timeline
+        </UButton>
+      </div>
     </div>
 
     <!-- Empty State -->
