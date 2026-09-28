@@ -83,7 +83,7 @@ async function resumePlan() {
 
 <template>
   <UContainer class="py-10">
-    <main class="mx-auto max-w-2xl space-y-8">
+    <div class="mx-auto max-w-2xl space-y-8">
       <header class="space-y-2">
         <p class="text-sm font-medium text-primary">
           Step {{ step }} of 4
@@ -185,6 +185,6 @@ async function resumePlan() {
           </div>
         </div>
       </form>
-    </main>
+    </div>
   </UContainer>
 </template>
