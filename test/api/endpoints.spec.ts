@@ -1,6 +1,7 @@
 import { $fetch, fetch, setup } from "@nuxt/test-utils/e2e";
 import { describe, expect, it } from "vitest";
 import { useDecryption, useEncryption } from "../../app/composables/use-crypto";
+import { PLAN_BLOB_CHUNK_SIZE } from "../../server/types/stored-plan";
 import env from "../../utils/env";
 
 await setup({
@@ -9,9 +10,9 @@ await setup({
 });
 
 describe("api endpoints", async () => {
-  const validId = "12345678-1234-1234-1234-123456789012";
+  const validId = "81b7a0e7-3f61-43af-9f9c-6808cc56956f";
   const invalidId = "too-short";
-  const nonExistentId = "00000000-0000-0000-0000-000000000001";
+  const nonExistentId = "52772524-e45e-48a2-b97e-697003a4b797";
 
   it("post /api/[id] stores a plan", async () => {
     const res = await $fetch(`/api/${validId}`, {
@@ -23,7 +24,20 @@ describe("api endpoints", async () => {
 
   it("gET /api/[id] should retrieve a stored plan", async () => {
     const res = await $fetch(`/api/${validId}`);
-    expect(res).toEqual({ blob: "test-plan-content" });
+    expect(res).toMatchObject({ blob: "test-plan-content", meta: {} });
+  });
+
+  it.each([
+    ["exactly one chunk", PLAN_BLOB_CHUNK_SIZE],
+    ["one byte over one chunk", PLAN_BLOB_CHUNK_SIZE + 1],
+    ["one byte over two chunks", PLAN_BLOB_CHUNK_SIZE * 2 + 1],
+  ])("stores and retrieves blobs %s", async (_label, size) => {
+    const planId = globalThis.crypto.randomUUID();
+    const blob = "x".repeat(size);
+    await $fetch(`/api/${planId}`, { method: "POST", body: { blob } });
+
+    const res = await $fetch(`/api/${planId}`);
+    expect(res.blob).toBe(blob);
   });
 
   it("get /api/[id] returns 404 for non-existent plan", async () => {

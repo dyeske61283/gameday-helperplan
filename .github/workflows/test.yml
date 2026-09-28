@@ -34,12 +34,18 @@ jobs:
           echo "TEST_HOST=$URL" >> $GITHUB_ENV
           echo "deployment_url=$URL" >> $GITHUB_OUTPUT
 
+      - name: Seed E2E plan
+        run: |
+          OUTPUT=$(SEED_BASE_URL="$TEST_HOST" pnpm seed:plan)
+          echo "$OUTPUT"
+          PLAN_URL=$(printf '%s\n' "$OUTPUT" | sed -n 's/^SEED_PLAN_URL=//p')
+          echo "E2E_PLAN_URL=$PLAN_URL" >> "$GITHUB_ENV"
+          {
+            echo "## Seeded E2E plan"
+            echo "[Open the seeded plan]($PLAN_URL)"
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Run Vitest tests
         run: pnpm test
-        env:
-          TEST_HOST: ${{ env.TEST_HOST }}
 
       - name: Run Accessibility tests
         run: pnpm test:a11y
-        env:
-          TEST_HOST: ${{ env.TEST_HOST }}

@@ -1,39 +1,44 @@
-import { metrics } from "@opentelemetry/api";
+import type { StoredPlan } from "../types/stored-plan.ts";
 import z from "zod";
 import env from "../../utils/env.ts";
-
-const createdPlansCounter = metrics
-  .getMeter("helperplan.plans", "1.0.0")
-  .createCounter("helperplan.plans.created", {
-    description: "The amount of created plans through the POST endpoint",
-    unit: "1",
-  });
+import { PLAN_BLOB_CHUNK_SIZE, STORAGE_PREFIX } from "../types/stored-plan.ts";
 
 export default defineEventHandler(async (event) => {
   const { id: planId } = await getValidatedRouterParams(event, z.object({
-    id: z.string().length(36),
+    id: z.uuid(),
   }).parse);
   const plan = await readValidatedBody(event, z.object({
     blob: z.string(),
   }).parse);
 
-  let storage = useStorage(env.DENO_DEPLOYMENT_ID ? "plans" : "memory");
+  const storage = useStorage<StoredPlan>(STORAGE_PREFIX);
+
+  const chunks = plan.blob.match(new RegExp(`.{1,${PLAN_BLOB_CHUNK_SIZE}}`, "g")) || [""];
+  const storedPlan: StoredPlan = {
+    blob: chunks.length > 1 ? "" : plan.blob,
+    modifiedAt: Date.now(),
+    meta: {},
+    ...(chunks.length > 1 ? { chunkCount: chunks.length } : {}),
+  };
+
   try {
-    await storage.setItem(planId, plan.blob);
+    if (chunks.length > 1) {
+      const chunkStorage = useStorage<string>(STORAGE_PREFIX);
+      await Promise.all(chunks.map((chunk, index) => chunkStorage.setItem(`${planId}:chunk:${index}`, chunk)));
+    }
+    await storage.setItem(planId, storedPlan);
   }
   catch (error) {
     if (env.DENO_DEPLOYMENT_ID) {
-      console.error("Deno KV setItem failed, falling back to memory", error);
-      storage = useStorage("memory");
-      await storage.setItem(planId, plan.blob);
+      console.error("Deno KV setItem failed, falling back to in-memory", error);
+      const fallBackInMemoryStorage = useStorage<StoredPlan>();
+      await fallBackInMemoryStorage.setItem(planId, storedPlan);
     }
     else {
       console.error("Storage setItem failed on memory", error);
       throw createError({ statusCode: 500, statusMessage: "Internal Server Error" });
     }
   }
-
-  createdPlansCounter.add(1);
 
   return plan;
 });

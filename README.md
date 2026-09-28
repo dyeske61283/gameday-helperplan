@@ -68,6 +68,19 @@ Locally preview production build:
 pnpm run preview
 ```
 
+### Seed A Demo Plan
+
+Seed the anonymized example plan into any deployed instance and print a fresh
+link:
+
+```bash
+SEED_BASE_URL=https://your-deployment.example pnpm seed:plan
+```
+
+The encryption key is generated locally and only appears in the printed link.
+Treat that link as a bearer secret. GitHub Actions runs the same command for
+E2E deployments and publishes the link in the workflow summary.
+
 ## Toolchain
 
 This project uses ESLint for linting and formatting.

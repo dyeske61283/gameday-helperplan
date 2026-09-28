@@ -138,6 +138,16 @@
     "tasks": "Aufgaben",
     "go_to_dashboard": "Zum Dashboard",
     "continue": "Weiter",
-    "back": "Zurück"
+    "back": "Zurück",
+    "unassigned": "Nicht besetzt"
+  },
+  "dashboard": {
+    "opens": "Öffnet",
+    "match": "Spiel",
+    "matches": "Spiele",
+    "duty_team": "Helferteam",
+    "here": "Da",
+    "check_in": "Einchecken",
+    "needed": "Gesucht"
   }
 }

@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     "@nuxtjs/i18n",
     "@pinia/nuxt",
     "@vueuse/nuxt",
+    "@nuxt/hints",
   ],
   $production: {
     sourcemap: {
@@ -21,9 +22,6 @@ export default defineNuxtConfig({
     config: {
       standalone: false,
     },
-  },
-  routeRules: {
-    "/": { prerender: true },
   },
   nitro: {
     storage: {
