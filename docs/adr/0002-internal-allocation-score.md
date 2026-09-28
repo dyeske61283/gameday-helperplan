@@ -10,3 +10,6 @@ The helper allocator may use an internal allocation score to balance duties. The
 - Blocking time is not currently persisted as a member-facing value.
 - The member cockpit and helper board must not show points, bonuses, balances, rankings, or reward language.
 - Required seasonal duties remain visible as a plain duty count.
+
+**Implementation State:** partial. The domain allocator exists, while the full
+product surface and persistence boundary remain under development.

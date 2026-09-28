@@ -13,3 +13,6 @@ We considered `/plans/<planId>?matchId=<matchId>`, but rejected it because it ma
 - Local resume is user-triggered rather than automatic.
 - Existing plans require migration from inferred occupancy to explicit slot status.
 - The migration is applied when example, persisted, or real-time plans enter the store; schema version 2 is written on the next save.
+
+**Implementation State:** partial. Plan-scoped routes and explicit slot status
+exist; legacy routes and the remaining migration work are still present.

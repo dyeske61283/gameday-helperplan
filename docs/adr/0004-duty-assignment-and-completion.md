@@ -16,3 +16,6 @@ Claiming an open eligible duty is immediately binding and requires no approval. 
 - Slots persist `assignmentStatus` as `OPEN`, `ASSIGNED`, `COMPLETED`, or `CANCELLED`; legacy occupancy is migrated to `OPEN` or `ASSIGNED` when plans are loaded.
 - Capability eligibility is evaluated from `Role.requiredSkillId` and `Member.skillIds` by the shared domain predicate used by both manual and automatic assignment.
 - Completion is a deterministic domain transition after a gameday's closing time. Check-in remains legacy data and is not used to determine completion.
+
+**Implementation State:** partial. Lifecycle migration and completion logic exist;
+swap and replacement workflows remain deferred.

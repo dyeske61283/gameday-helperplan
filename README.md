@@ -19,20 +19,15 @@ thing about that excel file...
 
 All of this is pain.
 
-So I thought.. let's change that and go as simple as possible.
+The current prototype keeps the flow deliberately smaller:
 
-1. press Start
-2. create permalink
-3. assign password (optional)
-4. import iCal or enter events manually
-5. assign roles/types of duty
-6. randomly assign people from lists
-7. possibly with restrictions/preferences
-8. export at the end (optional)
-9. then distribute link
-10. view (with PW)
-11. change appointments just like that
-12. change schedules (swap) with confirmation link
+1. Open or resume a shared plan link.
+2. Create a plan manually when using `/setup`.
+3. Add teams, members, fixtures, and duties.
+4. Claim eligible open duties immediately.
+5. Share the plan using `/plans/<planId>#key=<key>`.
+
+Authentication, admin authorization, swaps, nuLiga import, and automated assignment are deferred. See `CONTEXT.md` and `docs/adr/` for the current rules.
 
 Look at the
 [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to
