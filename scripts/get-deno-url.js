@@ -7,7 +7,7 @@
  * 1. Deno Deploy V2 API (primary)
  */
 
-/** @typedef {{ id: string, status: 'succeeded' | 'queued' | 'failed' | 'building' | 'skipped', failure_reason?: string, git?: { sha?: string }, preview_url?: string | null }} Revision */
+/** @typedef {{ id: string, status: 'succeeded' | 'queued' | 'failed' | 'building' | 'skipped', failure_reason?: string, labels?: Record<string, string>, timelines?: Array<{ hostnames?: string[] }> }} Revision */
 
 import process from "node:process";
 
@@ -26,7 +26,7 @@ async function getRevisionForCommit(headers) {
 
     /** @type {Array.<Revision>} */
     const revisions = await response.json();
-    const revision = revisions.find(item => item.git?.sha === GITHUB_SHA);
+    const revision = revisions.find(item => item.labels?.["custom.sha"] === GITHUB_SHA || item.labels?.sha === GITHUB_SHA);
     if (revision)
       return revision;
 
@@ -78,16 +78,14 @@ async function main() {
     process.exit(1);
   }
 
-  if (revision.status !== "succeeded") {
-    const ready = await pollRevisionStatus(revision.id, headers);
-    if (!ready)
-      process.exit(1);
-    revision = ready;
-  }
+  const ready = await pollRevisionStatus(revision.id, headers, revision.status === "succeeded" ? 1 : 40);
+  if (!ready)
+    process.exit(1);
 
-  const url = revision.preview_url;
+  const hostname = ready.timelines?.flatMap(timeline => timeline.hostnames ?? [])[0];
+  const url = hostname && (hostname.startsWith("http://") || hostname.startsWith("https://") ? hostname : `https://${hostname}`);
   if (!url) {
-    console.error(`Deno revision ${revision.id} succeeded but has no preview URL.`);
+    console.error(`Deno revision ${ready.id} succeeded but has no routed hostname.`);
     process.exit(1);
   }
 
