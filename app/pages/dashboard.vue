@@ -218,6 +218,7 @@ async function handleCheckIn(matchId: string, slotId: string) {
         v-for="gameday in filteredGamedays"
         :id="`gameday-${gameday.id}`"
         :key="gameday.id"
+        tabindex="-1"
         :gameday="gameday"
         :filter-member-id="matchedMember?.id"
         :location="planStore.locations.find(location => location.id === gameday.locationId)"

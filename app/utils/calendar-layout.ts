@@ -13,14 +13,20 @@ export type CalendarMonth = {
   days: CalendarDay[];
 };
 
+function parseCalendarDate(date: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(date))
+    return null;
+
+  const parsed = new Date(`${date}T00:00:00Z`);
+  return Number.isNaN(parsed.getTime()) || parsed.toISOString().slice(0, 10) !== date ? null : parsed;
+}
+
 export function buildCalendarLayout(gamedays: Gameday[], locale?: string) {
   const valid = new Map<string, Gameday[]>();
   const invalid: Gameday[] = [];
 
   for (const gameday of gamedays) {
-    const match = /^\d{4}-\d{2}-\d{2}$/.exec(gameday.date);
-    const date = match ? new Date(`${gameday.date}T00:00:00Z`) : null;
-    if (!date || Number.isNaN(date.getTime()) || date.toISOString().slice(0, 10) !== gameday.date) {
+    if (!parseCalendarDate(gameday.date)) {
       invalid.push(gameday);
       continue;
     }
@@ -37,7 +43,7 @@ export function buildCalendarLayout(gamedays: Gameday[], locale?: string) {
   const months = new Map<string, CalendarMonth>();
 
   for (const day of days) {
-    const date = new Date(`${day.date}T00:00:00Z`);
+    const date = parseCalendarDate(day.date)!;
     const key = `${date.getUTCFullYear()}-${date.getUTCMonth()}`;
     const month = months.get(key) ?? {
       key,
