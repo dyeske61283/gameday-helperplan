@@ -19,31 +19,14 @@ const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
 const API_BASE = "https://api.deno.com";
 
 async function getRevisionIdFromGitHub(headers) {
-  const deploymentsUrl = new URL(`https://api.github.com/repos/${GITHUB_REPOSITORY}/deployments`);
-  deploymentsUrl.searchParams.set("sha", GITHUB_SHA);
-  deploymentsUrl.searchParams.set("environment", "test");
-  deploymentsUrl.searchParams.set("per_page", "10");
+  const response = await fetch(`https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/status`, { headers });
+  if (!response.ok)
+    throw new Error(`GitHub commit status fetch failed: ${response.status}`);
 
-  const deploymentsResponse = await fetch(deploymentsUrl, { headers });
-  if (!deploymentsResponse.ok)
-    throw new Error(`GitHub deployments fetch failed: ${deploymentsResponse.status}`);
-
-  /** @type {Array<{ statuses_url: string }>} */
-  const deployments = await deploymentsResponse.json();
-  for (const deployment of deployments) {
-    const statusesResponse = await fetch(deployment.statuses_url, { headers });
-    if (!statusesResponse.ok)
-      continue;
-
-    /** @type {Array<{ state: string, target_url?: string }>} */
-    const statuses = await statusesResponse.json();
-    const targetUrl = statuses.find(status => status.state === "success")?.target_url;
-    const revisionId = targetUrl?.match(/\/builds\/([^/?#]+)/)?.[1];
-    if (revisionId)
-      return revisionId;
-  }
-
-  return null;
+  /** @type {{ statuses: Array<{ context: string, state: string, target_url?: string }> }} */
+  const data = await response.json();
+  const targetUrl = data.statuses.find(status => status.context === "deploy/duesen/helperplan" && status.state === "success")?.target_url;
+  return targetUrl?.match(/\/builds\/([^/?#]+)/)?.[1] ?? null;
 }
 
 async function main() {
