@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import type { Match, Slot } from "../utils/plan-types";
-import { usePlanStore } from "../stores/plan";
-import { checkMemberConflict, getMatchConflicts } from "../utils/conflict-detector";
-import { proposeHelperTeamsForMatch } from "../utils/helper-team-proposals";
+import type { Match, Slot } from "../../../utils/plan-types";
+import { usePlanStore } from "../../../stores/plan";
+import { checkMemberConflict, getMatchConflicts } from "../../../utils/conflict-detector";
+import { proposeHelperTeamsForMatch } from "../../../utils/helper-team-proposals";
+import { createPlanLink } from "../../../utils/plan-links";
 
+const route = useRoute();
 const planStore = usePlanStore();
 const toast = useToast();
 
@@ -14,8 +16,8 @@ function getSuggestedHelperTeams(match: Match): string[] {
 // Per-match conflict map: matchId -> { slotId -> ScheduleConflict }
 const matchConflicts = computed(() => {
   if (!planStore.plan)
-    return {} as Record<string, Record<string, import("../utils/conflict-detector").ScheduleConflict>>;
-  const result: Record<string, Record<string, import("../utils/conflict-detector").ScheduleConflict>> = {};
+    return {} as Record<string, Record<string, import("../../../utils/conflict-detector").ScheduleConflict>>;
+  const result: Record<string, Record<string, import("../../../utils/conflict-detector").ScheduleConflict>> = {};
   for (const match of Object.values(planStore.matches)) {
     const conflicts = getMatchConflicts(planStore.plan, match);
     if (Object.keys(conflicts).length > 0)
@@ -37,6 +39,11 @@ const customHelperInput = ref("");
 const memberListTab = ref<"team" | "all">("team");
 
 usePlanInit();
+
+const planLink = computed(() => {
+  const pathname = `/plans/${String(route.params.planId)}`;
+  return planStore.key ? createPlanLink(String(route.params.planId), planStore.key, pathname) : `${pathname}${route.hash}`;
+});
 
 // Formatters
 function formatDate(dateStr: string) {
@@ -292,7 +299,7 @@ async function handleSavePlan() {
 
       <div class="flex items-center gap-3">
         <UButton
-          to="/dashboard"
+          :to="planLink"
           icon="i-lucide-arrow-left"
           variant="ghost"
           class="rounded-full"

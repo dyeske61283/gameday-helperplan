@@ -1,72 +1,309 @@
-<!-- Nuxt requires camelCase dynamic parameter names here. -->
-<!-- eslint-disable unicorn/filename-case -->
 <script setup lang="ts">
+import type { Match } from "../../../utils/plan-types";
 import { usePlanStore } from "../../../stores/plan";
+import { buildCalendarLayout } from "../../../utils/calendar-layout";
+import { generateMemberICal } from "../../../utils/ical-export";
 import { createPlanLink } from "../../../utils/plan-links";
 
 const route = useRoute();
 const planStore = usePlanStore();
+const searchQuery = ref("");
+const viewMode = ref<"timeline" | "calendar">("timeline");
+
 usePlanInit();
-const matches = computed(() => planStore.gamedaysList.flatMap(day => day.matchIds.map(id => planStore.matches[id]).filter((match): match is NonNullable<typeof match> => !!match)));
-const setupLink = computed(() => `/plans/${route.params.planId}/setup${planStore.key ? `#key=${planStore.key}` : route.hash}`);
-function matchLink(matchId: string) {
-  const path = `/plans/${route.params.planId}/matches/${matchId}`;
-  return planStore.key ? createPlanLink(String(route.params.planId), planStore.key, path) : `${path}${route.hash}`;
+
+const planId = computed(() => String(route.params.planId));
+
+function planLink(path = "") {
+  const pathname = `/plans/${planId.value}${path}`;
+  return planStore.key ? createPlanLink(planId.value, planStore.key, pathname) : `${pathname}${route.hash}`;
 }
+
+// Computed active member match if search matches a member
+const matchedMember = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase();
+  if (!query)
+    return null;
+  return planStore.membersList.find(m => m.name.toLowerCase().includes(query));
+});
+
+// Filtered Gamedays
+const filteredGamedays = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase();
+  if (!query) {
+    return planStore.gamedaysList;
+  }
+
+  return planStore.gamedaysList.filter((gameday) => {
+    const matches = gameday.matchIds
+      .map(id => planStore.matches[id])
+      .filter((m): m is Match => !!m);
+
+    if (!query)
+      return true;
+
+    // Search query match in gameday date or location
+    if (gameday.date.toLowerCase().includes(query))
+      return true;
+
+    // Match in team names or helper names
+    return matches.some((match) => {
+      const homeTeam = planStore.teams[match.homeTeamId]?.name?.toLowerCase() || "";
+      const awayTeam = match.awayTeamName.toLowerCase();
+      const helperTeam = planStore.teams[match.helperTeamId || ""]?.name?.toLowerCase() || "";
+
+      if (homeTeam.includes(query) || awayTeam.includes(query) || helperTeam.includes(query)) {
+        return true;
+      }
+
+      // Check slot assigned members
+      return match.slots.some((slot) => {
+        const memberName = slot.assignedMemberId
+          ? planStore.members[slot.assignedMemberId]?.name?.toLowerCase() || ""
+          : slot.customHelperName?.toLowerCase() || "";
+        return memberName.includes(query);
+      });
+    });
+  });
+});
+
+const calendarLayout = computed(() => buildCalendarLayout(filteredGamedays.value));
+
+function showTimeline(gamedayId?: string) {
+  viewMode.value = "timeline";
+  if (gamedayId)
+    window.location.hash = `gameday-${gamedayId}`;
+}
+
+// Export iCal handler
+function handleExportICal() {
+  if (!matchedMember.value || !planStore.plan)
+    return;
+
+  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
+  const icsContent = generateMemberICal(planStore.plan, matchedMember.value.id, shareUrl);
+
+  const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `duties-${matchedMember.value.name.replace(/\s+/g, "-")}.ics`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Stats computed
+const totalMatchesCount = computed(() => Object.keys(planStore.matches).length);
+const totalAssignedSlots = computed(() => {
+  let count = 0;
+  for (const match of Object.values(planStore.matches)) {
+    count += match.slots.filter(s => !!s.assignedMemberId || !!s.customHelperName).length;
+  }
+  return count;
+});
 </script>
 
 <template>
-  <UContainer class="py-8 max-w-3xl space-y-6">
-    <div v-if="planStore.isLoading" class="text-center py-16">
-      Loading plan...
+  <UContainer v-if="planStore.isLoading" class="py-16 text-center">
+    Loading plan...
+  </UContainer>
+  <UContainer v-else-if="planStore.error" class="py-16 text-center space-y-4">
+    <h1 class="text-2xl font-bold">
+      Could not open this plan
+    </h1>
+    <p class="text-error">
+      {{ planStore.error }}
+    </p>
+    <UButton to="/">
+      Return to start
+    </UButton>
+  </UContainer>
+  <UContainer v-else-if="!planStore.plan" class="py-16 text-center space-y-4">
+    <h1 class="text-2xl font-bold">
+      This plan is unavailable.
+    </h1>
+    <p class="text-sm text-neutral-500">
+      Open a valid shared plan link to continue.
+    </p>
+    <UButton to="/">
+      Return to start
+    </UButton>
+  </UContainer>
+  <UContainer v-else class="py-8 md:py-12 max-w-5xl space-y-8">
+    <!-- Header with Club Info & Quick Actions -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-neutral-200 dark:border-neutral-800">
+      <div class="space-y-1">
+        <div class="flex items-center gap-3">
+          <h1 class="text-3xl font-extrabold text-on-surface tracking-tight">
+            {{ planStore.plan.club.name }}
+          </h1>
+          <UBadge variant="subtle" color="primary" class="font-mono font-bold">
+            {{ planStore.plan.season }}
+          </UBadge>
+        </div>
+        <p class="text-sm text-neutral-500">
+          Season fixtures, helper schedules, and real-time duty tracking.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap gap-3">
+        <UButton
+          :to="planLink('/assignments')"
+          icon="i-lucide-id-card-lanyard"
+          color="primary"
+          class="rounded-full"
+        >
+          Manage Duties
+        </UButton>
+        <UButton
+          :to="planLink('/teams')"
+          icon="i-lucide-users"
+          variant="outline"
+          class="rounded-full"
+        >
+          Teams & Roster
+        </UButton>
+      </div>
     </div>
-    <div v-else-if="planStore.error" class="space-y-3 text-center py-16">
-      <h1 class="text-xl font-bold">
-        Could not open this plan
-      </h1>
-      <p class="text-sm text-error">
-        {{ planStore.error }}
+
+    <!-- Quick Stats Bar -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+      <div class="p-4 rounded-xl bg-surface-container-low border border-neutral-200 dark:border-neutral-800">
+        <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+          Gamedays
+        </div>
+        <div class="text-2xl font-black text-on-surface mt-1">
+          {{ planStore.gamedaysList.length }}
+        </div>
+      </div>
+
+      <div class="p-4 rounded-xl bg-surface-container-low border border-neutral-200 dark:border-neutral-800">
+        <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+          Total Matches
+        </div>
+        <div class="text-2xl font-black text-on-surface mt-1">
+          {{ totalMatchesCount }}
+        </div>
+      </div>
+
+      <div class="p-4 rounded-xl bg-surface-container-low border border-neutral-200 dark:border-neutral-800 col-span-2 sm:col-span-1">
+        <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
+          Staffed Duty Slots
+        </div>
+        <div class="text-2xl font-black text-primary mt-1">
+          {{ totalAssignedSlots }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Personal "My Duties" Bar -->
+    <div class="p-4 rounded-2xl bg-surface-container-low border border-neutral-200 dark:border-neutral-800 space-y-4">
+      <div class="flex flex-col sm:flex-row gap-4">
+        <UInput
+          v-model="searchQuery"
+          icon="i-lucide-search"
+          placeholder="Filter by your name, team, or date..."
+          size="lg"
+          class="grow"
+          clearable
+        />
+
+        <UButton
+          v-if="matchedMember"
+          icon="i-lucide-calendar-arrow-down"
+          color="secondary"
+          variant="solid"
+          class="shrink-0 rounded-xl"
+          @click="handleExportICal"
+        >
+          Export {{ matchedMember.name }}'s Duties (.ics)
+        </UButton>
+      </div>
+
+      <!-- Active Filter Helper Message -->
+      <div v-if="matchedMember" class="text-xs text-secondary font-medium flex items-center gap-1.5">
+        <UIcon name="i-lucide-sparkles" class="w-4 h-4" />
+        Filtering duties for <strong>{{ matchedMember.name }}</strong>. Use the button above to sync to Apple Calendar or Google Calendar.
+      </div>
+    </div>
+
+    <!-- Gamedays Chronological Timeline -->
+    <div v-if="filteredGamedays.length > 0" class="flex justify-end">
+      <div class="inline-flex rounded-xl border border-neutral-200 dark:border-neutral-800 p-1" role="group" aria-label="Schedule view">
+        <UButton :variant="viewMode === 'timeline' ? 'soft' : 'ghost'" icon="i-lucide-list" size="sm" @click="viewMode = 'timeline'">
+          Timeline
+        </UButton>
+        <UButton :variant="viewMode === 'calendar' ? 'soft' : 'ghost'" icon="i-lucide-calendar-days" size="sm" @click="viewMode = 'calendar'">
+          Calendar
+        </UButton>
+      </div>
+    </div>
+
+    <div v-if="viewMode === 'timeline' && filteredGamedays.length > 0" class="space-y-6">
+      <GamedayCard
+        v-for="gameday in filteredGamedays"
+        :id="`gameday-${gameday.id}`"
+        :key="gameday.id"
+        tabindex="-1"
+        :gameday="gameday"
+        :filter-member-id="matchedMember?.id"
+        :location="planStore.locations.find(location => location.id === gameday.locationId)"
+        :matches="planStore.matches"
+        :roles="planStore.roles"
+        :teams="planStore.teams"
+        :members="planStore.members"
+        :plan-id="planId"
+        :plan-key="planStore.key"
+      />
+    </div>
+
+    <div v-else-if="viewMode === 'calendar' && (calendarLayout.months.length || calendarLayout.invalid.length)" class="space-y-6">
+      <section v-for="month in calendarLayout.months" :key="month.key" class="space-y-3">
+        <h2 class="text-xl font-bold capitalize">
+          {{ month.label }}
+        </h2>
+        <div class="grid grid-cols-7 gap-1 text-center text-xs text-neutral-500 sm:gap-2">
+          <span v-for="day in ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']" :key="day" class="py-1 font-semibold">
+            {{ day }}
+          </span>
+          <span v-for="emptyDay in month.leadingEmptyDays" :key="`empty-${emptyDay}`" aria-hidden="true" />
+          <div v-for="day in month.days" :id="`calendar-${day.date}`" :key="day.date" class="min-h-24 rounded-xl border border-primary/40 bg-primary/5 p-2 text-left text-on-surface hover:border-primary hover:bg-primary/10 sm:min-h-28">
+            <span class="font-bold">{{ day.dayNumber }}</span>
+            <span v-for="gameday in day.gamedays" :key="gameday.id" class="mt-2 block truncate rounded-md bg-primary px-2 py-1 text-xs text-white">
+              <a :href="`#gameday-${gameday.id}`" class="block focus:outline-2 focus:outline-offset-2 focus:outline-primary" @click.prevent="showTimeline(gameday.id)">
+                {{ gameday.matchIds.length }} {{ gameday.matchIds.length === 1 ? 'match' : 'matches' }}
+              </a>
+            </span>
+          </div>
+        </div>
+      </section>
+      <div v-if="calendarLayout.invalid.length" class="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
+        <p>{{ calendarLayout.invalid.length }} gameday{{ calendarLayout.invalid.length === 1 ? '' : 's' }} have an invalid date and cannot be placed on the calendar.</p>
+        <UButton class="mt-3" size="sm" variant="outline" color="warning" @click="showTimeline()">
+          Show timeline
+        </UButton>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else class="text-center py-16 p-8 rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-700">
+      <UIcon name="i-lucide-search-x" class="w-12 h-12 mx-auto text-neutral-400 mb-3" />
+      <h3 class="text-lg font-bold text-on-surface">
+        No gamedays found
+      </h3>
+      <p class="text-sm text-neutral-500 mt-1 max-w-sm mx-auto">
+        No matches or duty assignments match your current search query.
       </p>
-      <UButton to="/">
-        Return to start
+      <UButton
+        class="mt-4"
+        variant="ghost"
+        color="primary"
+        @click="searchQuery = ''"
+      >
+        Clear filters
       </UButton>
     </div>
-    <div v-else-if="!planStore.plan" class="text-center py-16">
-      This plan is unavailable.
-    </div>
-    <template v-else>
-      <header>
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <p class="text-sm text-primary">
-              {{ planStore.plan.season }}
-            </p>
-            <h1 class="text-3xl font-bold">
-              {{ planStore.plan.club.name }}
-            </h1>
-          </div>
-          <UButton :to="setupLink" variant="outline" icon="i-lucide-settings">
-            Edit plan
-          </UButton>
-        </div>
-        <p class="text-on-surface-variant">
-          Fixtures and open helper duties
-        </p>
-      </header>
-      <div v-if="matches.length" class="space-y-3">
-        <NuxtLink v-for="match in matches" :key="match.id" :to="matchLink(match.id)" class="block rounded-xl border p-4 hover:border-primary">
-          <div class="flex justify-between gap-4">
-            <span class="font-semibold">{{ planStore.teams[match.homeTeamId]?.name || match.homeTeamId }} vs {{ match.awayTeamName }}</span>
-            <span class="text-sm text-neutral-500">{{ new Date(match.time).toLocaleString() }}</span>
-          </div>
-          <p class="text-sm text-neutral-500">
-            {{ match.slots.filter(slot => slot.assignmentStatus === 'OPEN').length }} open duties
-          </p>
-        </NuxtLink>
-      </div>
-      <div v-else class="rounded-xl border border-dashed p-8 text-center">
-        No fixtures are available.
-      </div>
-    </template>
   </UContainer>
 </template>
