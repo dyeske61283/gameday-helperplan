@@ -129,6 +129,22 @@ describe("usePlanStore", () => {
       expect(store.teams[newTeam.id]).toBeUndefined();
       expect(store.members[member.id]?.teamIds).not.toContain(newTeam.id);
     });
+
+    it("updates club details without replacing the plan aggregate", () => {
+      const store = usePlanStore();
+      store.createNewPlan("test-plan", "test-key");
+      const original = store.plan;
+
+      store.updatePlanDetails({
+        club: { name: "Updated Club", contactEmail: "club@example.com" },
+        season: "2026/2027",
+      });
+
+      expect(store.plan).toBe(original);
+      expect(store.plan?.club.name).toBe("Updated Club");
+      expect(store.plan?.club.contactEmail).toBe("club@example.com");
+      expect(store.plan?.season).toBe("2026/2027");
+    });
   });
 
   describe("member management", () => {

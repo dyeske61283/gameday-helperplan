@@ -7,6 +7,7 @@ const route = useRoute();
 const planStore = usePlanStore();
 usePlanInit();
 const matches = computed(() => planStore.gamedaysList.flatMap(day => day.matchIds.map(id => planStore.matches[id]).filter((match): match is NonNullable<typeof match> => !!match)));
+const setupLink = computed(() => `/plans/${route.params.planId}/setup${planStore.key ? `#key=${planStore.key}` : route.hash}`);
 </script>
 
 <template>
@@ -30,12 +31,19 @@ const matches = computed(() => planStore.gamedaysList.flatMap(day => day.matchId
     </div>
     <template v-else>
       <header>
-        <p class="text-sm text-primary">
-          {{ planStore.plan.season }}
-        </p>
-        <h1 class="text-3xl font-bold">
-          {{ planStore.plan.club.name }}
-        </h1>
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p class="text-sm text-primary">
+              {{ planStore.plan.season }}
+            </p>
+            <h1 class="text-3xl font-bold">
+              {{ planStore.plan.club.name }}
+            </h1>
+          </div>
+          <UButton :to="setupLink" variant="outline" icon="i-lucide-settings">
+            Edit plan
+          </UButton>
+        </div>
         <p class="text-on-surface-variant">
           Fixtures and open helper duties
         </p>

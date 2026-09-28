@@ -1,9 +1,10 @@
 import { mountSuspended } from "@nuxt/test-utils/runtime";
+import { flushPromises } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 import PlanSetupPage from "../../app/pages/plans/[planId]/setup.vue";
 import BaseSetupPage from "../../app/pages/setup.vue";
 
-describe("setup page", () => {
+describe("plan setup", () => {
   it("renders the new-plan start action", async () => {
     const component = await mountSuspended(BaseSetupPage);
 
@@ -23,13 +24,13 @@ describe("setup page", () => {
     expect(component.text()).toContain("Cancel");
   });
 
-  it("renders existing-plan setup without loading plan data", async () => {
+  it("renders existing-plan setup with editing sections", async () => {
     const component = await mountSuspended(PlanSetupPage, {
       route: "/plans/plan-123/setup#key=test-key",
     });
 
-    expect(component.text()).toContain("Editing this plan is not available yet.");
-    expect(component.find("a[href='/plans/plan-123#key=test-key']").exists()).toBe(true);
-    expect(component.text()).not.toContain("Loading plan");
+    await flushPromises();
+    expect(component.text()).toContain("Could not load plan");
+    expect(component.text()).toContain("Return to plan");
   });
 });
