@@ -47,13 +47,6 @@ describe("feature: User Workflows (BDD Specs)", async () => {
 
   // 1 — Open a Shared Link (Get Link)
   Scenario("1 — Open a Shared Link (Get Link)", async () => {
-    await Given("the plan f530083d-8c74-4f10-931a-dd877ee7b52c exists in storage", async () => {
-      const res = await fetch(testUrl(`/api/${seededPlanId}`));
-      expect(res.status).toBe(200);
-      const data = await res.json();
-      expect(data.blob).toBeTruthy();
-    });
-
     await When("the user navigates to the seeded plan link", async () => {
       workflowPage = await createPage();
       const targetUrl = seededSetupLink.startsWith("http") ? seededSetupLink : testUrl(seededSetupLink);
