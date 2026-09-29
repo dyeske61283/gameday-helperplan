@@ -1,5 +1,6 @@
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { toRaw } from "vue";
 import { NewPlanMetadataSchema } from "../utils/plan-types";
 import { migrateIfNeeded, usePlanStore } from "./plan.ts";
 
@@ -43,6 +44,65 @@ describe("usePlanStore", () => {
     expect(store.error).toBe("storage unavailable");
     expect(store.plan!.club.name).toBe("Club");
     expect(store.plan!.rev).toBe(beforeRevision);
+    vi.unstubAllGlobals();
+  });
+
+  it("commits an isolated edit only after save succeeds and reloads it", async () => {
+    let savedBlob = "";
+    vi.stubGlobal("$fetch", vi.fn(async (_url: string, options?: { method?: string; body?: { blob: string } }) => {
+      if (options?.method === "POST") {
+        savedBlob = options.body!.blob;
+        return {};
+      }
+      return { blob: savedBlob };
+    }));
+    const store = usePlanStore();
+    store.createNewPlan("test-plan-id", "test-key", { clubName: "Original", season: "2026/2027" });
+    const draft = structuredClone(toRaw(store.plan!));
+    draft.club.name = "Edited";
+
+    await expect(store.savePlan(draft)).resolves.toBe(true);
+    expect(store.plan).not.toBeNull();
+    expect(store.plan!.club.name).toBe("Edited");
+    await store.loadPlan("test-plan-id", "test-key");
+
+    expect(store.plan?.club.name).toBe("Edited");
+    vi.unstubAllGlobals();
+  });
+
+  it("does not publish an isolated edit when save fails", async () => {
+    vi.stubGlobal("$fetch", vi.fn().mockRejectedValue(new Error("storage unavailable")));
+    const store = usePlanStore();
+    store.createNewPlan("test-plan-id", "test-key", { clubName: "Original", season: "2026/2027" });
+    const draft = structuredClone(toRaw(store.plan!));
+    draft.club.name = "Failed edit";
+
+    await expect(store.savePlan(draft)).resolves.toBe(false);
+    expect(store.plan?.club.name).toBe("Original");
+    vi.unstubAllGlobals();
+  });
+
+  it("defers newer SSE plans while an editor is dirty", async () => {
+    let source: { onmessage?: (event: MessageEvent) => Promise<void>; close: () => void } | undefined;
+    vi.stubGlobal("EventSource", class {
+      constructor() {
+        return source = { onmessage: undefined, close() {} };
+      }
+    });
+    const store = usePlanStore();
+    store.createNewPlan("test-plan-id", "test-key", { clubName: "Original", season: "2026/2027" });
+    store.setEditing(true);
+    store.watchPlan();
+
+    const update = structuredClone(toRaw(store.plan!));
+    update.rev = 2;
+    update.club.name = "Remote edit";
+    await source?.onmessage?.({ data: JSON.stringify(update) } as MessageEvent);
+
+    expect(store.plan?.club.name).toBe("Original");
+    expect(store.pendingUpdate?.club.name).toBe("Remote edit");
+    store.applyPendingUpdate();
+    expect(store.plan?.club.name).toBe("Remote edit");
     vi.unstubAllGlobals();
   });
 

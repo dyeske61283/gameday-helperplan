@@ -1,86 +1,97 @@
 <!-- Nuxt requires camelCase dynamic parameter names here. -->
 <!-- eslint-disable unicorn/filename-case -->
 <script setup lang="ts">
+import type { SeasonPlan } from "../../../utils/plan-types";
+import { toRaw } from "vue";
 import { usePlanStore } from "../../../stores/plan";
+import { createPlanLink } from "../../../utils/plan-links";
 
 const route = useRoute();
 const planStore = usePlanStore();
 const toast = useToast();
 usePlanInit();
 
-const planLink = computed(() => `/plans/${route.params.planId}${planStore.key ? `#key=${planStore.key}` : route.hash}`);
-const scheduleLink = computed(() => `/plans/${route.params.planId}${planStore.key ? `#key=${planStore.key}` : route.hash}`);
+const planLink = computed(() => planStore.key ? createPlanLink(String(route.params.planId), planStore.key) : `/plans/${route.params.planId}${route.hash}`);
+const scheduleLink = computed(() => planLink.value);
+const shareUrl = computed(() => planStore.key ? createPlanLink(String(route.params.planId), planStore.key) : "");
+const draft = ref<SeasonPlan | null>(null);
 const clubName = ref("");
 const season = ref("");
 const contactEmail = ref("");
 const homepage = ref("");
-const teamDrafts = ref<Record<string, string>>({});
-const memberDrafts = ref<Record<string, { name: string; teamIds: string[] }>>({});
+const rolesText = ref("");
+const locationsText = ref("");
 const newTeamName = ref("");
 const newMemberName = ref("");
 const isDirty = ref(false);
 const syncingDrafts = ref(false);
+const shareState = ref<"idle" | "copied" | "failed">("idle");
 
 function syncDrafts() {
   if (!planStore.plan || isDirty.value)
     return;
   syncingDrafts.value = true;
+  draft.value = structuredClone(toRaw(planStore.plan));
   clubName.value = planStore.plan.club.name;
   season.value = planStore.plan.season;
   contactEmail.value = planStore.plan.club.contactEmail;
   homepage.value = planStore.plan.club.homepage;
-  teamDrafts.value = Object.fromEntries(planStore.teamsList.map(team => [team.id, team.name]));
-  memberDrafts.value = Object.fromEntries(planStore.membersList.map(member => [member.id, { name: member.name, teamIds: [...member.teamIds] }]));
+  rolesText.value = planStore.roles.map(role => `${role.name} | ${role.scope}`).join("\n");
+  locationsText.value = planStore.locations.map(location => `${location.name}${location.link ? ` | ${location.link}` : ""}`).join("\n");
   nextTick(() => syncingDrafts.value = false);
 }
 
 watch(() => planStore.plan, syncDrafts, { immediate: true });
-watch([clubName, season, contactEmail, homepage, teamDrafts, memberDrafts], () => {
-  if (planStore.plan && !syncingDrafts.value)
-    isDirty.value = true;
-}, { deep: true });
-
 function markDirty() {
+  isDirty.value = true;
+  planStore.setEditing(true);
+}
+
+const teams = computed(() => Object.values(draft.value?.teams ?? {}));
+const members = computed(() => Object.values(draft.value?.members ?? {}));
+
+function touch() {
   isDirty.value = true;
 }
 
 function addTeam() {
   const name = newTeamName.value.trim();
-  if (!name)
+  if (!name || !draft.value)
     return;
-  const team = planStore.addTeam(name);
-  teamDrafts.value[team.id] = team.name;
+  const id = `team-${crypto.randomUUID().slice(0, 8)}`;
+  draft.value.teams[id] = { id, name, isManual: true, updatedAt: new Date() };
   newTeamName.value = "";
   markDirty();
 }
 
 function removeTeam(teamId: string) {
-  planStore.deleteTeam(teamId);
-  delete teamDrafts.value[teamId];
-  Object.values(memberDrafts.value).forEach(member => member.teamIds = member.teamIds.filter(id => id !== teamId));
-  markDirty();
+  if (!draft.value)
+    return;
+  delete draft.value.teams[teamId];
+  Object.values(draft.value.members).forEach(member => member.teamIds = member.teamIds.filter(id => id !== teamId));
+  touch();
 }
 
 function addMember() {
   const name = newMemberName.value.trim();
-  if (!name)
+  if (!name || !draft.value)
     return;
-  const member = planStore.addMember({ name });
-  memberDrafts.value[member.id] = { name: member.name, teamIds: [] };
+  const id = `member-${crypto.randomUUID().slice(0, 8)}`;
+  draft.value.members[id] = { id, name, teamIds: [], skillIds: [], isManual: true, updatedAt: new Date() };
   newMemberName.value = "";
   markDirty();
 }
 
 function removeMember(memberId: string) {
-  planStore.deleteMember(memberId);
-  delete memberDrafts.value[memberId];
-  markDirty();
+  if (draft.value)
+    delete draft.value.members[memberId];
+  touch();
 }
 
 function validate() {
   if (!clubName.value.trim() || !season.value.trim())
     return "Club name and season are required.";
-  if (Object.values(teamDrafts.value).some(name => !name.trim()) || Object.values(memberDrafts.value).some(member => !member.name.trim()))
+  if (!draft.value || Object.values(draft.value.teams).some(team => !team.name.trim()) || Object.values(draft.value.members).some(member => !member.name.trim()))
     return "Team and member names cannot be empty.";
   if (contactEmail.value && (!contactEmail.value.includes("@") || !contactEmail.value.includes(".")))
     return "Enter a valid contact email.";
@@ -95,15 +106,34 @@ async function save() {
     toast.add({ title: "Check your changes", description: validationError || "Plan is unavailable.", color: "error" });
     return;
   }
-  planStore.updatePlanDetails({ club: { name: clubName.value.trim(), contactEmail: contactEmail.value.trim(), homepage: homepage.value.trim() }, season: season.value.trim() });
-  Object.entries(teamDrafts.value).forEach(([id, name]) => planStore.updateTeam(id, name.trim()));
-  Object.entries(memberDrafts.value).forEach(([id, member]) => planStore.updateMember(id, { name: member.name.trim(), teamIds: member.teamIds }));
-  await planStore.savePlan();
-  if (planStore.error) {
-    toast.add({ title: "Save failed", description: planStore.error, color: "error" });
+  if (!draft.value)
+    return;
+  draft.value.club = { ...draft.value.club, name: clubName.value.trim(), contactEmail: contactEmail.value.trim(), homepage: homepage.value.trim(), lastUpdated: new Date() };
+  draft.value.season = season.value.trim();
+  draft.value.config.roles = rolesText.value.split("\n").map((line, index) => {
+    const [name, scope = "match"] = line.split("|").map(value => value.trim());
+    const previous = planStore.roles[index];
+    return { id: previous?.id ?? `role-${index + 1}`, name: name ?? "", scope: scope === "gameday" ? "gameday" as const : "match" as const, requiredSkillId: previous?.requiredSkillId ?? "" };
+  }).filter((role): role is NonNullable<typeof role> & { name: string } => Boolean(role.name));
+  draft.value.config.locations = locationsText.value.split("\n").map((line, index) => {
+    const [name, link] = line.split("|").map(value => value.trim());
+    return { id: planStore.locations[index]?.id ?? `location-${index + 1}`, name: name ?? "", ...(link ? { link } : {}) };
+  }).filter((location): location is NonNullable<typeof location> & { name: string } => Boolean(location.name));
+  Object.values(draft.value.teams).forEach((team) => {
+    team.name = team.name.trim();
+    team.updatedAt = new Date();
+  });
+  Object.values(draft.value.members).forEach((member) => {
+    member.name = member.name.trim();
+    member.updatedAt = new Date();
+  });
+  const saved = await planStore.savePlan(draft.value);
+  if (!saved) {
+    toast.add({ title: "Save failed", description: planStore.error || "Could not save the plan.", color: "error" });
   }
   else {
     isDirty.value = false;
+    planStore.setEditing(false);
     toast.add({ title: "Plan saved", description: "Changes synced to the shared plan.", color: "success" });
   }
 }
@@ -112,9 +142,22 @@ async function reload() {
   if (!planStore.plan || !planStore.key)
     return;
   isDirty.value = false;
+  planStore.applyPendingUpdate();
   await planStore.loadPlan(planStore.plan.id, planStore.key);
   if (planStore.error)
     toast.add({ title: "Reload failed", description: planStore.error, color: "error" });
+}
+
+async function copyShareUrl() {
+  if (!shareUrl.value)
+    return;
+  try {
+    await navigator.clipboard.writeText(shareUrl.value);
+    shareState.value = "copied";
+  }
+  catch {
+    shareState.value = "failed";
+  }
 }
 
 useHead({ title: "Edit plan" });
@@ -165,7 +208,17 @@ useHead({ title: "Edit plan" });
       <div v-if="planStore.error" class="rounded-lg bg-error/10 p-4 text-error">
         {{ planStore.error }}
       </div>
-
+      <div v-if="planStore.pendingUpdate" role="alert" class="rounded-lg bg-warning/10 p-4 text-warning">
+        A newer shared plan version arrived while you were editing.
+        <div class="mt-3 flex gap-2">
+          <UButton size="sm" variant="outline" @click="reload">
+            Use newer version
+          </UButton>
+          <UButton size="sm" variant="ghost" @click="planStore.setEditing(true)">
+            Keep my changes
+          </UButton>
+        </div>
+      </div>
       <section class="space-y-4 rounded-xl border p-5">
         <h2 class="text-xl font-bold">
           Plan details
@@ -196,12 +249,12 @@ useHead({ title: "Edit plan" });
           </UButton>
         </div>
         <div class="space-y-2">
-          <div v-for="team in planStore.teamsList" :key="team.id" class="flex gap-2">
-            <UInput v-model="teamDrafts[team.id]" class="grow" @input="markDirty" /><UButton color="error" variant="ghost" @click="removeTeam(team.id)">
+          <div v-for="team in teams" :key="team.id" class="flex gap-2">
+            <UInput v-model="team.name" class="grow" @input="markDirty" /><UButton color="error" variant="ghost" @click="removeTeam(team.id)">
               Remove
             </UButton>
           </div>
-          <p v-if="!planStore.teamsList.length" class="text-sm text-on-surface-variant">
+          <p v-if="!teams.length" class="text-sm text-on-surface-variant">
             No teams yet.
           </p>
         </div>
@@ -217,22 +270,52 @@ useHead({ title: "Edit plan" });
           </UButton>
         </div>
         <div class="space-y-3">
-          <div v-for="member in planStore.membersList" :key="member.id" class="space-y-2 rounded-lg border p-3">
+          <div v-for="member in members" :key="member.id" class="space-y-2 rounded-lg border p-3">
             <div class="flex gap-2">
-              <UInput v-model="memberDrafts[member.id]!.name" class="grow" @input="markDirty" /><UButton color="error" variant="ghost" @click="removeMember(member.id)">
+              <UInput v-model="member.name" class="grow" @input="markDirty" /><UButton color="error" variant="ghost" @click="removeMember(member.id)">
                 Remove
               </UButton>
             </div>
-            <select v-model="memberDrafts[member.id]!.teamIds" multiple class="w-full rounded-lg border bg-transparent p-2 text-sm" aria-label="Member teams" @change="markDirty">
-              <option v-for="team in planStore.teamsList" :key="team.id" :value="team.id">
+            <select v-model="member.teamIds" multiple class="w-full rounded-lg border bg-transparent p-2 text-sm" aria-label="Member teams" @change="markDirty">
+              <option v-for="team in teams" :key="team.id" :value="team.id">
                 {{ team.name }}
               </option>
             </select>
           </div>
-          <p v-if="!planStore.membersList.length" class="text-sm text-on-surface-variant">
+          <p v-if="!members.length" class="text-sm text-on-surface-variant">
             No members yet.
           </p>
         </div>
+      </section>
+
+      <section class="space-y-4 rounded-xl border p-5">
+        <h2 class="text-xl font-bold">
+          Schedule configuration
+        </h2>
+        <UFormField label="Duty roles" hint="One per line: role name | match or gameday">
+          <UTextarea v-model="rolesText" :rows="5" class="w-full" @input="markDirty" />
+        </UFormField>
+        <UFormField label="Locations" hint="One per line: location name | optional URL">
+          <UTextarea v-model="locationsText" :rows="4" class="w-full" @input="markDirty" />
+        </UFormField>
+      </section>
+
+      <section v-if="shareUrl" aria-labelledby="share-heading" class="space-y-3 rounded-xl border border-primary/30 p-5">
+        <h2 id="share-heading" class="text-xl font-bold">
+          Share this plan
+        </h2>
+        <div class="flex flex-col gap-2 sm:flex-row">
+          <UInput :model-value="shareUrl" readonly aria-label="Share link" class="grow" />
+          <UButton @click="copyShareUrl">
+            Copy share link
+          </UButton>
+        </div>
+        <p v-if="shareState === 'copied'" role="status" class="text-sm text-success">
+          Share link copied.
+        </p>
+        <p v-else-if="shareState === 'failed'" role="alert" class="text-sm text-error">
+          Could not copy the share link. Copy it from the field above.
+        </p>
       </section>
 
       <footer class="flex items-center justify-between border-t pt-6">

@@ -13,16 +13,16 @@ route URLs must be preserved.
 
 The canonical route contract is:
 
-| Route | Purpose |
-| --- | --- |
-| `/` | Link-first entry. It may resume a locally known plan and provides a reachable path to `/setup`; it is not a plan schedule. |
-| `/plans/:planId` | Canonical plan schedule, with one timeline/calendar view toggle. |
-| `/plans/:planId/matches/:matchId` | One match and its member claim flow. |
-| `/plans/:planId/cockpit` | The current member's plan-scoped duties. |
-| `/plans/:planId/teams` | Plan-scoped team and roster administration. |
-| `/plans/:planId/assignments` | Plan-scoped duty assignment administration. |
-| `/plans/:planId/setup` | Plan-scoped maintenance/editing. |
-| `/setup` | Creation and maintenance entrypoint when no plan context exists. |
+| Route                             | Purpose                                                                                                                    |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `/`                               | Link-first entry. It may resume a locally known plan and provides a reachable path to `/setup`; it is not a plan schedule. |
+| `/plans/:planId`                  | Canonical plan schedule, with one timeline/calendar view toggle.                                                           |
+| `/plans/:planId/matches/:matchId` | One match and its member claim flow.                                                                                       |
+| `/plans/:planId/cockpit`          | The current member's plan-scoped duties.                                                                                   |
+| `/plans/:planId/teams`            | Plan-scoped team and roster administration.                                                                                |
+| `/plans/:planId/assignments`      | Plan-scoped duty assignment administration.                                                                                |
+| `/plans/:planId/setup`            | Plan-scoped maintenance/editing.                                                                                           |
+| `/setup`                          | Creation and maintenance entrypoint when no plan context exists.                                                           |
 
 All plan-dependent navigation stays below `/plans/:planId`. The schedule is
 the plan entrypoint; it is not split into separate schedule routes. Match,

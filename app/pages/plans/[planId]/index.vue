@@ -2,12 +2,17 @@
 <!-- eslint-disable unicorn/filename-case -->
 <script setup lang="ts">
 import { usePlanStore } from "../../../stores/plan";
+import { createPlanLink } from "../../../utils/plan-links";
 
 const route = useRoute();
 const planStore = usePlanStore();
 usePlanInit();
 const matches = computed(() => planStore.gamedaysList.flatMap(day => day.matchIds.map(id => planStore.matches[id]).filter((match): match is NonNullable<typeof match> => !!match)));
 const setupLink = computed(() => `/plans/${route.params.planId}/setup${planStore.key ? `#key=${planStore.key}` : route.hash}`);
+function matchLink(matchId: string) {
+  const path = `/plans/${route.params.planId}/matches/${matchId}`;
+  return planStore.key ? createPlanLink(String(route.params.planId), planStore.key, path) : `${path}${route.hash}`;
+}
 </script>
 
 <template>
@@ -49,7 +54,7 @@ const setupLink = computed(() => `/plans/${route.params.planId}/setup${planStore
         </p>
       </header>
       <div v-if="matches.length" class="space-y-3">
-        <NuxtLink v-for="match in matches" :key="match.id" :to="`/plans/${route.params.planId}/matches/${match.id}`" class="block rounded-xl border p-4 hover:border-primary">
+        <NuxtLink v-for="match in matches" :key="match.id" :to="matchLink(match.id)" class="block rounded-xl border p-4 hover:border-primary">
           <div class="flex justify-between gap-4">
             <span class="font-semibold">{{ planStore.teams[match.homeTeamId]?.name || match.homeTeamId }} vs {{ match.awayTeamName }}</span>
             <span class="text-sm text-neutral-500">{{ new Date(match.time).toLocaleString() }}</span>

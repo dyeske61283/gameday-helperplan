@@ -10,7 +10,7 @@ import type {
 } from "../utils/plan-types";
 import { useLocalStorage } from "@vueuse/core";
 import { defineStore } from "pinia";
-import { computed, ref } from "vue";
+import { computed, ref, toRaw } from "vue";
 import examplePlan from "../../test/fixtures/plan-2025-2026.json";
 import { useDecryption, useEncryption } from "../composables/use-crypto";
 import { autoAssignMatchDuties, completeClosedAssignments, isMemberEligibleForSlot } from "../utils/helper-assignment";
@@ -71,6 +71,8 @@ export const usePlanStore = defineStore("plan", () => {
   const readOnly = ref(false);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
+  const pendingUpdate = ref<SeasonPlan | null>(null);
+  const isEditing = ref(false);
   const eventSource = ref<EventSource | null>(null);
   let completionTimer: ReturnType<typeof setInterval> | undefined;
 
@@ -194,7 +196,10 @@ export const usePlanStore = defineStore("plan", () => {
           console.warn("Real-time update received: Rev", updatedPlan.rev);
           updatedPlan = migrateIfNeeded(updatedPlan);
           completeClosedAssignments(updatedPlan);
-          plan.value = updatedPlan;
+          if (isEditing.value)
+            pendingUpdate.value = updatedPlan;
+          else
+            plan.value = updatedPlan;
         }
       }
       catch (err) {
@@ -205,6 +210,19 @@ export const usePlanStore = defineStore("plan", () => {
     eventSource.value.onerror = (err) => {
       console.error("SSE connection error:", err);
     };
+  }
+
+  function setEditing(value: boolean) {
+    isEditing.value = value;
+    if (!value)
+      pendingUpdate.value = null;
+  }
+
+  function applyPendingUpdate() {
+    if (pendingUpdate.value)
+      plan.value = pendingUpdate.value;
+    pendingUpdate.value = null;
+    isEditing.value = false;
   }
 
   function stopWatching() {
@@ -218,8 +236,8 @@ export const usePlanStore = defineStore("plan", () => {
     }
   }
 
-  async function savePlan(): Promise<boolean> {
-    if (!plan.value || !key.value) {
+  async function savePlan(draft?: SeasonPlan): Promise<boolean> {
+    if ((!plan.value && !draft) || !key.value) {
       error.value = "Missing plan or encryption key";
       return false;
     }
@@ -227,24 +245,28 @@ export const usePlanStore = defineStore("plan", () => {
     isLoading.value = true;
     error.value = null;
 
-    const previousRevision = plan.value.rev;
+    const livePlan = plan.value;
+    const planToSave = structuredClone(toRaw(draft ?? plan.value!));
     try {
-      completeClosedAssignments(plan.value);
-      plan.value.rev++;
-      plan.value.lastUpdated = new Date();
+      completeClosedAssignments(planToSave);
+      planToSave.rev++;
+      planToSave.lastUpdated = new Date();
 
-      const serializedPlan = JSON.stringify(plan.value);
+      const serializedPlan = JSON.stringify(planToSave);
       const encryptedBlob = await encryptData(serializedPlan, key.value);
 
-      await $fetch(`/api/${plan.value.id}`, {
+      await $fetch(`/api/${planToSave.id}`, {
         method: "POST",
         body: {
           blob: encryptedBlob,
         },
       });
 
-      lastPlanId.value = plan.value.id;
-      resumeState.value = { id: plan.value.id, key: key.value };
+      if (plan.value === livePlan)
+        plan.value = planToSave;
+      pendingUpdate.value = null;
+      lastPlanId.value = planToSave.id;
+      resumeState.value = { id: planToSave.id, key: key.value };
       return true;
     }
     catch (err: unknown) {
@@ -252,8 +274,6 @@ export const usePlanStore = defineStore("plan", () => {
         error.value = err.message || "Failed to save plan";
       }
       console.error("Error saving plan:", err);
-      if (plan.value?.rev === previousRevision + 1)
-        plan.value.rev = previousRevision;
       return false;
     }
     finally {
@@ -563,6 +583,7 @@ export const usePlanStore = defineStore("plan", () => {
     selectedMemberId,
     isLoading,
     error,
+    pendingUpdate,
     isModifiable,
     teams,
     members,
@@ -578,6 +599,8 @@ export const usePlanStore = defineStore("plan", () => {
     loadPlan,
     watchPlan,
     stopWatching,
+    setEditing,
+    applyPendingUpdate,
     savePlan,
     createNewPlan,
     addTeam,
