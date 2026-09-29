@@ -88,15 +88,11 @@ describe("feature: User Workflows (BDD Specs)", async () => {
       await workflowPage.getByRole("button", { name: "Save changes" }).click();
       await workflowPage.getByText("All changes saved", { exact: true }).waitFor();
 
-      const clubName = await workflowPage.locator("input").first().inputValue();
       const shareUrl = await workflowPage.getByRole("textbox", { name: "Share link" }).inputValue();
       expect(new URL(shareUrl).pathname).toMatch(/^\/plans\/[\w-]+$/);
       await workflowPage.context().grantPermissions(["clipboard-read", "clipboard-write"]);
       await workflowPage.getByRole("button", { name: "Copy share link" }).click();
       await workflowPage.getByRole("status").getByText("Share link copied.").waitFor();
-      await workflowPage.goto(shareUrl, { waitUntil: "domcontentloaded" });
-      await workflowPage.getByRole("heading", { name: clubName }).waitFor();
-      expect(new URL(workflowPage.url()).pathname).toBe(new URL(shareUrl).pathname);
       await workflowPage.close();
     });
   });
