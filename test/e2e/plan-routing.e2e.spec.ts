@@ -27,7 +27,7 @@ describe("plan-scoped routing", async () => {
   it("keeps schedule, match, cockpit, team, and assignment navigation in plan context", async () => {
     const page = await createPage();
     await page.goto(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl), { waitUntil: "domcontentloaded" });
-    await page.getByRole("heading", { name: /Gladbeck HC/ }).waitFor();
+    await page.getByText("Season fixtures, helper schedules, and real-time duty tracking.").waitFor();
 
     await page.getByRole("button", { name: "Calendar" }).click();
     await page.locator("[id^='calendar-']").first().waitFor();
