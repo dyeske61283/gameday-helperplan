@@ -34,24 +34,26 @@ describe("plan-scoped routing", async () => {
     await page.getByRole("button", { name: "Timeline" }).click();
 
     const matchLink = page.locator("a[href*='/matches/']").first();
-    expect(await matchLink.getAttribute("href")).toBeTruthy();
-    const matchUrl = new URL(seededPlanUrl, testUrl("/"));
-    matchUrl.pathname = `/plans/${seededPlanId}/matches/match-2025-10-04-ejgd-0`;
+    const matchHref = await matchLink.getAttribute("href");
+    expect(matchHref).toBeTruthy();
+    const matchUrl = new URL(matchHref!, page.url());
+    const planId = matchUrl.pathname.split("/")[2];
+    expect(planId).toBeTruthy();
     await page.goto(matchUrl.toString(), { waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: / vs / }).waitFor();
     expect(new URL(page.url()).pathname).toMatch(/^\/plans\/[^/]+\/matches\/[^/]+$/);
 
     const planUrl = new URL(page.url());
-    planUrl.pathname = `/plans/${seededPlanId}/cockpit`;
+    planUrl.pathname = `/plans/${planId}/cockpit`;
     await page.goto(planUrl.toString(), { waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "My duties" }).waitFor();
-    expect(new URL(page.url()).pathname).toBe(`/plans/${seededPlanId}/cockpit`);
+    expect(new URL(page.url()).pathname).toBe(`/plans/${planId}/cockpit`);
 
-    planUrl.pathname = `/plans/${seededPlanId}/teams`;
+    planUrl.pathname = `/plans/${planId}/teams`;
     await page.goto(planUrl.toString(), { waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "Teams" }).waitFor();
 
-    planUrl.pathname = `/plans/${seededPlanId}/assignments`;
+    planUrl.pathname = `/plans/${planId}/assignments`;
     await page.goto(planUrl.toString(), { waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "Duty Assignments" }).waitFor();
     await page.close();
