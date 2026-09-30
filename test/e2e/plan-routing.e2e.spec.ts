@@ -40,7 +40,7 @@ describe("plan-scoped routing", async () => {
     const planId = matchUrl.pathname.split("/")[2];
     expect(planId).toBeTruthy();
     await page.goto(matchUrl.toString(), { waitUntil: "domcontentloaded" });
-    await page.getByRole("heading", { name: / vs / }).waitFor();
+    await page.getByText("Claiming as").waitFor();
     expect(new URL(page.url()).pathname).toMatch(/^\/plans\/[^/]+\/matches\/[^/]+$/);
 
     const planUrl = new URL(page.url());
