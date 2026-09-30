@@ -1,10 +1,10 @@
 <!-- Nuxt requires camelCase dynamic parameter names here. -->
 <!-- eslint-disable unicorn/filename-case -->
 <script setup lang="ts">
-import type { SeasonPlan } from "../../../utils/plan-types";
+import type { SeasonPlan } from "~/utils/plan-types";
 import { toRaw } from "vue";
-import { usePlanStore } from "../../../stores/plan";
-import { createPlanLink } from "../../../utils/plan-links";
+import { usePlanStore } from "~/stores/plan";
+import { createPlanLink } from "~/utils/plan-links";
 
 const route = useRoute();
 const planStore = usePlanStore();

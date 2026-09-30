@@ -1,10 +1,10 @@
 <!-- Nuxt requires camelCase dynamic parameter names here. -->
 <!-- eslint-disable unicorn/filename-case -->
 <script setup lang="ts">
-import type { Slot } from "../../../../utils/plan-types";
-import { usePlanStore } from "../../../../stores/plan";
-import { isMemberEligibleForSlot } from "../../../../utils/helper-assignment";
-import { createPlanLink } from "../../../../utils/plan-links";
+import type { Slot } from "~/utils/plan-types";
+import { usePlanStore } from "~/stores/plan";
+import { isMemberEligibleForSlot } from "~/utils/helper-assignment";
+import { createPlanLink } from "~/utils/plan-links";
 
 const route = useRoute();
 const planStore = usePlanStore();

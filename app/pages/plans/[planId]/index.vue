@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import type { Match } from "../../../utils/plan-types";
-import { usePlanStore } from "../../../stores/plan";
-import { buildCalendarLayout } from "../../../utils/calendar-layout";
-import { generateMemberICal } from "../../../utils/ical-export";
-import { createPlanLink } from "../../../utils/plan-links";
+import type { Match } from "~/utils/plan-types";
+import { usePlanStore } from "~/stores/plan";
+import { buildCalendarLayout } from "~/utils/calendar-layout";
+import { generateMemberICal } from "~/utils/ical-export";
+import { createPlanLink } from "~/utils/plan-links";
 
 const route = useRoute();
 const planStore = usePlanStore();

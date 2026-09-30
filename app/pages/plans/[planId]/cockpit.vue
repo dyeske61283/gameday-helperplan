@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { usePlanStore } from "../../../stores/plan";
-import { createPlanLink } from "../../../utils/plan-links";
+import { usePlanStore } from "~/stores/plan";
+import { createPlanLink } from "~/utils/plan-links";
 
 const route = useRoute();
 const planStore = usePlanStore();
@@ -8,7 +8,7 @@ usePlanInit();
 function planLink(path = "") {
   const planId = String(route.params.planId);
   const pathname = `/plans/${planId}${path}`;
-  return planStore.key ? createPlanLink(planId, planStore.key, pathname) : `${pathname}${route.hash}`;
+  return createPlanLink(planId, planStore.key!, pathname);
 }
 const duties = computed(() => {
   if (!planStore.selectedMemberId)

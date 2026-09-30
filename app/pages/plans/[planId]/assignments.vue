@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import type { Match, Slot } from "../../../utils/plan-types";
-import { usePlanStore } from "../../../stores/plan";
-import { checkMemberConflict, getMatchConflicts } from "../../../utils/conflict-detector";
-import { proposeHelperTeamsForMatch } from "../../../utils/helper-team-proposals";
-import { createPlanLink } from "../../../utils/plan-links";
+import type { ScheduleConflict } from "~/utils/conflict-detector";
+import type { Match, Slot } from "~/utils/plan-types";
+import { usePlanStore } from "~/stores/plan";
+import { checkMemberConflict, getMatchConflicts } from "~/utils/conflict-detector";
+import { proposeHelperTeamsForMatch } from "~/utils/helper-team-proposals";
+import { createPlanLink } from "~/utils/plan-links";
 
 const route = useRoute();
 const planStore = usePlanStore();
@@ -16,8 +17,8 @@ function getSuggestedHelperTeams(match: Match): string[] {
 // Per-match conflict map: matchId -> { slotId -> ScheduleConflict }
 const matchConflicts = computed(() => {
   if (!planStore.plan)
-    return {} as Record<string, Record<string, import("../../../utils/conflict-detector").ScheduleConflict>>;
-  const result: Record<string, Record<string, import("../../../utils/conflict-detector").ScheduleConflict>> = {};
+    return {} as Record<string, Record<string, ScheduleConflict>>;
+  const result: Record<string, Record<string, ScheduleConflict>> = {};
   for (const match of Object.values(planStore.matches)) {
     const conflicts = getMatchConflicts(planStore.plan, match);
     if (Object.keys(conflicts).length > 0)
