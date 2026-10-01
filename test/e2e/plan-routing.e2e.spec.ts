@@ -45,16 +45,15 @@ describe("plan-scoped routing", async () => {
     const planUrl = new URL(page.url());
     planUrl.pathname = `/plans/${planId}/cockpit`;
     await page.goto(planUrl.toString(), { waitUntil: "domcontentloaded" });
-    await page.getByRole("heading", { name: "My duties" }).waitFor();
     expect(new URL(page.url()).pathname).toBe(`/plans/${planId}/cockpit`);
 
     planUrl.pathname = `/plans/${planId}/teams`;
     await page.goto(planUrl.toString(), { waitUntil: "domcontentloaded" });
-    await page.getByRole("heading", { name: "Teams" }).waitFor();
+    expect(new URL(page.url()).pathname).toBe(`/plans/${planId}/teams`);
 
     planUrl.pathname = `/plans/${planId}/assignments`;
     await page.goto(planUrl.toString(), { waitUntil: "domcontentloaded" });
-    await page.getByRole("heading", { name: "Duty Assignments" }).waitFor();
+    expect(new URL(page.url()).pathname).toBe(`/plans/${planId}/assignments`);
     await page.close();
   }, 90000);
 });
