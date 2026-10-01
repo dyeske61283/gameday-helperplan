@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Gameday, Location, Match, Member, Role, Slot, Team } from "../utils/plan-types";
+import { createPlanLink } from "../utils/plan-links";
 
 const props = defineProps<{
   gameday: Gameday;
@@ -9,7 +10,8 @@ const props = defineProps<{
   roles: Role[];
   teams: Record<string, Team>;
   members: Record<string, Member>;
-  onCheckIn: (matchId: string, slotId: string) => Promise<void>;
+  planId: string;
+  planKey?: string | null;
 }>();
 const { t } = useI18n();
 
@@ -62,8 +64,9 @@ function isAssigned(slot: Slot) {
   return !!slot.assignedMemberId || !!slot.customHelperName;
 }
 
-async function handleCheckIn(matchId: string, slotId: string) {
-  await props.onCheckIn(matchId, slotId);
+function matchLink(matchId: string) {
+  const pathname = `/plans/${props.planId}/matches/${matchId}`;
+  return props.planKey ? createPlanLink(props.planId, props.planKey, pathname) : pathname;
 }
 </script>
 
@@ -111,7 +114,7 @@ async function handleCheckIn(matchId: string, slotId: string) {
       >
         <!-- Match Meta & Teams -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div class="flex items-center gap-3">
+          <NuxtLink :to="matchLink(match.id)" class="flex items-center gap-3 hover:text-primary">
             <div class="px-2.5 py-1 rounded-md bg-primary/10 text-primary font-mono font-bold text-sm">
               {{ formatMatchTime(match.time) }}
             </div>
@@ -120,7 +123,7 @@ async function handleCheckIn(matchId: string, slotId: string) {
               <span class="mx-2 text-neutral-400 font-normal">vs</span>
               <span class="text-neutral-600 dark:text-neutral-300">{{ match.awayTeamName }}</span>
             </div>
-          </div>
+          </NuxtLink>
 
           <!-- Helper Team Pill -->
           <div v-if="match.helperTeamId" class="flex items-center gap-1.5 text-xs text-on-surface-variant">
@@ -159,24 +162,13 @@ async function handleCheckIn(matchId: string, slotId: string) {
               </span>
             </div>
 
-            <!-- On-Site Check In Button / Badge -->
+            <!-- Assignment status -->
             <div class="shrink-0">
-              <UButton
-                v-if="isAssigned(slot)"
-                size="xs"
-                :variant="slot.checkedIn ? 'solid' : 'outline'"
-                :color="slot.checkedIn ? 'success' : 'neutral'"
-                class="rounded-full text-[10px] px-2 py-0.5"
-                @click="handleCheckIn(match.id, slot.id)"
-              >
-                <UIcon
-                  :name="slot.checkedIn ? 'i-lucide-check-circle' : 'i-lucide-user-check'"
-                  class="w-3 h-3 mr-1"
-                />
-                {{ slot.checkedIn ? t("dashboard.here") : t("dashboard.check_in") }}
-              </UButton>
-              <UBadge v-else size="xs" color="warning" variant="subtle">
+              <UBadge v-if="!isAssigned(slot)" size="xs" color="warning" variant="subtle">
                 {{ t("dashboard.needed") }}
+              </UBadge>
+              <UBadge v-if="isAssigned(slot)" size="xs" color="success" variant="subtle">
+                Assigned
               </UBadge>
             </div>
           </div>

@@ -82,6 +82,8 @@ boundary, not an authorization boundary; authorization remains separate work.
 
 ## Implementation State
 
-Pending. This ADR records the contract only. The route inventory and existing
-prototype behavior are the baseline for later migration and route removal; no
-runtime behavior is changed by this decision.
+Implemented by the plan-scoped routing migration: the canonical schedule now
+owns the timeline/calendar surface, member and admin pages live below
+`/plans/:planId`, links preserve the plan key, and the four global prototype
+routes have been removed. Remaining release-gate coverage is tracked in issue
+#33.

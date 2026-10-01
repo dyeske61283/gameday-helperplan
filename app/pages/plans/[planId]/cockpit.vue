@@ -1,8 +1,15 @@
 <script setup lang="ts">
-import { usePlanStore } from "../stores/plan";
+import { usePlanStore } from "~/stores/plan";
+import { createPlanLink } from "~/utils/plan-links";
 
+const route = useRoute();
 const planStore = usePlanStore();
 usePlanInit();
+function planLink(path = "") {
+  const planId = String(route.params.planId);
+  const pathname = `/plans/${planId}${path}`;
+  return createPlanLink(planId, planStore.key!, pathname);
+}
 const duties = computed(() => {
   if (!planStore.selectedMemberId)
     return [];
@@ -41,7 +48,7 @@ const duties = computed(() => {
       You have no personal duties.
     </div>
     <div v-else class="space-y-3">
-      <NuxtLink v-for="{ match, slot, gameday } in duties" :key="slot.id" :to="match ? `/plans/${planStore.plan?.id}/matches/${match.id}` : `/plans/${planStore.plan?.id}`" class="block rounded-xl border p-4 hover:border-primary">
+      <NuxtLink v-for="{ match, slot, gameday } in duties" :key="slot.id" :to="match ? planLink(`/matches/${match.id}`) : planLink()" class="block rounded-xl border p-4 hover:border-primary">
         <p class="font-semibold">
           {{ planStore.roles.find(role => role.id === slot.roleId)?.name || slot.roleId }}
         </p>
