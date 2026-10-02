@@ -79,3 +79,7 @@ export function findHardCodedUiText(source: string) {
 
   return violations;
 }
+
+export function findHardCodedUiTextInSources(sources: Array<{ path: string; source: string }>) {
+  return sources.flatMap(({ path, source }) => findHardCodedUiText(source).map(text => `${path}: ${text}`));
+}

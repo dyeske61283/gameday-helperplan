@@ -4,6 +4,7 @@ import de from "../../i18n/de.json";
 import en from "../../i18n/en.json";
 import {
   findHardCodedUiText,
+  findHardCodedUiTextInSources,
   findMissingLocalePaths,
   findMissingReferencedLocaleKeys,
   findReferencedLocaleKeys,
@@ -72,6 +73,13 @@ describe("locale completeness", () => {
       <button aria-label="Close">Close</button>
       <span>{{ member.name }}</span>
     `)).toEqual(["Search members", "Close", "line 3: Close"]);
+  });
+
+  it("keeps source paths attached to violations", () => {
+    expect(findHardCodedUiTextInSources([{ path: "app/example.vue", source: "<button title=\"Close\">Close</button>" }])).toEqual([
+      "app/example.vue: Close",
+      "app/example.vue: line 1: Close",
+    ]);
   });
 
   it("keeps literal translation references in application source valid", () => {
