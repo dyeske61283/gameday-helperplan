@@ -27,11 +27,23 @@ describe("usePlanStore", () => {
   });
 
   it("validates the required new-plan metadata", () => {
-    expect(NewPlanMetadataSchema.safeParse({ clubName: "", season: "2026/2027" }).success).toBe(false);
+    const invalidClub = NewPlanMetadataSchema.safeParse({ clubName: "", season: "2026/2027" });
+    const invalidSeason = NewPlanMetadataSchema.safeParse({ clubName: "Club", season: "" });
+    expect(invalidClub.success).toBe(false);
+    expect(invalidClub.error?.issues[0]?.message).toBe("ui.clubNameRequired");
+    expect(invalidSeason.success).toBe(false);
+    expect(invalidSeason.error?.issues[0]?.message).toBe("ui.seasonRequired");
     expect(NewPlanMetadataSchema.parse({ clubName: " TSV Musterstadt ", season: " 2026/2027 " })).toEqual({
       clubName: "TSV Musterstadt",
       season: "2026/2027",
     });
+  });
+
+  it("reports a localized error key when saving without plan context", async () => {
+    const store = usePlanStore();
+
+    await expect(store.savePlan()).resolves.toBe(false);
+    expect(store.error).toBe("ui.missingPlanKey");
   });
 
   it("returns false and preserves the draft when saving fails", async () => {
