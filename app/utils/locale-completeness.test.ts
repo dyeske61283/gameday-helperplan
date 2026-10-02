@@ -91,10 +91,22 @@ describe("locale completeness", () => {
     expect(findMissingReferencedLocaleKeys(sources, de)).toEqual([]);
   });
 
-  it("keeps public-facing Vue text behind locale keys", () => {
-    const sources = globSync("app/**/*.vue")
+  it("keeps public-facing application text behind locale keys", () => {
+    const sources = globSync("app/**/*.{vue,ts}")
+      .filter(path => !/\.(?:test|spec)\.ts$/.test(path))
       .map(path => ({ path, source: readFileSync(path, "utf8") }));
 
     expect(findHardCodedUiTextInSources(sources)).toEqual([]);
+  });
+
+  it("reports UI-facing TypeScript string literals", () => {
+    expect(findHardCodedUiTextInSources([{
+      path: "app/pages/example.vue",
+      source: "toast.add({ title: \"Saved\", description: \"Changes synced.\" });\nuseHead({ title: \"Edit plan\" });",
+    }])).toEqual([
+      "app/pages/example.vue: Saved",
+      "app/pages/example.vue: Changes synced.",
+      "app/pages/example.vue: Edit plan",
+    ]);
   });
 });

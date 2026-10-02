@@ -9,6 +9,7 @@ import { createPlanLink } from "~/utils/plan-links";
 const route = useRoute();
 const planStore = usePlanStore();
 const toast = useToast();
+const { t } = useI18n();
 
 function getSuggestedHelperTeams(match: Match): string[] {
   return proposeHelperTeamsForMatch(match, Object.values(planStore.matches)).slice(0, 2);
@@ -221,7 +222,7 @@ async function autoSave(
   }
   await planStore.savePlan();
   if (planStore.error) {
-    toast.add({ title: "Save Failed", description: planStore.error, color: "error" });
+    toast.add({ title: t("ui.saveFailed"), description: planStore.error, color: "error" });
   }
   else {
     toast.add({ title, description, color });
@@ -270,15 +271,15 @@ async function handleSavePlan() {
   await planStore.savePlan();
   if (planStore.error) {
     toast.add({
-      title: "Save Failed",
+      title: t("ui.saveFailed"),
       description: planStore.error,
       color: "error",
     });
   }
   else {
     toast.add({
-      title: "Plan Saved",
-      description: "All assignment changes synced to server.",
+      title: t("ui.planSaved"),
+      description: t("ui.assignmentsSynced"),
       color: "success",
     });
   }

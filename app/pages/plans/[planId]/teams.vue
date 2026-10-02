@@ -2,6 +2,7 @@
 import { usePlanStore } from "~/stores/plan";
 
 const planStore = usePlanStore();
+const { t } = useI18n();
 
 usePlanInit();
 
@@ -102,7 +103,7 @@ async function autoSave(title = "Saved", description = "Changes synced to server
   }
   await planStore.savePlan();
   if (planStore.error) {
-    toast.add({ title: "Save Failed", description: planStore.error, color: "error" });
+    toast.add({ title: t("ui.saveFailed"), description: planStore.error, color: "error" });
   }
   else {
     toast.add({ title, description, color: "success" });

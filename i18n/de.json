@@ -197,6 +197,18 @@
     "chooseMember": "Mitgliedsprofil auswählen",
     "memberProfile": "Mitgliedsprofil",
     "chooseMemberHint": "Wählen Sie ein Mitgliedsprofil, um mit der Übernahme fortzufahren.",
-    "brand": "Helperplan"
+    "brand": "Helperplan",
+    "setUpPlan": "Plan einrichten",
+    "saveFailed": "Speichern fehlgeschlagen",
+    "planSaved": "Plan gespeichert",
+    "assignmentsSynced": "Alle Aufgabenzuweisungen wurden mit dem Server synchronisiert.",
+    "checkChanges": "Änderungen prüfen",
+    "planUnavailable": "Plan ist nicht verfügbar.",
+    "couldNotSavePlan": "Der Plan konnte nicht gespeichert werden.",
+    "sharedPlanSynced": "Änderungen mit dem geteilten Plan synchronisiert.",
+    "reloadFailed": "Neuladen fehlgeschlagen",
+    "editPlan": "Plan bearbeiten",
+    "dutyClaimed": "Aufgabe übernommen",
+    "couldNotClaimDuty": "Aufgabe konnte nicht übernommen werden"
   }
 }

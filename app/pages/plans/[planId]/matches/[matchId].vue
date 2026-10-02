@@ -9,6 +9,7 @@ import { createPlanLink } from "~/utils/plan-links";
 const route = useRoute();
 const planStore = usePlanStore();
 const toast = useToast();
+const { t } = useI18n();
 usePlanInit();
 
 const match = computed(() => planStore.matches[route.params.matchId as string]);
@@ -43,14 +44,14 @@ async function claim(slot: Slot) {
     await planStore.savePlan();
     if (planStore.error)
       throw new Error(planStore.error);
-    toast.add({ title: "Duty claimed", color: "success" });
+    toast.add({ title: t("ui.dutyClaimed"), color: "success" });
   }
   catch (error) {
     slot.assignedMemberId = previous.assignedMemberId;
     slot.assignmentStatus = previous.assignmentStatus;
     slot.customHelperName = previous.customHelperName;
     slot.updatedAt = previous.updatedAt;
-    toast.add({ title: "Could not claim duty", description: (error as Error).message, color: "error" });
+    toast.add({ title: t("ui.couldNotClaimDuty"), description: (error as Error).message, color: "error" });
   }
 }
 

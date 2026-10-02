@@ -5,6 +5,7 @@ import { createPlanLink } from "../utils/plan-links";
 import { NewPlanMetadataSchema } from "../utils/plan-types";
 
 const planStore = usePlanStore();
+const { t } = useI18n();
 const { generateKey } = useEncryption();
 const step = ref(1);
 const clubName = ref("");
@@ -17,7 +18,7 @@ const isSaving = ref(false);
 const finalizedPlan = ref<{ id: string; key: string } | null>(null);
 const shareState = ref<"idle" | "copied" | "failed">("idle");
 
-useHead({ title: "Set up a plan" });
+useHead({ title: () => t("ui.setUpPlan") });
 
 const metadataValid = computed(() => NewPlanMetadataSchema.safeParse({ clubName: clubName.value, season: season.value }).success);
 const hasResume = computed(() => !!planStore.resumeState?.id && !!planStore.resumeState.key);

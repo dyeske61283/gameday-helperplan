@@ -11,6 +11,7 @@ import { createPlanLink } from "~/utils/plan-links";
 const route = useRoute();
 const planStore = usePlanStore();
 const toast = useToast();
+const { t } = useI18n();
 usePlanInit();
 
 const planLink = computed(() => planStore.key ? createPlanLink(String(route.params.planId), planStore.key) : `/plans/${route.params.planId}${route.hash}`);
@@ -114,7 +115,7 @@ function validate() {
 async function save() {
   const validationError = validate();
   if (validationError || !planStore.plan) {
-    toast.add({ title: "Check your changes", description: validationError || "Plan is unavailable.", color: "error" });
+    toast.add({ title: t("ui.checkChanges"), description: validationError || t("ui.planUnavailable"), color: "error" });
     return;
   }
   if (!draft.value)
@@ -140,12 +141,12 @@ async function save() {
   });
   const saved = await planStore.savePlan(draft.value);
   if (!saved) {
-    toast.add({ title: "Save failed", description: planStore.error || "Could not save the plan.", color: "error" });
+    toast.add({ title: t("ui.saveFailed"), description: planStore.error || t("ui.couldNotSavePlan"), color: "error" });
   }
   else {
     isDirty.value = false;
     planStore.setEditing(false);
-    toast.add({ title: "Plan saved", description: "Changes synced to the shared plan.", color: "success" });
+    toast.add({ title: t("ui.planSaved"), description: t("ui.sharedPlanSynced"), color: "success" });
   }
 }
 
@@ -156,7 +157,7 @@ async function reload() {
   planStore.applyPendingUpdate();
   await planStore.loadPlan(planStore.plan.id, planStore.key);
   if (planStore.error)
-    toast.add({ title: "Reload failed", description: planStore.error, color: "error" });
+    toast.add({ title: t("ui.reloadFailed"), description: planStore.error, color: "error" });
 }
 
 async function copyShareUrl() {
@@ -165,7 +166,7 @@ async function copyShareUrl() {
   shareState.value = await copyToClipboard(shareUrl.value) ? "copied" : "failed";
 }
 
-useHead({ title: "Edit plan" });
+useHead({ title: () => t("ui.editPlan") });
 </script>
 
 <template>

@@ -197,6 +197,18 @@
     "chooseMember": "Choose your member profile",
     "memberProfile": "Member profile",
     "chooseMemberHint": "Select a member profile to continue claiming this duty.",
-    "brand": "Helperplan"
+    "brand": "Helperplan",
+    "setUpPlan": "Set up a plan",
+    "saveFailed": "Save failed",
+    "planSaved": "Plan saved",
+    "assignmentsSynced": "All assignment changes synced to server.",
+    "checkChanges": "Check your changes",
+    "planUnavailable": "Plan is unavailable.",
+    "couldNotSavePlan": "Could not save the plan.",
+    "sharedPlanSynced": "Changes synced to the shared plan.",
+    "reloadFailed": "Reload failed",
+    "editPlan": "Edit plan",
+    "dutyClaimed": "Duty claimed",
+    "couldNotClaimDuty": "Could not claim duty"
   }
 }
