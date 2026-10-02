@@ -1,7 +1,3 @@
-<script lang="ts" setup>
-
-</script>
-
 <template>
   <div class="min-h-screen overflow-x-hidden flex flex-col">
     <UHeader title="Helperplan" :toggle="false">

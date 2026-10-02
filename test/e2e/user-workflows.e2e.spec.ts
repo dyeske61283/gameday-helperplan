@@ -2,12 +2,17 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { createPage, setup, url } from "@nuxt/test-utils/e2e";
-import { beforeAll, describe, expect } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { checkMemberConflict } from "../../app/utils/conflict-detector";
 import { autoAssignMatchDuties } from "../../app/utils/helper-assignment";
 import { generateMemberICal } from "../../app/utils/ical-export";
-import { Given, Scenario, Then, When } from "./helpers/bdd";
 /* eslint-disable node/no-process-env */
+
+const step = (_description: string, fn: () => Promise<void> | void) => fn();
+const Given = step;
+const Scenario = it;
+const Then = step;
+const When = step;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

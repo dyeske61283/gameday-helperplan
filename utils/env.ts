@@ -9,8 +9,9 @@ const EnvSchema = z.object({
 
 export type EnvSchemaType = z.infer<typeof EnvSchema>;
 
+let env: EnvSchemaType;
 try {
-  EnvSchema.parse(process.env);
+  env = EnvSchema.parse(process.env);
 }
 catch (error) {
   if (error instanceof ZodError) {
@@ -24,4 +25,4 @@ catch (error) {
   }
 }
 
-export default EnvSchema.parse(process.env);
+export default env!;
