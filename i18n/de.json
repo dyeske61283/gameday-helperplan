@@ -209,6 +209,8 @@
     "reloadFailed": "Neuladen fehlgeschlagen",
     "editPlan": "Plan bearbeiten",
     "dutyClaimed": "Aufgabe übernommen",
-    "couldNotClaimDuty": "Aufgabe konnte nicht übernommen werden"
+    "couldNotClaimDuty": "Aufgabe konnte nicht übernommen werden",
+    "clubSeasonRequired": "Geben Sie einen Vereinsnamen und eine Saison ein, um fortzufahren.",
+    "dutyRoleRequired": "Geben Sie mindestens eine Aufgabenrolle ein."
   }
 }

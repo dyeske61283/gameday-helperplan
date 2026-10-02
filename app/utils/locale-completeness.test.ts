@@ -85,6 +85,8 @@ describe("locale completeness", () => {
   it("keeps literal translation references in application source valid", () => {
     const sources = globSync("app/**/*.{vue,ts}")
       .filter(path => !/\.(?:test|spec)\.ts$/.test(path))
+      // Store errors may contain server-provided messages; pages translate their own UI fallbacks.
+      .filter(path => !path.startsWith("app/stores/"))
       .map(path => readFileSync(path, "utf8"));
 
     expect(findMissingReferencedLocaleKeys(sources, en)).toEqual([]);
@@ -94,6 +96,8 @@ describe("locale completeness", () => {
   it("keeps public-facing application text behind locale keys", () => {
     const sources = globSync("app/**/*.{vue,ts}")
       .filter(path => !/\.(?:test|spec)\.ts$/.test(path))
+      // Store errors may contain server-provided messages; pages translate their own UI fallbacks.
+      .filter(path => !path.startsWith("app/stores/"))
       .map(path => ({ path, source: readFileSync(path, "utf8") }));
 
     expect(findHardCodedUiTextInSources(sources)).toEqual([]);

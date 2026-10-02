@@ -209,6 +209,8 @@
     "reloadFailed": "Reload failed",
     "editPlan": "Edit plan",
     "dutyClaimed": "Duty claimed",
-    "couldNotClaimDuty": "Could not claim duty"
+    "couldNotClaimDuty": "Could not claim duty",
+    "clubSeasonRequired": "Enter a club name and season to continue.",
+    "dutyRoleRequired": "Enter at least one duty role."
   }
 }

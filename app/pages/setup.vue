@@ -30,7 +30,7 @@ function entries(value: string) {
 function continueFromMetadata() {
   error.value = "";
   if (!metadataValid.value) {
-    error.value = "Enter a club name and season to continue.";
+    error.value = t("ui.clubSeasonRequired");
     return;
   }
   step.value = 3;
@@ -45,13 +45,13 @@ async function createPlan() {
   error.value = "";
   if (!metadataValid.value) {
     step.value = 2;
-    error.value = "Enter a club name and season to continue.";
+    error.value = t("ui.clubSeasonRequired");
     return;
   }
 
   const roles = entries(rolesText.value);
   if (!roles.length) {
-    error.value = "Enter at least one duty role.";
+    error.value = t("ui.dutyRoleRequired");
     return;
   }
 
