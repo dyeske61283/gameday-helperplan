@@ -1,6 +1,9 @@
 import type { ZodType } from "zod";
 import z from "zod";
 
+export type SchemaVersion = 1 | 2;
+export const CURRENT_SCHEMA_VERSION: SchemaVersion = 2;
+
 const unixTimestampToDateSchema: ZodType<Date, number> = z.number().int().positive().transform(millis => new Date(millis));
 const isoDateTimeStringToDateSchema: ZodType<Date, string> = z.iso.datetime().transform(millis => new Date(millis));
 
@@ -119,7 +122,7 @@ export type Skill = z.infer<typeof SkillSchema>;
 
 export const SeasonPlanSchema = z.object({
   id: z.uuid(),
-  schemaVersion: z.number().positive(),
+  schemaVersion: z.union([z.literal(1), z.literal(CURRENT_SCHEMA_VERSION)]),
   rev: z.number().positive(),
   lastUpdated: unixTimestampToDateSchema,
   club: ClubSchema,

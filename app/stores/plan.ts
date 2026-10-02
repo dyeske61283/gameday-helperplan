@@ -1,6 +1,5 @@
 import type { AutoAssignOptions } from "../utils/helper-assignment";
 import type {
-  Club,
   Gameday,
   Match,
   Member,
@@ -14,8 +13,8 @@ import { computed, ref, toRaw } from "vue";
 import examplePlan from "../../test/fixtures/plan-2025-2026.json";
 import { useDecryption, useEncryption } from "../composables/use-crypto";
 import { autoAssignMatchDuties, completeClosedAssignments, isMemberEligibleForSlot } from "../utils/helper-assignment";
+import { CURRENT_SCHEMA_VERSION } from "../utils/plan-types";
 
-const STORAGE_KEY = "gameday-plan-id";
 const RESUME_KEY = "gameday-plan-resume";
 const MEMBER_KEY = "gameday-selected-member";
 const _FRAGMENT_PREFIX = "key=";
@@ -23,9 +22,7 @@ const _FRAGMENT_PREFIX = "key=";
 /**
  * Migrate the plan schema if needed.
  */
-export function migrateIfNeeded(loadedPlan: SeasonPlan): SeasonPlan {
-  const CURRENT_SCHEMA_VERSION = 2;
-
+export function migrateIfNeeded(loadedPlan: Omit<SeasonPlan, "schemaVersion"> & { schemaVersion: number }): SeasonPlan {
   if (loadedPlan.schemaVersion < CURRENT_SCHEMA_VERSION) {
     console.warn(
       `Migrating plan from version ${loadedPlan.schemaVersion} to ${CURRENT_SCHEMA_VERSION}`,
@@ -62,7 +59,7 @@ export function migrateIfNeeded(loadedPlan: SeasonPlan): SeasonPlan {
     loadedPlan.schemaVersion = CURRENT_SCHEMA_VERSION;
   }
 
-  return loadedPlan;
+  return loadedPlan as SeasonPlan;
 }
 
 export const usePlanStore = defineStore("plan", () => {
@@ -76,8 +73,6 @@ export const usePlanStore = defineStore("plan", () => {
   const eventSource = ref<EventSource | null>(null);
   let completionTimer: ReturnType<typeof setInterval> | undefined;
 
-  // Local storage for the last active plan ID
-  const lastPlanId = useLocalStorage(STORAGE_KEY, "");
   const resumeState = useLocalStorage<{ id: string; key: string } | null>(RESUME_KEY, null, {
     serializer: {
       read: (value) => {
@@ -150,7 +145,6 @@ export const usePlanStore = defineStore("plan", () => {
       completeClosedAssignments(loadedPlan);
 
       plan.value = loadedPlan;
-      lastPlanId.value = id;
       resumeState.value = { id, key: decryptionKey };
     }
     catch (err: unknown) {
@@ -265,7 +259,6 @@ export const usePlanStore = defineStore("plan", () => {
       if (plan.value === livePlan)
         plan.value = planToSave;
       pendingUpdate.value = null;
-      lastPlanId.value = planToSave.id;
       resumeState.value = { id: planToSave.id, key: key.value };
       return true;
     }
@@ -295,7 +288,7 @@ export const usePlanStore = defineStore("plan", () => {
       },
       lastUpdated: now,
       skills: {},
-      schemaVersion: 2,
+      schemaVersion: CURRENT_SCHEMA_VERSION,
       rev: 1,
       season: metadata?.season ?? `${new Date().getFullYear()}/${new Date().getFullYear() + 1}`,
       members: {},
@@ -355,8 +348,6 @@ export const usePlanStore = defineStore("plan", () => {
 
     plan.value.id = id;
     key.value = newKey;
-    lastPlanId.value = id;
-
     await savePlan();
   }
 
@@ -395,17 +386,6 @@ export const usePlanStore = defineStore("plan", () => {
       m.teamIds = m.teamIds.filter(tId => tId !== teamId);
     });
     plan.value.lastUpdated = new Date();
-  }
-
-  function updatePlanDetails(updates: { club?: Partial<Club>; season?: string }) {
-    if (!plan.value)
-      return;
-    const now = new Date();
-    if (updates.club)
-      plan.value.club = { ...plan.value.club, ...updates.club, lastUpdated: now };
-    if (updates.season !== undefined)
-      plan.value.season = updates.season;
-    plan.value.lastUpdated = now;
   }
 
   // --- Domain Methods: Members ---
@@ -578,7 +558,6 @@ export const usePlanStore = defineStore("plan", () => {
   return {
     plan,
     key,
-    lastPlanId,
     resumeState,
     selectedMemberId,
     isLoading,
@@ -606,7 +585,6 @@ export const usePlanStore = defineStore("plan", () => {
     addTeam,
     updateTeam,
     deleteTeam,
-    updatePlanDetails,
     addMember,
     configureRoles,
     updateMember,

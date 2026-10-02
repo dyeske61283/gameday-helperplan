@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { usePlanStore } from "../stores/plan";
+import { copyToClipboard } from "../utils/clipboard";
 import { createPlanLink } from "../utils/plan-links";
 import { NewPlanMetadataSchema } from "../utils/plan-types";
 
@@ -83,13 +84,7 @@ const shareUrl = computed(() => finalizedPlan.value ? createPlanLink(finalizedPl
 async function copyShareUrl() {
   if (!shareUrl.value)
     return;
-  try {
-    await navigator.clipboard.writeText(shareUrl.value);
-    shareState.value = "copied";
-  }
-  catch {
-    shareState.value = "failed";
-  }
+  shareState.value = await copyToClipboard(shareUrl.value) ? "copied" : "failed";
 }
 
 async function resumePlan() {

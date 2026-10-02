@@ -60,9 +60,12 @@ describe("feature: User Workflows (BDD Specs)", async () => {
       const clubName = await workflowPage.inputValue("input");
       expect(clubName).toContain("Gladbeck HC");
     });
-    await Then("the plan ID is persisted to localStorage under gameday-plan-id", async () => {
-      const storedId = await workflowPage.evaluate(() => localStorage.getItem("gameday-plan-id"));
-      expect(storedId).toBe("f530083d-8c74-4f10-931a-dd877ee7b52c");
+    await Then("the plan ID and key are persisted to localStorage for resume", async () => {
+      const storedResume = await workflowPage.evaluate(() => JSON.parse(localStorage.getItem("gameday-plan-resume") || "null"));
+      expect(storedResume).toMatchObject({
+        id: "f530083d-8c74-4f10-931a-dd877ee7b52c",
+        key: expect.any(String),
+      });
     });
     await Then("the setup view displays the active plan with Plan ID and encryption key indicator", async () => {
       const content = await workflowPage.textContent("body");

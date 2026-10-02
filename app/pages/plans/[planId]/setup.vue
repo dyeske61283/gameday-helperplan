@@ -3,7 +3,9 @@
 <script setup lang="ts">
 import type { SeasonPlan } from "~/utils/plan-types";
 import { toRaw } from "vue";
+import z from "zod";
 import { usePlanStore } from "~/stores/plan";
+import { copyToClipboard } from "~/utils/clipboard";
 import { createPlanLink } from "~/utils/plan-links";
 
 const route = useRoute();
@@ -26,6 +28,13 @@ const newMemberName = ref("");
 const isDirty = ref(false);
 const syncingDrafts = ref(false);
 const shareState = ref<"idle" | "copied" | "failed">("idle");
+
+const SetupSchema = z.object({
+  clubName: z.string().trim().min(1, "Club name and season are required."),
+  season: z.string().trim().min(1, "Club name and season are required."),
+  contactEmail: z.email("Enter a valid contact email.").or(z.literal("")),
+  homepage: z.string().trim().refine(value => !value || /^https?:\/\//.test(value), "Homepage must start with http:// or https://."),
+});
 
 function syncDrafts() {
   if (!planStore.plan || isDirty.value)
@@ -89,14 +98,16 @@ function removeMember(memberId: string) {
 }
 
 function validate() {
-  if (!clubName.value.trim() || !season.value.trim())
-    return "Club name and season are required.";
+  const result = SetupSchema.safeParse({
+    clubName: clubName.value,
+    season: season.value,
+    contactEmail: contactEmail.value,
+    homepage: homepage.value,
+  });
+  if (!result.success)
+    return result.error.issues[0]?.message ?? "Check your plan details.";
   if (!draft.value || Object.values(draft.value.teams).some(team => !team.name.trim()) || Object.values(draft.value.members).some(member => !member.name.trim()))
     return "Team and member names cannot be empty.";
-  if (contactEmail.value && (!contactEmail.value.includes("@") || !contactEmail.value.includes(".")))
-    return "Enter a valid contact email.";
-  if (homepage.value && !/^https?:\/\//.test(homepage.value))
-    return "Homepage must start with http:// or https://.";
   return null;
 }
 
@@ -151,13 +162,7 @@ async function reload() {
 async function copyShareUrl() {
   if (!shareUrl.value)
     return;
-  try {
-    await navigator.clipboard.writeText(shareUrl.value);
-    shareState.value = "copied";
-  }
-  catch {
-    shareState.value = "failed";
-  }
+  shareState.value = await copyToClipboard(shareUrl.value) ? "copied" : "failed";
 }
 
 useHead({ title: "Edit plan" });

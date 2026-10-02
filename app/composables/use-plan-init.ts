@@ -8,7 +8,7 @@ import { usePlanStore } from "../stores/plan";
  * Load priority:
  *   1. If planId + key come from the URL path/hash → load from server.
  *   2. Else if the store already has a plan in memory → keep it (navigation within session).
- *   3. Else if lastPlanId + key are known (localStorage + store) → reload from server.
+ *   3. Else if a resume state is known → reload from server.
  *   4. No plan → leave the UI in its empty state.
  *
  * Also starts the SSE watcher and calls initFromUrl() so the encryption

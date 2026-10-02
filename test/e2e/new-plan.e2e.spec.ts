@@ -7,8 +7,10 @@ describe("new plan setup", async () => {
   it("creates, encrypts, opens, and reloads a plan", async () => {
     const page = await createPage();
     await page.goto(url("/setup"), { waitUntil: "domcontentloaded" });
-    await page.waitForFunction(() => !!(document.querySelector("button") as any)?.__vueParentComponent, null, { timeout: 10000 });
+    await page.waitForLoadState("networkidle");
+    await page.getByRole("button", { name: "Start Setup" }).waitFor();
     await page.getByRole("button", { name: "Start Setup" }).click();
+    await page.getByRole("heading", { name: "Club Information" }).waitFor();
     await page.locator("input").nth(0).fill("TSV Browser Test");
     await page.locator("input").nth(1).fill("2026/2027");
     await page.getByRole("button", { name: "Continue" }).click();
