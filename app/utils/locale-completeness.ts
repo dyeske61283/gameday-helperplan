@@ -79,7 +79,7 @@ export function findHardCodedUiText(source: string) {
   }
 
   for (const [index, line] of source.split("\n").entries()) {
-    const text = line.match(/>([^<]*)<\//)?.[1]?.trim();
+    const text = line.match(/>([^<{][^<]*)<\/[^>]+>/)?.[1]?.trim();
     if (text && !text.includes("{{") && !ignoredText.test(text) && /[a-z]/i.test(text))
       violations.push(`line ${index + 1}: ${text}`);
   }
