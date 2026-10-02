@@ -34,6 +34,17 @@ const duties = computed(() => {
         {{ $t("ui.cockpit.yourClaimedHelperDuties") }}
       </p>
     </header>
+    <label class="block space-y-2">
+      <span class="font-semibold">{{ $t("ui.memberProfile") }}</span>
+      <select v-model="planStore.selectedMemberId" class="w-full rounded-lg border p-2" :aria-label="$t('ui.memberProfile')">
+        <option :value="null">
+          {{ $t("ui.match.selectAMember") }}
+        </option>
+        <option v-for="member in planStore.membersList" :key="member.id" :value="member.id">
+          {{ member.name }}
+        </option>
+      </select>
+    </label>
     <div v-if="planStore.error" class="rounded-xl border border-dashed p-8 text-center space-y-3">
       <p>{{ $t('ui.loadPlanFailed') }}</p>
       <p class="text-sm text-neutral-500">

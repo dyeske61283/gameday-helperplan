@@ -366,6 +366,19 @@ describe("usePlanStore", () => {
   });
 
   describe("claimSlot", () => {
+    it("keeps selected members scoped to their plan", () => {
+      const store = usePlanStore();
+      store.createNewPlan("plan-a", "key-a");
+      store.selectedMemberId = "member-a";
+
+      store.createNewPlan("plan-b", "key-b");
+      expect(store.selectedMemberId).toBeNull();
+
+      store.selectedMemberId = "member-b";
+      store.createNewPlan("plan-a", "key-a");
+      expect(store.selectedMemberId).toBe("member-a");
+    });
+
     it("claims an open eligible slot without replacing an assignment", () => {
       const store = usePlanStore();
       store.createNewPlan("test-plan-id", "test-key");

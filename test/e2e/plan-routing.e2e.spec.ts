@@ -40,8 +40,13 @@ describe("plan-scoped routing", async () => {
     const matchUrl = new URL(matchHref!, page.url());
     const planId = matchUrl.pathname.split("/")[2];
     expect(planId).toBeTruthy();
+    expect(matchUrl.hash).toBe("#key=tWVZ4hmOA7LFsrNViX1X6w");
     await page.goto(matchUrl.toString(), { waitUntil: "domcontentloaded" });
     expect(new URL(page.url()).pathname).toMatch(/^\/plans\/[^/]+\/matches\/[^/]+$/);
+    const allFixturesUrl = new URL(await page.getByText("All fixtures").getAttribute("href")!, page.url());
+    expect(allFixturesUrl.pathname).toBe(`/plans/${planId}`);
+    expect(allFixturesUrl.hash).toBe("#key=tWVZ4hmOA7LFsrNViX1X6w");
+    expect(await page.getByText("Claiming as").count()).toBe(0);
 
     const planUrl = new URL(page.url());
     planUrl.pathname = `/plans/${planId}/cockpit`;
@@ -55,6 +60,20 @@ describe("plan-scoped routing", async () => {
     planUrl.pathname = `/plans/${planId}/assignments`;
     await page.goto(planUrl.toString(), { waitUntil: "domcontentloaded" });
     expect(new URL(page.url()).pathname).toBe(`/plans/${planId}/assignments`);
+    await page.close();
+  }, 90000);
+
+  it("lets the cockpit own member selection", async () => {
+    const page = await createPage();
+    await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
+    await page.goto(testUrl(`/plans/${seededPlanId}/cockpit#key=tWVZ4hmOA7LFsrNViX1X6w`), { waitUntil: "domcontentloaded" });
+
+    await page.getByRole("heading", { name: "My Duties" }).waitFor();
+    const memberProfile = page.getByLabel("Member profile");
+    expect(await memberProfile.count()).toBeGreaterThan(0);
+    await memberProfile.selectOption({ index: 1 });
+    const selectedMember = await memberProfile.inputValue();
+    expect(await page.evaluate(planId => JSON.parse(localStorage.getItem("gameday-selected-member") || "{}")?.[planId], seededPlanId)).toBe(selectedMember);
     await page.close();
   }, 90000);
 });

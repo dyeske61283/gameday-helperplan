@@ -86,7 +86,20 @@ export const usePlanStore = defineStore("plan", () => {
       write: value => JSON.stringify(value),
     },
   });
-  const selectedMemberId = useLocalStorage<string | null>(MEMBER_KEY, null);
+  const selectedMembers = useLocalStorage<Record<string, string>>(MEMBER_KEY, {});
+  const selectedMemberId = computed<string | null>({
+    get: () => plan.value ? selectedMembers.value[plan.value.id] ?? null : null,
+    set: (memberId) => {
+      if (!plan.value)
+        return;
+      const next = { ...selectedMembers.value };
+      if (memberId)
+        next[plan.value.id] = memberId;
+      else
+        delete next[plan.value.id];
+      selectedMembers.value = next;
+    },
+  });
 
   const { encryptData, generateKey } = useEncryption();
   const { decryptBlob } = useDecryption();

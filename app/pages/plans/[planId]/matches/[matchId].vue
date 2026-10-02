@@ -20,6 +20,11 @@ const cockpitLink = computed(() => {
   const pathname = `/plans/${planId}/cockpit`;
   return planStore.key ? createPlanLink(planId, planStore.key, pathname) : `${pathname}${route.hash}`;
 });
+function planLink(path = "") {
+  const planId = String(route.params.planId);
+  const pathname = `/plans/${planId}${path}`;
+  return planStore.key ? createPlanLink(planId, planStore.key, pathname) : `${pathname}${route.hash}`;
+}
 const selectedMember = computed(() => planStore.selectedMemberId ? planStore.members[planStore.selectedMemberId] : undefined);
 const roleName = (slot: Slot) => planStore.roles.find(role => role.id === slot.roleId)?.name || slot.roleId;
 function canClaim(slot: Slot) {
@@ -76,12 +81,12 @@ async function resumeClaim() {
       <p class="text-sm text-neutral-500">
         {{ $t("ui.match.thisMatchIsNotPartOfTheSharedPlan") }}
       </p>
-      <UButton :to="`/plans/${route.params.planId}`">
+      <UButton :to="planLink()">
         {{ $t("ui.match.backToFixtures") }}
       </UButton>
     </div>
     <template v-else>
-      <NuxtLink :to="`/plans/${route.params.planId}`" class="text-sm text-primary">
+      <NuxtLink :to="planLink()" class="text-sm text-primary">
         {{ $t("ui.match.allFixtures") }}
       </NuxtLink>
       <header>
@@ -92,17 +97,6 @@ async function resumeClaim() {
           {{ new Date(match.time).toLocaleString() }}
         </p>
       </header>
-      <div class="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
-        <p class="font-semibold">
-          {{ $t("ui.match.claimingAs") }}
-        </p>
-        <p v-if="!selectedMember">
-          {{ $t("ui.match.selectYourMemberProfileBeforeClaimingADuty") }}
-        </p>
-        <p v-else>
-          {{ selectedMember.name }}. You can change this selection at any time.
-        </p>
-      </div>
       <div v-if="match.slots.length" class="space-y-3">
         <div v-for="slot in match.slots" :key="slot.id" class="flex items-center justify-between gap-4 rounded-xl border p-4">
           <div>
