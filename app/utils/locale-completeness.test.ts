@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import de from "../../i18n/de.json";
 import en from "../../i18n/en.json";
 import {
+  findHardCodedUiText,
   findMissingLocalePaths,
   findMissingReferencedLocaleKeys,
   findReferencedLocaleKeys,
@@ -63,6 +64,14 @@ describe("locale completeness", () => {
     expect(findMissingReferencedLocaleKeys(["t(\"missing.key\")"], { known: "yes" })).toEqual([
       "missing.key",
     ]);
+  });
+
+  it("reports public-facing literal text and allows dynamic bindings", () => {
+    expect(findHardCodedUiText(`
+      <UInput placeholder="Search members" />
+      <button aria-label="Close">Close</button>
+      <span>{{ member.name }}</span>
+    `)).toEqual(["Search members", "Close", "line 3: Close"]);
   });
 
   it("keeps literal translation references in application source valid", () => {

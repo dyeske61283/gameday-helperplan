@@ -58,3 +58,24 @@ export function findMissingReferencedLocaleKeys(sources: string[], locale: Local
   const paths = new Set(collectPaths(locale));
   return findReferencedLocaleKeys(sources).filter(key => !paths.has(key));
 }
+
+const publicAttributes = /(?<!:)\b(?:aria-label|description|hint|label|placeholder|title)="([^"{]+)"/g;
+const ignoredText = /^(?:https?:\/\/|[•·]|vs)$/i;
+
+export function findHardCodedUiText(source: string) {
+  const violations: string[] = [];
+
+  for (const match of source.matchAll(publicAttributes)) {
+    const value = match[1]?.trim();
+    if (value && !ignoredText.test(value))
+      violations.push(value);
+  }
+
+  for (const [index, line] of source.split("\n").entries()) {
+    const text = line.match(/>([^<]*)<\//)?.[1]?.trim();
+    if (text && !text.includes("{{") && !ignoredText.test(text) && /[a-z]/i.test(text))
+      violations.push(`line ${index + 1}: ${text}`);
+  }
+
+  return violations;
+}
