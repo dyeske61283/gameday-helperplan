@@ -67,13 +67,13 @@ async function createPlan() {
     planStore.configureRoles(roles);
 
     if (!await planStore.savePlan()) {
-      error.value = planStore.error || "Could not save the plan.";
+      error.value = planStore.error || t("ui.couldNotSavePlan");
       return;
     }
     finalizedPlan.value = { id, key };
   }
   catch (cause) {
-    error.value = cause instanceof Error ? cause.message : "Could not save the plan.";
+    error.value = cause instanceof Error ? cause.message : t("ui.couldNotSavePlan");
   }
   finally {
     isSaving.value = false;
@@ -102,10 +102,10 @@ async function resumePlan() {
           Step {{ step }} of 4
         </p>
         <h1 class="text-3xl font-bold text-on-surface">
-          {{ $t("ui.bulk.bulk_06c2bc3c45") }}
+          {{ $t("ui.setup.title") }}
         </h1>
         <p class="text-on-surface-variant">
-          {{ $t("ui.bulk.bulk_2a7819a98a") }}
+          {{ $t("ui.setup.intro") }}
         </p>
       </header>
 
@@ -114,52 +114,52 @@ async function resumePlan() {
       <section v-if="finalizedPlan" aria-labelledby="ready-heading" class="space-y-5 rounded-xl border border-success/40 p-5">
         <div>
           <h2 id="ready-heading" class="text-xl font-semibold">
-            {{ $t("ui.bulk.bulk_f49ca08145") }}
+            {{ $t("ui.setup.ready") }}
           </h2>
           <p class="text-on-surface-variant">
-            {{ $t("ui.bulk.bulk_ed30815f48") }}
+            {{ $t("ui.setup.savedIntro") }}
           </p>
         </div>
         <div class="flex flex-col gap-2 sm:flex-row">
           <UInput :model-value="shareUrl" readonly :aria-label="$t('ui.shareLink')" class="grow" />
           <UButton @click="copyShareUrl">
-            {{ $t("ui.bulk.bulk_dd71c73b93") }}
+            {{ $t("ui.common.copyShareLink") }}
           </UButton>
           <UButton :to="shareUrl" variant="outline">
-            {{ $t("ui.bulk.bulk_717d4fbd3e") }}
+            {{ $t("ui.setup.openSchedule") }}
           </UButton>
         </div>
         <p v-if="shareState === 'copied'" role="status" class="text-sm text-success">
-          {{ $t("ui.bulk.bulk_c0aea5c684") }}
+          {{ $t("ui.common.shareCopied") }}
         </p>
         <p v-else-if="shareState === 'failed'" role="alert" class="text-sm text-error">
-          {{ $t("ui.bulk.bulk_bd126302d0") }}
+          {{ $t("ui.common.shareCopyFailed") }}
         </p>
       </section>
 
       <section v-if="step === 1" aria-labelledby="start-heading" class="space-y-5">
         <h2 id="start-heading" class="text-xl font-semibold">
-          {{ $t("ui.bulk.bulk_2008c0a08b") }}
+          {{ $t("ui.setup.start") }}
         </h2>
         <p class="text-on-surface-variant">
-          {{ $t("ui.bulk.bulk_1b72d8bd26") }}
+          {{ $t("ui.setup.startIntro") }}
         </p>
         <div class="flex flex-wrap gap-3">
           <UButton size="lg" @click="step = 2">
-            {{ $t("ui.bulk.bulk_2008c0a08b") }}
+            {{ $t("ui.setup.start") }}
           </UButton>
           <UButton v-if="hasResume" variant="outline" size="lg" @click="resumePlan">
-            {{ $t("ui.bulk.bulk_0a284a1dc5") }}
+            {{ $t("ui.setup.resumeLast") }}
           </UButton>
           <UButton to="/" variant="ghost" size="lg">
-            {{ $t("ui.bulk.bulk_77dfd2135f") }}
+            {{ $t("ui.common.cancel") }}
           </UButton>
         </div>
       </section>
 
       <form v-else-if="step === 2" class="space-y-5" @submit.prevent="continueFromMetadata">
         <h2 class="text-xl font-semibold">
-          {{ $t("ui.bulk.bulk_602f1a24a2") }}
+          {{ $t("ui.setup.clubInfo") }}
         </h2>
         <UFormField :label="$t('ui.clubName')" required>
           <UInput v-model="clubName" autofocus :placeholder="$t('ui.clubExample')" class="w-full" />
@@ -169,13 +169,13 @@ async function resumePlan() {
         </UFormField>
         <div class="flex justify-between gap-3">
           <UButton type="button" variant="ghost" @click="step = 1">
-            {{ $t("ui.bulk.bulk_b52b36b726") }}
+            {{ $t("ui.common.back") }}
           </UButton>
           <div class="flex gap-3">
             <UButton type="button" variant="outline" @click="navigateTo('/')">
-              {{ $t("ui.bulk.bulk_77dfd2135f") }}
+              {{ $t("ui.common.cancel") }}
             </UButton><UButton type="submit">
-              {{ $t("ui.bulk.bulk_2e02623966") }}
+              {{ $t("ui.common.continue") }}
             </UButton>
           </div>
         </div>
@@ -183,20 +183,20 @@ async function resumePlan() {
 
       <form v-else-if="step === 3" class="space-y-5" @submit.prevent="continueFromTeams">
         <h2 class="text-xl font-semibold">
-          {{ $t("ui.bulk.bulk_cbfd44d9c7") }}
+          {{ $t("ui.setup.teams") }}
         </h2>
         <p class="text-sm text-on-surface-variant">
-          {{ $t("ui.bulk.bulk_08c6c65e9e") }}
+          {{ $t("ui.setup.teamHint") }}
         </p>
         <UTextarea v-model="teamsText" :rows="6" :placeholder="$t('ui.teamsExample')" class="w-full" />
         <div class="flex justify-between gap-3">
           <UButton type="button" variant="ghost" @click="step = 2">
-            {{ $t("ui.bulk.bulk_b52b36b726") }}
+            {{ $t("ui.common.back") }}
           </UButton><div class="flex gap-3">
             <UButton type="button" variant="outline" @click="navigateTo('/')">
-              {{ $t("ui.bulk.bulk_77dfd2135f") }}
+              {{ $t("ui.common.cancel") }}
             </UButton><UButton type="submit">
-              {{ $t("ui.bulk.bulk_1901ec6392") }}
+              {{ $t("ui.setup.continueMembers") }}
             </UButton>
           </div>
         </div>
@@ -204,7 +204,7 @@ async function resumePlan() {
 
       <form v-else class="space-y-5" @submit.prevent="createPlan">
         <h2 class="text-xl font-semibold">
-          {{ $t("ui.bulk.bulk_09a74a51eb") }}
+          {{ $t("ui.setup.membersAndDuties") }}
         </h2>
         <UFormField :label="$t('ui.members')" :hint="$t('ui.membersHint')">
           <UTextarea v-model="membersText" :rows="6" :placeholder="$t('ui.membersExample')" class="w-full" />
@@ -214,12 +214,12 @@ async function resumePlan() {
         </UFormField>
         <div class="flex justify-between gap-3">
           <UButton type="button" variant="ghost" @click="step = 3">
-            {{ $t("ui.bulk.bulk_b52b36b726") }}
+            {{ $t("ui.common.back") }}
           </UButton><div class="flex gap-3">
             <UButton type="button" variant="outline" @click="navigateTo('/')">
-              {{ $t("ui.bulk.bulk_77dfd2135f") }}
+              {{ $t("ui.common.cancel") }}
             </UButton><UButton type="submit" :loading="isSaving">
-              {{ $t("ui.bulk.bulk_37683d4ef8") }}
+              {{ $t("ui.setup.finish") }}
             </UButton>
           </div>
         </div>

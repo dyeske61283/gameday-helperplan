@@ -131,7 +131,7 @@ async function saveMember() {
     skillIds: selectedMember.value.skillIds,
   });
   isMemberModalOpen.value = false;
-  await autoSave("Member Saved", `${selectedMember.value.name} has been updated.`);
+  await autoSave(t("ui.memberSaved"), t("ui.memberUpdated", { name: selectedMember.value.name }));
 }
 
 async function addMember() {
@@ -168,12 +168,12 @@ async function saveTeam() {
     planStore.updateTeam(selectedTeam.value.id, newTeamName.value);
   }
   isTeamModalOpen.value = false;
-  await autoSave("Team Saved");
+  await autoSave(t("ui.teamSaved"));
 }
 
 async function deleteTeam(teamId: string) {
   planStore.deleteTeam(teamId);
-  await autoSave("Team Deleted");
+  await autoSave(t("ui.teamDeleted"));
 }
 </script>
 
@@ -184,10 +184,10 @@ async function deleteTeam(teamId: string) {
       <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h1 class="text-4xl font-bold tracking-tight text-on-surface">
-            {{ $t("ui.bulk.bulk_cbfd44d9c7") }}
+            {{ $t("ui.setup.teams") }}
           </h1>
           <p class="text-sm text-neutral-500 mt-1">
-            {{ $t("ui.bulk.bulk_8bb2dd0f85") }}
+            {{ $t("ui.teams.manageYourClubTeamsLicensesAndMemberRoles") }}
           </p>
         </div>
         <div class="flex gap-3">
@@ -196,13 +196,13 @@ async function deleteTeam(teamId: string) {
             variant="outline"
             @click="addMember"
           >
-            {{ $t("ui.bulk.bulk_fbe4f901cb") }}
+            {{ $t("ui.teams.addMember") }}
           </UButton>
           <UButton
             icon="i-lucide-plus"
             @click="openCreateTeam"
           >
-            {{ $t("ui.bulk.bulk_8b8973510f") }}
+            {{ $t("ui.teams.createTeam") }}
           </UButton>
         </div>
       </div>
@@ -239,7 +239,7 @@ async function deleteTeam(teamId: string) {
                     color="neutral"
                     @click.stop="openEditTeam(item.value)"
                   >
-                    {{ $t("ui.bulk.bulk_7d94193c78") }}
+                    {{ $t("ui.teams.editName") }}
                   </UButton>
                   <UButton
                     size="xs"
@@ -248,14 +248,14 @@ async function deleteTeam(teamId: string) {
                     color="error"
                     @click.stop="deleteTeam(item.value)"
                   >
-                    {{ $t("ui.bulk.bulk_6ed65c185b") }}
+                    {{ $t("ui.teams.deleteTeam") }}
                   </UButton>
                 </div>
               </div>
 
               <!-- Inside Members List -->
               <div v-if="getMembersForTeam(item.value).length === 0" class="text-sm text-neutral-400 py-2 text-center">
-                {{ $t("ui.bulk.bulk_2f95244535") }}
+                {{ $t("ui.teams.noMembersFound") }}
               </div>
               <div v-else v-auto-animate class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div
@@ -391,10 +391,10 @@ async function deleteTeam(teamId: string) {
       <template #footer>
         <div class="flex gap-2 justify-end w-full">
           <UButton variant="outline" color="neutral" @click="isMemberModalOpen = false">
-            {{ $t("ui.bulk.bulk_77dfd2135f") }}
+            {{ $t("ui.common.cancel") }}
           </UButton>
           <UButton @click="saveMember">
-            {{ $t("ui.bulk.bulk_fa2984b367") }}
+            {{ $t("ui.common.saveChanges") }}
           </UButton>
         </div>
       </template>
@@ -415,7 +415,7 @@ async function deleteTeam(teamId: string) {
       <template #footer>
         <div class="flex gap-2 justify-end w-full">
           <UButton variant="outline" color="neutral" @click="isTeamModalOpen = false">
-            {{ $t("ui.bulk.bulk_77dfd2135f") }}
+            {{ $t("ui.common.cancel") }}
           </UButton>
           <UButton :disabled="!newTeamName.trim()" @click="saveTeam">
             {{ isCreatingTeam ? 'Create' : 'Save' }}

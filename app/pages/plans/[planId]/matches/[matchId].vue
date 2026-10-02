@@ -67,22 +67,22 @@ async function resumeClaim() {
 <template>
   <UContainer class="py-8 max-w-3xl space-y-6">
     <div v-if="planStore.isLoading">
-      {{ $t("ui.bulk.bulk_9876a07e15") }}
+      {{ $t("ui.match.loadingMatch") }}
     </div>
     <div v-else-if="!match" class="text-center py-16 space-y-3">
       <h1 class="text-xl font-bold">
-        {{ $t("ui.bulk.bulk_fb0d5c3263") }}
+        {{ $t("ui.match.matchNotFound") }}
       </h1>
       <p class="text-sm text-neutral-500">
-        {{ $t("ui.bulk.bulk_b661921b54") }}
+        {{ $t("ui.match.thisMatchIsNotPartOfTheSharedPlan") }}
       </p>
       <UButton :to="`/plans/${route.params.planId}`">
-        {{ $t("ui.bulk.bulk_88a1e49a08") }}
+        {{ $t("ui.match.backToFixtures") }}
       </UButton>
     </div>
     <template v-else>
       <NuxtLink :to="`/plans/${route.params.planId}`" class="text-sm text-primary">
-        {{ $t("ui.bulk.bulk_3015382129") }}
+        {{ $t("ui.match.allFixtures") }}
       </NuxtLink>
       <header>
         <h1 class="text-3xl font-bold">
@@ -94,10 +94,10 @@ async function resumeClaim() {
       </header>
       <div class="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
         <p class="font-semibold">
-          {{ $t("ui.bulk.bulk_f6c70961c2") }}
+          {{ $t("ui.match.claimingAs") }}
         </p>
         <p v-if="!selectedMember">
-          {{ $t("ui.bulk.bulk_ea1ec91b8f") }}
+          {{ $t("ui.match.selectYourMemberProfileBeforeClaimingADuty") }}
         </p>
         <p v-else>
           {{ selectedMember.name }}. You can change this selection at any time.
@@ -109,7 +109,7 @@ async function resumeClaim() {
             <p class="font-semibold">
               {{ roleName(slot) }}
             </p><p class="text-sm text-neutral-500">
-              {{ slot.assignedMemberId ? planStore.members[slot.assignedMemberId]?.name : slot.assignmentStatus === 'CANCELLED' ? 'Cancelled' : 'Open' }}
+              {{ slot.assignedMemberId ? planStore.members[slot.assignedMemberId]?.name : slot.assignmentStatus === 'CANCELLED' ? $t("ui.cancelled") : $t("ui.open") }}
             </p>
           </div>
           <UButton v-if="slot.assignmentStatus === 'OPEN'" :disabled="!canClaim(slot)" @click="claim(slot)">
@@ -121,10 +121,10 @@ async function resumeClaim() {
         </div>
       </div>
       <div v-else class="rounded-xl border border-dashed p-8 text-center">
-        {{ $t("ui.bulk.bulk_26211ec35f") }}
+        {{ $t("ui.match.thisFixtureHasNoHelperDuties") }}
       </div>
       <NuxtLink :to="cockpitLink" class="text-sm text-primary">
-        {{ $t("ui.bulk.bulk_f70e7a62da") }}
+        {{ $t("ui.match.openPersonalCockpit") }}
       </NuxtLink>
       <UModal v-model:open="isMemberPickerOpen" :title="$t('ui.chooseMember')">
         <template #body>
@@ -132,14 +132,14 @@ async function resumeClaim() {
             <p>{{ $t('ui.chooseMemberHint') }}</p>
             <select v-model="planStore.selectedMemberId" class="w-full rounded-lg border p-2" :aria-label="$t('ui.memberProfile')">
               <option :value="null">
-                {{ $t("ui.bulk.bulk_6d593674c4") }}
+                {{ $t("ui.match.selectAMember") }}
               </option>
               <option v-for="member in planStore.membersList" :key="member.id" :value="member.id">
                 {{ member.name }}
               </option>
             </select>
             <UButton :disabled="!planStore.selectedMemberId" @click="resumeClaim">
-              {{ $t("ui.bulk.bulk_90d9120bb3") }}
+              {{ $t("ui.match.continueClaim") }}
             </UButton>
           </div>
         </template>

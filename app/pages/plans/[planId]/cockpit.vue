@@ -29,9 +29,9 @@ const duties = computed(() => {
   <UContainer class="py-8 max-w-3xl space-y-6">
     <header>
       <h1 class="text-3xl font-bold">
-        {{ $t("ui.bulk.bulk_90fdb0ae2e") }}
+        {{ $t("ui.cockpit.myDuties") }}
       </h1><p class="text-on-surface-variant">
-        {{ $t("ui.bulk.bulk_b9b3ef8d3a") }}
+        {{ $t("ui.cockpit.yourClaimedHelperDuties") }}
       </p>
     </header>
     <div v-if="planStore.error" class="rounded-xl border border-dashed p-8 text-center space-y-3">
@@ -40,14 +40,14 @@ const duties = computed(() => {
         {{ planError }}
       </p>
       <UButton to="/">
-        {{ $t("ui.bulk.bulk_ca935c2eb5") }}
+        {{ $t("ui.schedule.returnStart") }}
       </UButton>
     </div>
     <div v-else-if="!planStore.selectedMemberId" class="rounded-xl border border-dashed p-8 text-center">
-      {{ $t("ui.bulk.bulk_89d8e68b1f") }}
+      {{ $t("ui.cockpit.selectAMemberFromAMatchToSeePersonalDuties") }}
     </div>
     <div v-else-if="!duties.length" class="rounded-xl border border-dashed p-8 text-center">
-      {{ $t("ui.bulk.bulk_e7a8b3031e") }}
+      {{ $t("ui.cockpit.youHaveNoPersonalDuties") }}
     </div>
     <div v-else class="space-y-3">
       <NuxtLink v-for="{ match, slot, gameday } in duties" :key="slot.id" :to="match ? planLink(`/matches/${match.id}`) : planLink()" class="block rounded-xl border p-4 hover:border-primary">
@@ -55,7 +55,7 @@ const duties = computed(() => {
           {{ planStore.roles.find(role => role.id === slot.roleId)?.name || slot.roleId }}
         </p>
         <p class="text-sm text-neutral-500">
-          {{ match ? `${planStore.teams[match.homeTeamId]?.name || match.homeTeamId} vs ${match.awayTeamName}` : `Gameday duty · ${gameday?.date}` }}
+          {{ match ? $t("ui.matchVersus", { home: planStore.teams[match.homeTeamId]?.name || match.homeTeamId, away: match.awayTeamName }) : $t("ui.gamedayDuty", { date: gameday?.date }) }}
         </p>
       </NuxtLink>
     </div>
