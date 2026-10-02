@@ -138,8 +138,8 @@ export const SeasonPlanSchema = z.object({
 export type SeasonPlan = z.infer<typeof SeasonPlanSchema>;
 
 export const NewPlanMetadataSchema = z.object({
-  clubName: z.string().trim().min(1, "Club name is required"),
-  season: z.string().trim().min(1, "Season is required"),
+  clubName: z.string().trim().min(1, "ui.clubNameRequired"),
+  season: z.string().trim().min(1, "ui.seasonRequired"),
 });
 
 export type NewPlanMetadata = z.infer<typeof NewPlanMetadataSchema>;

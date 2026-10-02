@@ -113,4 +113,11 @@ describe("locale completeness", () => {
       "app/pages/example.vue: Edit plan",
     ]);
   });
+
+  it("reports literal validation messages", () => {
+    expect(findHardCodedUiTextInSources([{
+      path: "app/pages/example.vue",
+      source: "z.string().min(1, \"Required\")",
+    }])).toEqual(["app/pages/example.vue: Required"]);
+  });
 });

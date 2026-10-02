@@ -32,10 +32,10 @@ const syncingDrafts = ref(false);
 const shareState = ref<"idle" | "copied" | "failed">("idle");
 
 const SetupSchema = z.object({
-  clubName: z.string().trim().min(1, "Club name and season are required."),
-  season: z.string().trim().min(1, "Club name and season are required."),
-  contactEmail: z.email("Enter a valid contact email.").or(z.literal("")),
-  homepage: z.string().trim().refine(value => !value || /^https?:\/\//.test(value), "Homepage must start with http:// or https://."),
+  clubName: z.string().trim().min(1, "ui.clubSeasonRequired"),
+  season: z.string().trim().min(1, "ui.clubSeasonRequired"),
+  contactEmail: z.email("ui.validEmailRequired").or(z.literal("")),
+  homepage: z.string().trim().refine(value => !value || /^https?:\/\//.test(value), "ui.homepageProtocolRequired"),
 });
 
 function syncDrafts() {
@@ -106,10 +106,12 @@ function validate() {
     contactEmail: contactEmail.value,
     homepage: homepage.value,
   });
-  if (!result.success)
-    return result.error.issues[0]?.message ?? "Check your plan details.";
+  if (!result.success) {
+    const message = result.error.issues[0]?.message;
+    return message ? (message.startsWith("ui.") ? t(message) : message) : t("ui.checkPlanDetails");
+  }
   if (!draft.value || Object.values(draft.value.teams).some(team => !team.name.trim()) || Object.values(draft.value.members).some(member => !member.name.trim()))
-    return "Team and member names cannot be empty.";
+    return t("ui.teamMemberNamesRequired");
   return null;
 }
 

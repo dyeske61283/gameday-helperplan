@@ -213,6 +213,12 @@
     "clubSeasonRequired": "Geben Sie einen Vereinsnamen und eine Saison ein, um fortzufahren.",
     "dutyRoleRequired": "Geben Sie mindestens eine Aufgabenrolle ein.",
     "missingPlanKey": "Plan oder Verschlüsselungsschlüssel fehlt",
-    "savePlanFailed": "Plan konnte nicht gespeichert werden"
+    "savePlanFailed": "Plan konnte nicht gespeichert werden",
+    "clubNameRequired": "Vereinsname ist erforderlich",
+    "seasonRequired": "Saison ist erforderlich",
+    "validEmailRequired": "Geben Sie eine gültige Kontakt-E-Mail ein.",
+    "homepageProtocolRequired": "Die Homepage muss mit http:// oder https:// beginnen.",
+    "checkPlanDetails": "Prüfen Sie die Plandetails.",
+    "teamMemberNamesRequired": "Team- und Mitgliedsnamen dürfen nicht leer sein."
   }
 }
