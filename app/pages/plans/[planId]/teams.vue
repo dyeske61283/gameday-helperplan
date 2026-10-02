@@ -3,6 +3,7 @@ import { usePlanStore } from "~/stores/plan";
 
 const planStore = usePlanStore();
 const { t } = useI18n();
+const planError = computed(() => planStore.error?.startsWith("ui.") ? t(planStore.error) : planStore.error);
 
 usePlanInit();
 
@@ -103,7 +104,7 @@ async function autoSave(title = "Saved", description = "Changes synced to server
   }
   await planStore.savePlan();
   if (planStore.error) {
-    toast.add({ title: t("ui.saveFailed"), description: planStore.error, color: "error" });
+    toast.add({ title: t("ui.saveFailed"), description: planError.value || undefined, color: "error" });
   }
   else {
     toast.add({ title, description, color: "success" });

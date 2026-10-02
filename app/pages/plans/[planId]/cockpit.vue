@@ -4,6 +4,8 @@ import { createPlanLink } from "~/utils/plan-links";
 
 const route = useRoute();
 const planStore = usePlanStore();
+const { t } = useI18n();
+const planError = computed(() => planStore.error?.startsWith("ui.") ? t(planStore.error) : planStore.error);
 usePlanInit();
 function planLink(path = "") {
   const planId = String(route.params.planId);
@@ -35,7 +37,7 @@ const duties = computed(() => {
     <div v-if="planStore.error" class="rounded-xl border border-dashed p-8 text-center space-y-3">
       <p>{{ $t('ui.loadPlanFailed') }}</p>
       <p class="text-sm text-neutral-500">
-        {{ planStore.error }}
+        {{ planError }}
       </p>
       <UButton to="/">
         Return to start

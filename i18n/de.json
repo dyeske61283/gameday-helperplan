@@ -211,6 +211,8 @@
     "dutyClaimed": "Aufgabe übernommen",
     "couldNotClaimDuty": "Aufgabe konnte nicht übernommen werden",
     "clubSeasonRequired": "Geben Sie einen Vereinsnamen und eine Saison ein, um fortzufahren.",
-    "dutyRoleRequired": "Geben Sie mindestens eine Aufgabenrolle ein."
+    "dutyRoleRequired": "Geben Sie mindestens eine Aufgabenrolle ein.",
+    "missingPlanKey": "Plan oder Verschlüsselungsschlüssel fehlt",
+    "savePlanFailed": "Plan konnte nicht gespeichert werden"
   }
 }

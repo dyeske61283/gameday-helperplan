@@ -149,7 +149,7 @@ export const usePlanStore = defineStore("plan", () => {
     }
     catch (err: unknown) {
       if (err instanceof Error)
-        error.value = err.message || "Failed to load plan";
+        error.value = err.message || "ui.loadPlanFailed";
       console.error("Error loading plan:", err);
     }
     finally {
@@ -232,7 +232,7 @@ export const usePlanStore = defineStore("plan", () => {
 
   async function savePlan(draft?: SeasonPlan): Promise<boolean> {
     if ((!plan.value && !draft) || !key.value) {
-      error.value = "Missing plan or encryption key";
+      error.value = "ui.missingPlanKey";
       return false;
     }
 
@@ -264,7 +264,7 @@ export const usePlanStore = defineStore("plan", () => {
     }
     catch (err: unknown) {
       if (err instanceof Error) {
-        error.value = err.message || "Failed to save plan";
+        error.value = err.message || "ui.savePlanFailed";
       }
       console.error("Error saving plan:", err);
       return false;

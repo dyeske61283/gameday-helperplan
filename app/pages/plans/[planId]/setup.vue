@@ -12,6 +12,7 @@ const route = useRoute();
 const planStore = usePlanStore();
 const toast = useToast();
 const { t } = useI18n();
+const planError = computed(() => planStore.error?.startsWith("ui.") ? t(planStore.error) : planStore.error);
 usePlanInit();
 
 const planLink = computed(() => planStore.key ? createPlanLink(String(route.params.planId), planStore.key) : `/plans/${route.params.planId}${route.hash}`);
@@ -141,7 +142,7 @@ async function save() {
   });
   const saved = await planStore.savePlan(draft.value);
   if (!saved) {
-    toast.add({ title: t("ui.saveFailed"), description: planStore.error || t("ui.couldNotSavePlan"), color: "error" });
+    toast.add({ title: t("ui.saveFailed"), description: planError.value || t("ui.couldNotSavePlan"), color: "error" });
   }
   else {
     isDirty.value = false;
@@ -157,7 +158,7 @@ async function reload() {
   planStore.applyPendingUpdate();
   await planStore.loadPlan(planStore.plan.id, planStore.key);
   if (planStore.error)
-    toast.add({ title: t("ui.reloadFailed"), description: planStore.error, color: "error" });
+    toast.add({ title: t("ui.reloadFailed"), description: planError.value || undefined, color: "error" });
 }
 
 async function copyShareUrl() {
@@ -179,7 +180,7 @@ useHead({ title: () => t("ui.editPlan") });
         Could not load plan
       </h1>
       <p class="text-error">
-        {{ planStore.error }}
+        {{ planError }}
       </p>
       <UButton :to="planLink">
         Return to plan
@@ -212,7 +213,7 @@ useHead({ title: () => t("ui.editPlan") });
       </header>
 
       <div v-if="planStore.error" class="rounded-lg bg-error/10 p-4 text-error">
-        {{ planStore.error }}
+        {{ planError }}
       </div>
       <div v-if="planStore.pendingUpdate" role="alert" class="rounded-lg bg-warning/10 p-4 text-warning">
         A newer shared plan version arrived while you were editing.

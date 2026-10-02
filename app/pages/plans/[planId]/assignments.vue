@@ -222,7 +222,7 @@ async function autoSave(
   }
   await planStore.savePlan();
   if (planStore.error) {
-    toast.add({ title: t("ui.saveFailed"), description: planStore.error, color: "error" });
+    toast.add({ title: t("ui.saveFailed"), description: planStore.error?.startsWith("ui.") ? t(planStore.error) : planStore.error, color: "error" });
   }
   else {
     toast.add({ title, description, color });
@@ -272,7 +272,7 @@ async function handleSavePlan() {
   if (planStore.error) {
     toast.add({
       title: t("ui.saveFailed"),
-      description: planStore.error,
+      description: planStore.error?.startsWith("ui.") ? t(planStore.error) : planStore.error,
       color: "error",
     });
   }
