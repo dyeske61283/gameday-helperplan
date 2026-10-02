@@ -292,10 +292,10 @@ async function handleSavePlan() {
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-neutral-200 dark:border-neutral-800">
       <div class="space-y-1">
         <h1 class="text-3xl font-extrabold text-on-surface tracking-tight">
-          Duty Assignments
+          {{ $t("ui.bulk.bulk_81633bc11e") }}
         </h1>
         <p class="text-sm text-neutral-500">
-          Assign responsible helper teams and distribute individual duties across matches.
+          {{ $t("ui.bulk.bulk_2051e2cb17") }}
         </p>
       </div>
 
@@ -306,7 +306,7 @@ async function handleSavePlan() {
           variant="ghost"
           class="rounded-full"
         >
-          View Schedule
+          {{ $t("ui.bulk.bulk_2973d6acdf") }}
         </UButton>
         <UButton
           icon="i-lucide-save"
@@ -315,7 +315,7 @@ async function handleSavePlan() {
           :loading="planStore.isLoading"
           @click="handleSavePlan"
         >
-          Save Plan
+          {{ $t("ui.bulk.bulk_53e337d44c") }}
         </UButton>
       </div>
     </div>
@@ -351,9 +351,7 @@ async function handleSavePlan() {
               id="filter-unassigned"
               v-model="onlyUnassigned"
             />
-            <label for="filter-unassigned" class="text-xs font-medium cursor-pointer">
-              Unassigned
-            </label>
+            <label for="filter-unassigned" class="text-xs font-medium cursor-pointer">{{ $t("ui.bulk.bulk_e57016edce") }}</label>
           </div>
 
           <span class="text-xs text-neutral-500">
@@ -383,7 +381,7 @@ async function handleSavePlan() {
             </div>
             <div class="text-xl font-bold text-on-surface">
               <span>{{ planStore.teams[match.homeTeamId]?.name || match.homeTeamId }}</span>
-              <span class="mx-2 text-neutral-400 font-normal">vs</span>
+              <span class="mx-2 text-neutral-400 font-normal">{{ $t("ui.bulk.bulk_691a77cd21") }}</span>
               <span class="text-neutral-600 dark:text-neutral-300">{{ match.awayTeamName }}</span>
             </div>
           </div>
@@ -412,7 +410,7 @@ async function handleSavePlan() {
                   icon="i-lucide-wand-sparkles"
                   @click="handleAutoStaff(match.id)"
                 >
-                  Auto-Staff
+                  {{ $t("ui.bulk.bulk_5d2e59d0f0") }}
                 </UButton>
                 <UButton
                   size="xs"
@@ -421,7 +419,7 @@ async function handleSavePlan() {
                   icon="i-lucide-rotate-ccw"
                   @click="handleClearMatch(match.id)"
                 >
-                  Reset
+                  {{ $t("ui.bulk.bulk_44c57abd88") }}
                 </UButton>
               </div>
             </div>
@@ -526,10 +524,10 @@ async function handleSavePlan() {
     <div v-else class="text-center py-16 p-8 rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-700">
       <UIcon name="i-lucide-search-x" class="w-12 h-12 mx-auto text-neutral-400 mb-3" />
       <h3 class="text-lg font-bold text-on-surface">
-        No matches match the filters
+        {{ $t("ui.bulk.bulk_7ac200ce4c") }}
       </h3>
       <p class="text-sm text-neutral-500 mt-1">
-        Try adjusting your search criteria or toggle off unassigned filters.
+        {{ $t("ui.bulk.bulk_3442ab8532") }}
       </p>
       <UButton
         class="mt-4"
@@ -537,7 +535,7 @@ async function handleSavePlan() {
         color="primary"
         @click="searchQuery = ''; selectedGamedayDate = ''; onlyUnassigned = false"
       >
-        Clear filters
+        {{ $t("ui.bulk.bulk_412226715c") }}
       </UButton>
     </div>
 
@@ -554,7 +552,7 @@ async function handleSavePlan() {
         :loading="planStore.isLoading"
         @click="handleSavePlan"
       >
-        Save Changes
+        {{ $t("ui.bulk.bulk_fa2984b367") }}
       </UButton>
     </div>
 
@@ -565,7 +563,7 @@ async function handleSavePlan() {
           <!-- Role Details Header -->
           <div class="p-3.5 rounded-xl bg-surface-container border border-neutral-200 dark:border-neutral-800 space-y-1">
             <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
-              Selected Duty
+              {{ $t("ui.bulk.bulk_12edafc563") }}
             </div>
             <div class="text-base font-bold text-on-surface">
               {{ getRoleName(activeSlot.roleId) }}
@@ -592,7 +590,7 @@ async function handleSavePlan() {
               :class="memberListTab === 'all' ? 'bg-surface text-primary shadow-xs' : 'text-neutral-500 hover:text-on-surface'"
               @click="memberListTab = 'all'"
             >
-              All Club Members
+              {{ $t("ui.bulk.bulk_5c2e72f297") }}
             </button>
           </div>
 
@@ -636,7 +634,7 @@ async function handleSavePlan() {
                     color="success"
                     variant="subtle"
                   >
-                    Ref
+                    {{ $t("ui.bulk.bulk_c89dd33c64") }}
                   </UBadge>
                   <UBadge
                     v-if="member.skillIds.includes('esb')"
@@ -644,13 +642,13 @@ async function handleSavePlan() {
                     color="info"
                     variant="subtle"
                   >
-                    ESB
+                    {{ $t("ui.bulk.bulk_2883cd0df2") }}
                   </UBadge>
                 </div>
               </div>
 
               <div v-if="candidateMembers.length === 0" class="p-4 text-center text-xs text-neutral-400">
-                No members found in this roster.
+                {{ $t("ui.bulk.bulk_03848c6a81") }}
               </div>
             </div>
           </div>
@@ -677,7 +675,7 @@ async function handleSavePlan() {
             size="sm"
             @click="handleClearActiveSlot"
           >
-            Clear Slot
+            {{ $t("ui.bulk.bulk_e7ae418f74") }}
           </UButton>
 
           <div class="flex gap-2">
@@ -687,7 +685,7 @@ async function handleSavePlan() {
               size="sm"
               @click="isAssignmentModalOpen = false"
             >
-              Cancel
+              {{ $t("ui.bulk.bulk_77dfd2135f") }}
             </UButton>
             <UButton
               size="sm"
@@ -695,7 +693,7 @@ async function handleSavePlan() {
               :disabled="!selectedMemberId && !customHelperInput.trim()"
               @click="confirmAssignment"
             >
-              Confirm Assignment
+              {{ $t("ui.bulk.bulk_459761f698") }}
             </UButton>
           </div>
         </div>

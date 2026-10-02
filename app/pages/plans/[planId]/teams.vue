@@ -184,10 +184,10 @@ async function deleteTeam(teamId: string) {
       <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
         <div>
           <h1 class="text-4xl font-bold tracking-tight text-on-surface">
-            Teams
+            {{ $t("ui.bulk.bulk_cbfd44d9c7") }}
           </h1>
           <p class="text-sm text-neutral-500 mt-1">
-            Manage your club teams, licenses, and member roles.
+            {{ $t("ui.bulk.bulk_8bb2dd0f85") }}
           </p>
         </div>
         <div class="flex gap-3">
@@ -196,13 +196,13 @@ async function deleteTeam(teamId: string) {
             variant="outline"
             @click="addMember"
           >
-            Add Member
+            {{ $t("ui.bulk.bulk_fbe4f901cb") }}
           </UButton>
           <UButton
             icon="i-lucide-plus"
             @click="openCreateTeam"
           >
-            Create Team
+            {{ $t("ui.bulk.bulk_8b8973510f") }}
           </UButton>
         </div>
       </div>
@@ -239,7 +239,7 @@ async function deleteTeam(teamId: string) {
                     color="neutral"
                     @click.stop="openEditTeam(item.value)"
                   >
-                    Edit Name
+                    {{ $t("ui.bulk.bulk_7d94193c78") }}
                   </UButton>
                   <UButton
                     size="xs"
@@ -248,14 +248,14 @@ async function deleteTeam(teamId: string) {
                     color="error"
                     @click.stop="deleteTeam(item.value)"
                   >
-                    Delete Team
+                    {{ $t("ui.bulk.bulk_6ed65c185b") }}
                   </UButton>
                 </div>
               </div>
 
               <!-- Inside Members List -->
               <div v-if="getMembersForTeam(item.value).length === 0" class="text-sm text-neutral-400 py-2 text-center">
-                No members found
+                {{ $t("ui.bulk.bulk_2f95244535") }}
               </div>
               <div v-else v-auto-animate class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div
@@ -391,10 +391,10 @@ async function deleteTeam(teamId: string) {
       <template #footer>
         <div class="flex gap-2 justify-end w-full">
           <UButton variant="outline" color="neutral" @click="isMemberModalOpen = false">
-            Cancel
+            {{ $t("ui.bulk.bulk_77dfd2135f") }}
           </UButton>
           <UButton @click="saveMember">
-            Save Changes
+            {{ $t("ui.bulk.bulk_fa2984b367") }}
           </UButton>
         </div>
       </template>
@@ -415,7 +415,7 @@ async function deleteTeam(teamId: string) {
       <template #footer>
         <div class="flex gap-2 justify-end w-full">
           <UButton variant="outline" color="neutral" @click="isTeamModalOpen = false">
-            Cancel
+            {{ $t("ui.bulk.bulk_77dfd2135f") }}
           </UButton>
           <UButton :disabled="!newTeamName.trim()" @click="saveTeam">
             {{ isCreatingTeam ? 'Create' : 'Save' }}

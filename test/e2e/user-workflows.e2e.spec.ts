@@ -54,6 +54,7 @@ describe("feature: User Workflows (BDD Specs)", async () => {
   Scenario("1 — Open a Shared Link (Get Link)", async () => {
     await When("the user navigates to the seeded plan link", async () => {
       workflowPage = await createPage();
+      await workflowPage.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
       const targetUrl = seededSetupLink.startsWith("http") ? seededSetupLink : testUrl(seededSetupLink);
       await workflowPage.goto(targetUrl, { waitUntil: "domcontentloaded" });
     });

@@ -107,28 +107,28 @@ const totalAssignedSlots = computed(() => {
 
 <template>
   <UContainer v-if="planStore.isLoading" class="py-16 text-center">
-    Loading plan...
+    {{ $t("ui.bulk.bulk_2274dbbc90") }}
   </UContainer>
   <UContainer v-else-if="planStore.error" class="py-16 text-center space-y-4">
     <h1 class="text-2xl font-bold">
-      Could not open this plan
+      {{ $t("ui.bulk.bulk_ca9e80c838") }}
     </h1>
     <p class="text-error">
       {{ planStore.error }}
     </p>
     <UButton to="/">
-      Return to start
+      {{ $t("ui.bulk.bulk_ca935c2eb5") }}
     </UButton>
   </UContainer>
   <UContainer v-else-if="!planStore.plan" class="py-16 text-center space-y-4">
     <h1 class="text-2xl font-bold">
-      This plan is unavailable.
+      {{ $t("ui.bulk.bulk_9bd32cc1ba") }}
     </h1>
     <p class="text-sm text-neutral-500">
-      Open a valid shared plan link to continue.
+      {{ $t("ui.bulk.bulk_4066f78e77") }}
     </p>
     <UButton to="/">
-      Return to start
+      {{ $t("ui.bulk.bulk_ca935c2eb5") }}
     </UButton>
   </UContainer>
   <UContainer v-else class="py-8 md:py-12 max-w-5xl space-y-8">
@@ -144,7 +144,7 @@ const totalAssignedSlots = computed(() => {
           </UBadge>
         </div>
         <p class="text-sm text-neutral-500">
-          Season fixtures, helper schedules, and real-time duty tracking.
+          {{ $t("ui.bulk.bulk_9a7ddea738") }}
         </p>
       </div>
 
@@ -155,7 +155,7 @@ const totalAssignedSlots = computed(() => {
           color="primary"
           class="rounded-full"
         >
-          Manage Duties
+          {{ $t("ui.bulk.bulk_e56e8d74fa") }}
         </UButton>
         <UButton
           :to="planLink('/teams')"
@@ -163,7 +163,7 @@ const totalAssignedSlots = computed(() => {
           variant="outline"
           class="rounded-full"
         >
-          Teams & Roster
+          {{ $t("ui.bulk.bulk_e2714ab3b4") }}
         </UButton>
       </div>
     </div>
@@ -172,7 +172,7 @@ const totalAssignedSlots = computed(() => {
     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
       <div class="p-4 rounded-xl bg-surface-container-low border border-neutral-200 dark:border-neutral-800">
         <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
-          Gamedays
+          {{ $t("ui.bulk.bulk_e033816dd9") }}
         </div>
         <div class="text-2xl font-black text-on-surface mt-1">
           {{ planStore.gamedaysList.length }}
@@ -181,7 +181,7 @@ const totalAssignedSlots = computed(() => {
 
       <div class="p-4 rounded-xl bg-surface-container-low border border-neutral-200 dark:border-neutral-800">
         <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
-          Total Matches
+          {{ $t("ui.bulk.bulk_231d257f60") }}
         </div>
         <div class="text-2xl font-black text-on-surface mt-1">
           {{ totalMatchesCount }}
@@ -190,7 +190,7 @@ const totalAssignedSlots = computed(() => {
 
       <div class="p-4 rounded-xl bg-surface-container-low border border-neutral-200 dark:border-neutral-800 col-span-2 sm:col-span-1">
         <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
-          Staffed Duty Slots
+          {{ $t("ui.bulk.bulk_d63e73c814") }}
         </div>
         <div class="text-2xl font-black text-primary mt-1">
           {{ totalAssignedSlots }}
@@ -233,10 +233,10 @@ const totalAssignedSlots = computed(() => {
     <div v-if="filteredGamedays.length > 0" class="flex justify-end">
       <div class="inline-flex rounded-xl border border-neutral-200 dark:border-neutral-800 p-1" role="group" :aria-label="$t('ui.scheduleView')">
         <UButton :variant="viewMode === 'timeline' ? 'soft' : 'ghost'" icon="i-lucide-list" size="sm" @click="viewMode = 'timeline'">
-          Timeline
+          {{ $t("ui.bulk.bulk_018514a3d5") }}
         </UButton>
         <UButton :variant="viewMode === 'calendar' ? 'soft' : 'ghost'" icon="i-lucide-calendar-days" size="sm" @click="viewMode = 'calendar'">
-          Calendar
+          {{ $t("ui.bulk.bulk_adab5090ac") }}
         </UButton>
       </div>
     </div>
@@ -282,7 +282,7 @@ const totalAssignedSlots = computed(() => {
       <div v-if="calendarLayout.invalid.length" class="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
         <p>{{ calendarLayout.invalid.length }} gameday{{ calendarLayout.invalid.length === 1 ? '' : 's' }} have an invalid date and cannot be placed on the calendar.</p>
         <UButton class="mt-3" size="sm" variant="outline" color="warning" @click="showTimeline()">
-          Show timeline
+          {{ $t("ui.bulk.bulk_169e9875a1") }}
         </UButton>
       </div>
     </div>
@@ -291,10 +291,10 @@ const totalAssignedSlots = computed(() => {
     <div v-else class="text-center py-16 p-8 rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-700">
       <UIcon name="i-lucide-search-x" class="w-12 h-12 mx-auto text-neutral-400 mb-3" />
       <h3 class="text-lg font-bold text-on-surface">
-        No gamedays found
+        {{ $t("ui.bulk.bulk_f99957bb66") }}
       </h3>
       <p class="text-sm text-neutral-500 mt-1 max-w-sm mx-auto">
-        No matches or duty assignments match your current search query.
+        {{ $t("ui.bulk.bulk_d162f44bd2") }}
       </p>
       <UButton
         class="mt-4"
@@ -302,7 +302,7 @@ const totalAssignedSlots = computed(() => {
         color="primary"
         @click="searchQuery = ''"
       >
-        Clear filters
+        {{ $t("ui.bulk.bulk_412226715c") }}
       </UButton>
     </div>
   </UContainer>

@@ -175,41 +175,41 @@ useHead({ title: () => t("ui.editPlan") });
 <template>
   <UContainer class="max-w-4xl space-y-8 py-8">
     <div v-if="planStore.isLoading && !planStore.plan" class="py-16 text-center">
-      Loading plan...
+      {{ $t("ui.bulk.bulk_2274dbbc90") }}
     </div>
     <main v-else-if="planStore.error && !planStore.plan" class="mx-auto max-w-xl space-y-4 py-16 text-center">
       <h1 class="text-2xl font-bold">
-        Could not load plan
+        {{ $t("ui.bulk.bulk_5c169519af") }}
       </h1>
       <p class="text-error">
         {{ planError }}
       </p>
       <UButton :to="planLink">
-        Return to plan
+        {{ $t("ui.bulk.bulk_8267144cef") }}
       </UButton>
     </main>
     <main v-else-if="!planStore.plan" class="py-16 text-center">
-      This plan is unavailable.
+      {{ $t("ui.bulk.bulk_9bd32cc1ba") }}
     </main>
     <main v-else class="space-y-8">
       <header class="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p class="text-sm text-primary">
-            Plan setup
+            {{ $t("ui.bulk.bulk_86de19c24b") }}
           </p>
           <h1 class="text-3xl font-bold">
             {{ planStore.plan.club.name || "Edit shared plan" }}
           </h1>
           <p class="text-on-surface-variant">
-            Changes are encrypted and shared with everyone using this link.
+            {{ $t("ui.bulk.bulk_c6dc14fc15") }}
           </p>
         </div>
         <div class="flex gap-2">
           <UButton :to="scheduleLink" variant="outline">
-            View schedule
+            {{ $t("ui.bulk.bulk_5a7d6cb8ae") }}
           </UButton>
           <UButton :loading="planStore.isLoading" @click="save">
-            Save changes
+            {{ $t("ui.bulk.bulk_179359b39e") }}
           </UButton>
         </div>
       </header>
@@ -221,16 +221,16 @@ useHead({ title: () => t("ui.editPlan") });
         A newer shared plan version arrived while you were editing.
         <div class="mt-3 flex gap-2">
           <UButton size="sm" variant="outline" @click="reload">
-            Use newer version
+            {{ $t("ui.bulk.bulk_08197b1ce3") }}
           </UButton>
           <UButton size="sm" variant="ghost" @click="planStore.setEditing(true)">
-            Keep my changes
+            {{ $t("ui.bulk.bulk_118b134882") }}
           </UButton>
         </div>
       </div>
       <section class="space-y-4 rounded-xl border p-5">
         <h2 class="text-xl font-bold">
-          Plan details
+          {{ $t("ui.bulk.bulk_f014740803") }}
         </h2>
         <div class="grid gap-4 sm:grid-cols-2">
           <UFormField :label="$t('ui.clubName')" required>
@@ -250,39 +250,39 @@ useHead({ title: () => t("ui.editPlan") });
 
       <section class="space-y-4 rounded-xl border p-5">
         <h2 class="text-xl font-bold">
-          Teams
+          {{ $t("ui.bulk.bulk_cbfd44d9c7") }}
         </h2>
         <div class="flex gap-2">
           <UInput v-model="newTeamName" class="grow" :placeholder="$t('ui.teamName')" @keyup.enter="addTeam" /><UButton :disabled="!newTeamName.trim()" @click="addTeam">
-            Add team
+            {{ $t("ui.bulk.bulk_046c3ad7b2") }}
           </UButton>
         </div>
         <div class="space-y-2">
           <div v-for="team in teams" :key="team.id" class="flex gap-2">
             <UInput v-model="team.name" class="grow" @input="markDirty" /><UButton color="error" variant="ghost" @click="removeTeam(team.id)">
-              Remove
+              {{ $t("ui.bulk.bulk_e963907dac") }}
             </UButton>
           </div>
           <p v-if="!teams.length" class="text-sm text-on-surface-variant">
-            No teams yet.
+            {{ $t("ui.bulk.bulk_9210826956") }}
           </p>
         </div>
       </section>
 
       <section class="space-y-4 rounded-xl border p-5">
         <h2 class="text-xl font-bold">
-          Members
+          {{ $t("ui.bulk.bulk_1cb449c112") }}
         </h2>
         <div class="flex gap-2">
           <UInput v-model="newMemberName" class="grow" :placeholder="$t('ui.memberName')" @keyup.enter="addMember" /><UButton :disabled="!newMemberName.trim()" @click="addMember">
-            Add member
+            {{ $t("ui.bulk.bulk_170ad0e32e") }}
           </UButton>
         </div>
         <div class="space-y-3">
           <div v-for="member in members" :key="member.id" class="space-y-2 rounded-lg border p-3">
             <div class="flex gap-2">
               <UInput v-model="member.name" class="grow" @input="markDirty" /><UButton color="error" variant="ghost" @click="removeMember(member.id)">
-                Remove
+                {{ $t("ui.bulk.bulk_e963907dac") }}
               </UButton>
             </div>
             <select v-model="member.teamIds" multiple class="w-full rounded-lg border bg-transparent p-2 text-sm" :aria-label="$t('ui.memberTeams')" @change="markDirty">
@@ -292,14 +292,14 @@ useHead({ title: () => t("ui.editPlan") });
             </select>
           </div>
           <p v-if="!members.length" class="text-sm text-on-surface-variant">
-            No members yet.
+            {{ $t("ui.bulk.bulk_ea27c45b9e") }}
           </p>
         </div>
       </section>
 
       <section class="space-y-4 rounded-xl border p-5">
         <h2 class="text-xl font-bold">
-          Schedule configuration
+          {{ $t("ui.bulk.bulk_d04f6cae0d") }}
         </h2>
         <UFormField :label="$t('ui.dutyRoles')" :hint="$t('ui.dutyRolesHintDetailed')">
           <UTextarea v-model="rolesText" :rows="5" class="w-full" @input="markDirty" />
@@ -311,26 +311,26 @@ useHead({ title: () => t("ui.editPlan") });
 
       <section v-if="shareUrl" aria-labelledby="share-heading" class="space-y-3 rounded-xl border border-primary/30 p-5">
         <h2 id="share-heading" class="text-xl font-bold">
-          Share this plan
+          {{ $t("ui.bulk.bulk_d20b69be17") }}
         </h2>
         <div class="flex flex-col gap-2 sm:flex-row">
           <UInput :model-value="shareUrl" readonly :aria-label="$t('ui.shareLink')" class="grow" />
           <UButton @click="copyShareUrl">
-            Copy share link
+            {{ $t("ui.bulk.bulk_dd71c73b93") }}
           </UButton>
         </div>
         <p v-if="shareState === 'copied'" role="status" class="text-sm text-success">
-          Share link copied.
+          {{ $t("ui.bulk.bulk_c0aea5c684") }}
         </p>
         <p v-else-if="shareState === 'failed'" role="alert" class="text-sm text-error">
-          Could not copy the share link. Copy it from the field above.
+          {{ $t("ui.bulk.bulk_bd126302d0") }}
         </p>
       </section>
 
       <footer class="flex items-center justify-between border-t pt-6">
         <span class="text-sm text-on-surface-variant">{{ isDirty ? "Unsaved changes" : "All changes saved" }}</span>
         <UButton variant="outline" :loading="planStore.isLoading" @click="reload">
-          Reload from server
+          {{ $t("ui.bulk.bulk_d6de3101a8") }}
         </UButton>
       </footer>
     </main>

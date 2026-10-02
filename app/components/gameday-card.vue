@@ -120,7 +120,7 @@ function matchLink(matchId: string) {
             </div>
             <div class="font-bold text-on-surface">
               <span>{{ teams[match.homeTeamId]?.name || match.homeTeamId }}</span>
-              <span class="mx-2 text-neutral-400 font-normal">vs</span>
+              <span class="mx-2 text-neutral-400 font-normal">{{ $t("ui.bulk.bulk_691a77cd21") }}</span>
               <span class="text-neutral-600 dark:text-neutral-300">{{ match.awayTeamName }}</span>
             </div>
           </NuxtLink>
@@ -168,7 +168,7 @@ function matchLink(matchId: string) {
                 {{ t("dashboard.needed") }}
               </UBadge>
               <UBadge v-if="isAssigned(slot)" size="xs" color="success" variant="subtle">
-                Assigned
+                {{ $t("ui.bulk.bulk_e24e824b68") }}
               </UBadge>
             </div>
           </div>

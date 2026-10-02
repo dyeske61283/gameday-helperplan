@@ -67,22 +67,22 @@ async function resumeClaim() {
 <template>
   <UContainer class="py-8 max-w-3xl space-y-6">
     <div v-if="planStore.isLoading">
-      Loading match...
+      {{ $t("ui.bulk.bulk_9876a07e15") }}
     </div>
     <div v-else-if="!match" class="text-center py-16 space-y-3">
       <h1 class="text-xl font-bold">
-        Match not found
+        {{ $t("ui.bulk.bulk_fb0d5c3263") }}
       </h1>
       <p class="text-sm text-neutral-500">
-        This match is not part of the shared plan.
+        {{ $t("ui.bulk.bulk_b661921b54") }}
       </p>
       <UButton :to="`/plans/${route.params.planId}`">
-        Back to fixtures
+        {{ $t("ui.bulk.bulk_88a1e49a08") }}
       </UButton>
     </div>
     <template v-else>
       <NuxtLink :to="`/plans/${route.params.planId}`" class="text-sm text-primary">
-        ← All fixtures
+        {{ $t("ui.bulk.bulk_3015382129") }}
       </NuxtLink>
       <header>
         <h1 class="text-3xl font-bold">
@@ -94,10 +94,10 @@ async function resumeClaim() {
       </header>
       <div class="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950 dark:border-amber-700 dark:bg-amber-950/40 dark:text-amber-100">
         <p class="font-semibold">
-          Claiming as
+          {{ $t("ui.bulk.bulk_f6c70961c2") }}
         </p>
         <p v-if="!selectedMember">
-          Select your member profile before claiming a duty.
+          {{ $t("ui.bulk.bulk_ea1ec91b8f") }}
         </p>
         <p v-else>
           {{ selectedMember.name }}. You can change this selection at any time.
@@ -121,10 +121,10 @@ async function resumeClaim() {
         </div>
       </div>
       <div v-else class="rounded-xl border border-dashed p-8 text-center">
-        This fixture has no helper duties.
+        {{ $t("ui.bulk.bulk_26211ec35f") }}
       </div>
       <NuxtLink :to="cockpitLink" class="text-sm text-primary">
-        Open personal cockpit
+        {{ $t("ui.bulk.bulk_f70e7a62da") }}
       </NuxtLink>
       <UModal v-model:open="isMemberPickerOpen" :title="$t('ui.chooseMember')">
         <template #body>
@@ -132,14 +132,14 @@ async function resumeClaim() {
             <p>{{ $t('ui.chooseMemberHint') }}</p>
             <select v-model="planStore.selectedMemberId" class="w-full rounded-lg border p-2" :aria-label="$t('ui.memberProfile')">
               <option :value="null">
-                Select a member
+                {{ $t("ui.bulk.bulk_6d593674c4") }}
               </option>
               <option v-for="member in planStore.membersList" :key="member.id" :value="member.id">
                 {{ member.name }}
               </option>
             </select>
             <UButton :disabled="!planStore.selectedMemberId" @click="resumeClaim">
-              Continue claim
+              {{ $t("ui.bulk.bulk_90d9120bb3") }}
             </UButton>
           </div>
         </template>

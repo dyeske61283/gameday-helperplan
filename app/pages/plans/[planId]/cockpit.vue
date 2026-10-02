@@ -29,9 +29,9 @@ const duties = computed(() => {
   <UContainer class="py-8 max-w-3xl space-y-6">
     <header>
       <h1 class="text-3xl font-bold">
-        My duties
+        {{ $t("ui.bulk.bulk_90fdb0ae2e") }}
       </h1><p class="text-on-surface-variant">
-        Your claimed helper duties.
+        {{ $t("ui.bulk.bulk_b9b3ef8d3a") }}
       </p>
     </header>
     <div v-if="planStore.error" class="rounded-xl border border-dashed p-8 text-center space-y-3">
@@ -40,14 +40,14 @@ const duties = computed(() => {
         {{ planError }}
       </p>
       <UButton to="/">
-        Return to start
+        {{ $t("ui.bulk.bulk_ca935c2eb5") }}
       </UButton>
     </div>
     <div v-else-if="!planStore.selectedMemberId" class="rounded-xl border border-dashed p-8 text-center">
-      Select a member from a match to see personal duties.
+      {{ $t("ui.bulk.bulk_89d8e68b1f") }}
     </div>
     <div v-else-if="!duties.length" class="rounded-xl border border-dashed p-8 text-center">
-      You have no personal duties.
+      {{ $t("ui.bulk.bulk_e7a8b3031e") }}
     </div>
     <div v-else class="space-y-3">
       <NuxtLink v-for="{ match, slot, gameday } in duties" :key="slot.id" :to="match ? planLink(`/matches/${match.id}`) : planLink()" class="block rounded-xl border p-4 hover:border-primary">

@@ -75,6 +75,10 @@ describe("locale completeness", () => {
     `)).toEqual(["Search members", "Close", "line 3: Close"]);
   });
 
+  it("reports multiline template text", () => {
+    expect(findHardCodedUiText("<template><button>\n  Save changes\n</button></template>")).toContain("Save changes");
+  });
+
   it("keeps source paths attached to violations", () => {
     expect(findHardCodedUiTextInSources([{ path: "app/example.vue", source: "<button title=\"Close\">Close</button>" }])).toEqual([
       "app/example.vue: Close",

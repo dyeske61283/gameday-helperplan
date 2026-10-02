@@ -6,6 +6,7 @@ describe("new plan setup", async () => {
 
   it("creates, encrypts, opens, and reloads a plan", async () => {
     const page = await createPage();
+    await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: url("/") }]);
     await page.goto(url("/setup"), { waitUntil: "domcontentloaded" });
     await page.waitForLoadState("networkidle");
     await page.getByRole("button", { name: "Start Setup" }).waitFor();

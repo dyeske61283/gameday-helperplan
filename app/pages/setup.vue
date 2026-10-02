@@ -102,10 +102,10 @@ async function resumePlan() {
           Step {{ step }} of 4
         </p>
         <h1 class="text-3xl font-bold text-on-surface">
-          Set up your Gameday Plan
+          {{ $t("ui.bulk.bulk_06c2bc3c45") }}
         </h1>
         <p class="text-on-surface-variant">
-          Create a local plan. No account is required.
+          {{ $t("ui.bulk.bulk_2a7819a98a") }}
         </p>
       </header>
 
@@ -114,52 +114,52 @@ async function resumePlan() {
       <section v-if="finalizedPlan" aria-labelledby="ready-heading" class="space-y-5 rounded-xl border border-success/40 p-5">
         <div>
           <h2 id="ready-heading" class="text-xl font-semibold">
-            Plan ready
+            {{ $t("ui.bulk.bulk_f49ca08145") }}
           </h2>
           <p class="text-on-surface-variant">
-            Your encrypted plan is saved. Share this link or open the schedule.
+            {{ $t("ui.bulk.bulk_ed30815f48") }}
           </p>
         </div>
         <div class="flex flex-col gap-2 sm:flex-row">
           <UInput :model-value="shareUrl" readonly :aria-label="$t('ui.shareLink')" class="grow" />
           <UButton @click="copyShareUrl">
-            Copy share link
+            {{ $t("ui.bulk.bulk_dd71c73b93") }}
           </UButton>
           <UButton :to="shareUrl" variant="outline">
-            Open schedule
+            {{ $t("ui.bulk.bulk_717d4fbd3e") }}
           </UButton>
         </div>
         <p v-if="shareState === 'copied'" role="status" class="text-sm text-success">
-          Share link copied.
+          {{ $t("ui.bulk.bulk_c0aea5c684") }}
         </p>
         <p v-else-if="shareState === 'failed'" role="alert" class="text-sm text-error">
-          Could not copy the share link. Copy it from the field above.
+          {{ $t("ui.bulk.bulk_bd126302d0") }}
         </p>
       </section>
 
       <section v-if="step === 1" aria-labelledby="start-heading" class="space-y-5">
         <h2 id="start-heading" class="text-xl font-semibold">
-          Start Setup
+          {{ $t("ui.bulk.bulk_2008c0a08b") }}
         </h2>
         <p class="text-on-surface-variant">
-          Enter your club, roster, teams, and duties. The saved plan opens in its canonical schedule.
+          {{ $t("ui.bulk.bulk_1b72d8bd26") }}
         </p>
         <div class="flex flex-wrap gap-3">
           <UButton size="lg" @click="step = 2">
-            Start Setup
+            {{ $t("ui.bulk.bulk_2008c0a08b") }}
           </UButton>
           <UButton v-if="hasResume" variant="outline" size="lg" @click="resumePlan">
-            Resume Last Plan
+            {{ $t("ui.bulk.bulk_0a284a1dc5") }}
           </UButton>
           <UButton to="/" variant="ghost" size="lg">
-            Cancel
+            {{ $t("ui.bulk.bulk_77dfd2135f") }}
           </UButton>
         </div>
       </section>
 
       <form v-else-if="step === 2" class="space-y-5" @submit.prevent="continueFromMetadata">
         <h2 class="text-xl font-semibold">
-          Club Information
+          {{ $t("ui.bulk.bulk_602f1a24a2") }}
         </h2>
         <UFormField :label="$t('ui.clubName')" required>
           <UInput v-model="clubName" autofocus :placeholder="$t('ui.clubExample')" class="w-full" />
@@ -169,13 +169,13 @@ async function resumePlan() {
         </UFormField>
         <div class="flex justify-between gap-3">
           <UButton type="button" variant="ghost" @click="step = 1">
-            Back
+            {{ $t("ui.bulk.bulk_b52b36b726") }}
           </UButton>
           <div class="flex gap-3">
             <UButton type="button" variant="outline" @click="navigateTo('/')">
-              Cancel
+              {{ $t("ui.bulk.bulk_77dfd2135f") }}
             </UButton><UButton type="submit">
-              Continue
+              {{ $t("ui.bulk.bulk_2e02623966") }}
             </UButton>
           </div>
         </div>
@@ -183,20 +183,20 @@ async function resumePlan() {
 
       <form v-else-if="step === 3" class="space-y-5" @submit.prevent="continueFromTeams">
         <h2 class="text-xl font-semibold">
-          Teams
+          {{ $t("ui.bulk.bulk_cbfd44d9c7") }}
         </h2>
         <p class="text-sm text-on-surface-variant">
-          Add one team per line. You can manage fixtures later.
+          {{ $t("ui.bulk.bulk_08c6c65e9e") }}
         </p>
         <UTextarea v-model="teamsText" :rows="6" :placeholder="$t('ui.teamsExample')" class="w-full" />
         <div class="flex justify-between gap-3">
           <UButton type="button" variant="ghost" @click="step = 2">
-            Back
+            {{ $t("ui.bulk.bulk_b52b36b726") }}
           </UButton><div class="flex gap-3">
             <UButton type="button" variant="outline" @click="navigateTo('/')">
-              Cancel
+              {{ $t("ui.bulk.bulk_77dfd2135f") }}
             </UButton><UButton type="submit">
-              Continue to Members
+              {{ $t("ui.bulk.bulk_1901ec6392") }}
             </UButton>
           </div>
         </div>
@@ -204,7 +204,7 @@ async function resumePlan() {
 
       <form v-else class="space-y-5" @submit.prevent="createPlan">
         <h2 class="text-xl font-semibold">
-          Add Members & Configure Duties
+          {{ $t("ui.bulk.bulk_09a74a51eb") }}
         </h2>
         <UFormField :label="$t('ui.members')" :hint="$t('ui.membersHint')">
           <UTextarea v-model="membersText" :rows="6" :placeholder="$t('ui.membersExample')" class="w-full" />
@@ -214,12 +214,12 @@ async function resumePlan() {
         </UFormField>
         <div class="flex justify-between gap-3">
           <UButton type="button" variant="ghost" @click="step = 3">
-            Back
+            {{ $t("ui.bulk.bulk_b52b36b726") }}
           </UButton><div class="flex gap-3">
             <UButton type="button" variant="outline" @click="navigateTo('/')">
-              Cancel
+              {{ $t("ui.bulk.bulk_77dfd2135f") }}
             </UButton><UButton type="submit" :loading="isSaving">
-              Add Members & Finish
+              {{ $t("ui.bulk.bulk_37683d4ef8") }}
             </UButton>
           </div>
         </div>

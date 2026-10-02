@@ -26,6 +26,7 @@ describe("plan-scoped routing", async () => {
 
   it("keeps schedule, match, cockpit, team, and assignment navigation in plan context", async () => {
     const page = await createPage();
+    await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
     await page.goto(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl), { waitUntil: "domcontentloaded" });
     await page.getByText("Season fixtures, helper schedules, and real-time duty tracking.").waitFor();
 

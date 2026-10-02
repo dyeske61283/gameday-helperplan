@@ -1,3 +1,5 @@
+import { parse } from "vue/compiler-sfc";
+
 type LocaleValue = Record<string, unknown> | unknown[] | string | number | boolean | null;
 
 type MissingLocalePaths = {
@@ -82,6 +84,17 @@ export function findHardCodedUiText(source: string) {
     const text = line.match(/>([^<{][^<]*)<\/[^>]+>/)?.[1]?.trim();
     if (text && !text.includes("{{") && !ignoredText.test(text) && /[a-z]/i.test(text))
       violations.push(`line ${index + 1}: ${text}`);
+  }
+
+  if (source.includes("<template")) {
+    const template = parse(source).descriptor.template?.content ?? "";
+    const cleanTemplate = template.replace(/<!--[\s\S]*?-->/g, "");
+    const templateText = /<([a-z][\w.-]*)(?:\s[^>]*)?>([^<>{}]+)<\/\1\s*>/gi;
+    for (const match of cleanTemplate.matchAll(templateText)) {
+      const text = match[2]?.replace(/\s+/g, " ").trim();
+      if (text && !ignoredText.test(text) && /[a-z]/i.test(text) && !violations.includes(text))
+        violations.push(text);
+    }
   }
 
   return violations;
