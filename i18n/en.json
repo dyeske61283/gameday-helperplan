@@ -101,7 +101,9 @@
         "description": "Search for your club in the NuLiga system.",
         "search_club": "Search Club",
         "placeholder": "e.g. TSV Example City",
-        "select": "Select"
+        "select": "Select",
+        "import_rosters": "Import rosters",
+        "import_games": "Import games"
       }
     },
     "step3": {

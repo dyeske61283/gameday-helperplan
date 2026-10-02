@@ -85,5 +85,4 @@ boundary, not an authorization boundary; authorization remains separate work.
 Implemented by the plan-scoped routing migration: the canonical schedule now
 owns the timeline/calendar surface, member and admin pages live below
 `/plans/:planId`, links preserve the plan key, and the four global prototype
-routes have been removed. Remaining release-gate coverage is tracked in issue
-#33.
+routes have been removed. Remaining release-gate coverage is tracked in issue 33.

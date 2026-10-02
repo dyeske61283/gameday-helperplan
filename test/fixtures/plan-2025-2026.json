@@ -1515,17 +1515,17 @@
       "matchIds": [
         "match-2025-09-21-maenner-i-0"
       ],
-       "slots": [
-         {
-           "id": "slot-gd-opening-2025-09-21",
-           "roleId": "hall_opening",
-           "assignedMemberId": "member-nelly-walton",
-           "assignmentStatus": "ASSIGNED",
-           "customHelperName": null,
-           "checkedIn": false,
-           "updatedAt": 1785777749294
-         }
-       ],
+      "slots": [
+        {
+          "id": "slot-gd-opening-2025-09-21",
+          "roleId": "hall_opening",
+          "assignedMemberId": "member-nelly-walton",
+          "assignmentStatus": "ASSIGNED",
+          "customHelperName": null,
+          "checkedIn": false,
+          "updatedAt": 1785777749294
+        }
+      ],
       "openingTime": "17:00",
       "closingTime": "20:15",
       "notes": "",

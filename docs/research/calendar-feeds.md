@@ -16,14 +16,14 @@ issue, not a recommendation for new feed cryptography.
 
 ## Access Options
 
-| Design | Main property | Main cost |
-| --- | --- | --- |
-| Query key endpoint | No additional storage; server decrypts per request | Full plan key appears in a URL and can leak through URL retention and logs |
-| Derived key | Can produce a different credential | Native calendar clients cannot run application derivation; a KDF is not access control |
-| Stored random token | Individual revocation and inspection | Requires token metadata storage and cleanup |
-| Stateless encrypted token | No per-feed storage; scoped expiry; canonical plan remains the only plan copy | Individual revocation is unavailable before expiry |
-| Client-only download | Server never sees plaintext calendar data | No polling or automatic updates |
-| Stored calendar projection | Easy native polling | Plaintext projection must be synchronized and can diverge |
+| Design                     | Main property                                                                 | Main cost                                                                              |
+| -------------------------- | ----------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Query key endpoint         | No additional storage; server decrypts per request                            | Full plan key appears in a URL and can leak through URL retention and logs             |
+| Derived key                | Can produce a different credential                                            | Native calendar clients cannot run application derivation; a KDF is not access control |
+| Stored random token        | Individual revocation and inspection                                          | Requires token metadata storage and cleanup                                            |
+| Stateless encrypted token  | No per-feed storage; scoped expiry; canonical plan remains the only plan copy | Individual revocation is unavailable before expiry                                     |
+| Client-only download       | Server never sees plaintext calendar data                                     | No polling or automatic updates                                                        |
+| Stored calendar projection | Easy native polling                                                           | Plaintext projection must be synchronized and can diverge                              |
 
 The selected design is the stateless encrypted token. The token carries scope,
 member ID where needed, expiry, and the plan key wrapped for the server. Each
