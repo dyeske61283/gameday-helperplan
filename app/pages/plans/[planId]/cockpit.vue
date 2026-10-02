@@ -33,7 +33,7 @@ const duties = computed(() => {
       </p>
     </header>
     <div v-if="planStore.error" class="rounded-xl border border-dashed p-8 text-center space-y-3">
-      <p>We could not load your plan.</p>
+      <p>{{ $t('ui.loadPlanFailed') }}</p>
       <p class="text-sm text-neutral-500">
         {{ planStore.error }}
       </p>

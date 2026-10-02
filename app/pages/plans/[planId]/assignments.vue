@@ -326,7 +326,7 @@ async function handleSavePlan() {
           <UInput
             v-model="searchQuery"
             icon="i-lucide-search"
-            placeholder="Search team or match..."
+            :placeholder="$t('ui.searchTeamMatch')"
             size="md"
             class="w-full"
             clearable
@@ -391,7 +391,7 @@ async function handleSavePlan() {
           <div class="flex flex-col sm:items-end gap-2">
             <div class="flex flex-wrap items-center gap-3">
               <div class="flex items-center gap-2">
-                <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Duty Team:</span>
+                <span class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">{{ $t('ui.dutyTeam') }}</span>
                 <select
                   :value="match.helperTeamId || ''"
                   class="text-xs font-semibold rounded-lg bg-surface-container-lowest border border-neutral-300 dark:border-neutral-700 px-3 py-1.5 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary"
@@ -513,7 +513,7 @@ async function handleSavePlan() {
               </div>
               <div v-else class="text-xs text-amber-700 dark:text-amber-400 font-medium flex items-center gap-1.5">
                 <UIcon name="i-lucide-user-plus" class="w-4 h-4" />
-                <span>Assign volunteer</span>
+                <span>{{ $t('ui.assignVolunteer') }}</span>
               </div>
             </div>
           </div>
@@ -543,7 +543,7 @@ async function handleSavePlan() {
     <!-- Floating Bottom Save Bar -->
     <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 bg-surface-container-high/90 backdrop-blur-md shadow-2xl border border-neutral-200 dark:border-neutral-700 rounded-full px-6 py-3 flex items-center gap-4 max-w-lg w-full">
       <div class="grow text-xs text-on-surface font-medium truncate">
-        <span class="font-bold">Plan:</span> {{ planStore.plan?.club.name || 'Helper Plan' }}
+        <span class="font-bold">{{ $t('ui.plan') }}</span> {{ planStore.plan?.club.name || 'Helper Plan' }}
       </div>
       <UButton
         size="sm"
@@ -558,7 +558,7 @@ async function handleSavePlan() {
     </div>
 
     <!-- Slot Assignment Modal -->
-    <UModal v-model:open="isAssignmentModalOpen" title="Assign Helper to Slot">
+    <UModal v-model:open="isAssignmentModalOpen" :title="$t('ui.assignHelper')">
       <template #body>
         <div v-if="activeSlot && activeMatch" class="space-y-6">
           <!-- Role Details Header -->
@@ -597,7 +597,7 @@ async function handleSavePlan() {
 
           <!-- Members List Picker -->
           <div class="space-y-2">
-            <label class="block text-xs font-bold text-neutral-500 uppercase tracking-wider">Select Member</label>
+            <label class="block text-xs font-bold text-neutral-500 uppercase tracking-wider">{{ $t('ui.selectMember') }}</label>
             <div class="max-h-56 overflow-y-auto divide-y divide-neutral-100 dark:divide-neutral-800 border border-neutral-200 dark:border-neutral-800 rounded-xl p-1">
               <div
                 v-for="member in candidateMembers"
@@ -656,10 +656,10 @@ async function handleSavePlan() {
 
           <!-- Custom Non-Member Helper Input -->
           <div class="space-y-2 pt-2 border-t border-neutral-200 dark:border-neutral-800">
-            <UFormField label="Or Custom Guest / Volunteer Name" description="For non-members or parents without an account">
+            <UFormField :label="$t('ui.customGuest')" :description="$t('ui.customGuestHint')">
               <UInput
                 v-model="customHelperInput"
-                placeholder="e.g. Parent of Max, Guest Volunteer"
+                :placeholder="$t('ui.customGuestExample')"
                 class="w-full"
                 @input="selectedMemberId = null"
               />

@@ -120,7 +120,7 @@ async function resumePlan() {
           </p>
         </div>
         <div class="flex flex-col gap-2 sm:flex-row">
-          <UInput :model-value="shareUrl" readonly aria-label="Share link" class="grow" />
+          <UInput :model-value="shareUrl" readonly :aria-label="$t('ui.shareLink')" class="grow" />
           <UButton @click="copyShareUrl">
             Copy share link
           </UButton>
@@ -160,11 +160,11 @@ async function resumePlan() {
         <h2 class="text-xl font-semibold">
           Club Information
         </h2>
-        <UFormField label="Club Name" required>
-          <UInput v-model="clubName" autofocus placeholder="TSV Musterstadt" class="w-full" />
+        <UFormField :label="$t('ui.clubName')" required>
+          <UInput v-model="clubName" autofocus :placeholder="$t('ui.clubExample')" class="w-full" />
         </UFormField>
-        <UFormField label="Season" required hint="For example, 2026/2027">
-          <UInput v-model="season" placeholder="2026/2027" class="w-full" />
+        <UFormField :label="$t('ui.season')" required :hint="$t('ui.seasonHint')">
+          <UInput v-model="season" :placeholder="$t('ui.seasonExample')" class="w-full" />
         </UFormField>
         <div class="flex justify-between gap-3">
           <UButton type="button" variant="ghost" @click="step = 1">
@@ -187,7 +187,7 @@ async function resumePlan() {
         <p class="text-sm text-on-surface-variant">
           Add one team per line. You can manage fixtures later.
         </p>
-        <UTextarea v-model="teamsText" :rows="6" placeholder="Men 1&#10;Women 1" class="w-full" />
+        <UTextarea v-model="teamsText" :rows="6" :placeholder="$t('ui.teamsExample')" class="w-full" />
         <div class="flex justify-between gap-3">
           <UButton type="button" variant="ghost" @click="step = 2">
             Back
@@ -205,10 +205,10 @@ async function resumePlan() {
         <h2 class="text-xl font-semibold">
           Add Members & Configure Duties
         </h2>
-        <UFormField label="Members" hint="Add one member per line. This is not an account or identity system.">
-          <UTextarea v-model="membersText" :rows="6" placeholder="Max Mustermann&#10;Erika Musterfrau" class="w-full" />
+        <UFormField :label="$t('ui.members')" :hint="$t('ui.membersHint')">
+          <UTextarea v-model="membersText" :rows="6" :placeholder="$t('ui.membersExample')" class="w-full" />
         </UFormField>
-        <UFormField label="Duty roles" required hint="Add one role per line.">
+        <UFormField :label="$t('ui.dutyRoles')" required :hint="$t('ui.dutyRolesHint')">
           <UTextarea v-model="rolesText" :rows="5" class="w-full" />
         </UFormField>
         <div class="flex justify-between gap-3">

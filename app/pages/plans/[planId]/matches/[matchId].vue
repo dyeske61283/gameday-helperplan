@@ -125,11 +125,11 @@ async function resumeClaim() {
       <NuxtLink :to="cockpitLink" class="text-sm text-primary">
         Open personal cockpit
       </NuxtLink>
-      <UModal v-model:open="isMemberPickerOpen" title="Choose your member profile">
+      <UModal v-model:open="isMemberPickerOpen" :title="$t('ui.chooseMember')">
         <template #body>
           <div class="space-y-4">
-            <p>Select a member profile to continue claiming this duty.</p>
-            <select v-model="planStore.selectedMemberId" class="w-full rounded-lg border p-2" aria-label="Member profile">
+            <p>{{ $t('ui.chooseMemberHint') }}</p>
+            <select v-model="planStore.selectedMemberId" class="w-full rounded-lg border p-2" :aria-label="$t('ui.memberProfile')">
               <option :value="null">
                 Select a member
               </option>

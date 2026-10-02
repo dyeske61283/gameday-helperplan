@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen overflow-x-hidden flex flex-col">
-    <UHeader title="Helperplan" :toggle="false">
+    <UHeader :title="$t('ui.brand')" :toggle="false">
       <template #right>
         <LanguageSwitcher />
         <UColorModeButton />

@@ -90,4 +90,11 @@ describe("locale completeness", () => {
     expect(findMissingReferencedLocaleKeys(sources, en)).toEqual([]);
     expect(findMissingReferencedLocaleKeys(sources, de)).toEqual([]);
   });
+
+  it("keeps public-facing Vue text behind locale keys", () => {
+    const sources = globSync("app/**/*.vue")
+      .map(path => ({ path, source: readFileSync(path, "utf8") }));
+
+    expect(findHardCodedUiTextInSources(sources)).toEqual([]);
+  });
 });

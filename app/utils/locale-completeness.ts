@@ -67,7 +67,7 @@ export function findHardCodedUiText(source: string) {
 
   for (const match of source.matchAll(publicAttributes)) {
     const value = match[1]?.trim();
-    if (value && !ignoredText.test(value))
+    if (value && !value.startsWith("$t(") && !ignoredText.test(value))
       violations.push(value);
   }
 

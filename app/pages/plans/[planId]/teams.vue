@@ -210,7 +210,7 @@ async function deleteTeam(teamId: string) {
         <UInput
           v-model="searchQuery"
           icon="i-lucide-search"
-          placeholder="Search members by name..."
+          :placeholder="$t('ui.searchMembersByName')"
           size="lg"
           class="w-full"
           clearable
@@ -316,7 +316,7 @@ async function deleteTeam(teamId: string) {
         <UInput
           v-model="searchQuery"
           icon="i-lucide-search"
-          placeholder="Search members..."
+          :placeholder="$t('ui.searchMembers')"
           size="md"
           class="rounded-full"
           clearable
@@ -325,17 +325,17 @@ async function deleteTeam(teamId: string) {
     </div>
 
     <!-- Member Details & Assignment Modal -->
-    <UModal v-model:open="isMemberModalOpen" title="Member Details">
+    <UModal v-model:open="isMemberModalOpen" :title="$t('ui.memberDetails')">
       <template #body>
         <div v-if="selectedMember" class="space-y-6">
           <!-- Name Input -->
-          <UFormField label="Full Name">
+          <UFormField :label="$t('ui.fullName')">
             <UInput v-model="selectedMember.name" class="w-full" />
           </UFormField>
 
           <!-- Licenses (Toggles) -->
           <div>
-            <span class="block text-sm font-medium mb-2 text-on-surface">Licenses</span>
+            <span class="block text-sm font-medium mb-2 text-on-surface">{{ $t('ui.licenses') }}</span>
             <div class="grid grid-cols-2 gap-4">
               <div class="flex items-center gap-2">
                 <USwitch
@@ -346,7 +346,7 @@ async function deleteTeam(teamId: string) {
                     else selectedMember!.skillIds = selectedMember!.skillIds.filter(s => s !== 'referee');
                   }"
                 />
-                <label for="license-referee" class="text-sm font-medium">Referee License</label>
+                <label for="license-referee" class="text-sm font-medium">{{ $t('ui.refereeLicense') }}</label>
               </div>
               <div class="flex items-center gap-2">
                 <USwitch
@@ -357,14 +357,14 @@ async function deleteTeam(teamId: string) {
                     else selectedMember!.skillIds = selectedMember!.skillIds.filter(s => s !== 'esb');
                   }"
                 />
-                <label for="license-esb" class="text-sm font-medium">Timekeeper License (ESB)</label>
+                <label for="license-esb" class="text-sm font-medium">{{ $t('ui.timekeeperLicense') }}</label>
               </div>
             </div>
           </div>
 
           <!-- Team Assignments (Checkboxes) -->
           <div>
-            <span class="block text-sm font-medium mb-2 text-on-surface">Team Assignments</span>
+            <span class="block text-sm font-medium mb-2 text-on-surface">{{ $t('ui.teamAssignments') }}</span>
             <div class="space-y-2 max-h-48 overflow-y-auto border border-neutral-200 dark:border-neutral-800 rounded-lg p-3">
               <div
                 v-for="team in planStore.teamsList"
@@ -401,10 +401,10 @@ async function deleteTeam(teamId: string) {
     <!-- Team Add/Edit Modal -->
     <UModal v-model:open="isTeamModalOpen" :title="isCreatingTeam ? 'Create Team' : 'Edit Team'">
       <template #body>
-        <UFormField label="Team Name">
+        <UFormField :label="$t('ui.teamNameTitle')">
           <UInput
             v-model="newTeamName"
-            placeholder="e.g. Männer I, gem. E-Jugend"
+            :placeholder="$t('ui.teamExample')"
             class="w-full"
             @keyup.enter="saveTeam"
           />

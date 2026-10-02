@@ -229,17 +229,17 @@ useHead({ title: "Edit plan" });
           Plan details
         </h2>
         <div class="grid gap-4 sm:grid-cols-2">
-          <UFormField label="Club name" required>
+          <UFormField :label="$t('ui.clubName')" required>
             <UInput v-model="clubName" @input="markDirty" />
           </UFormField>
-          <UFormField label="Season" required>
-            <UInput v-model="season" placeholder="2026/2027" @input="markDirty" />
+          <UFormField :label="$t('ui.season')" required>
+            <UInput v-model="season" :placeholder="$t('ui.seasonExample')" @input="markDirty" />
           </UFormField>
-          <UFormField label="Contact email">
+          <UFormField :label="$t('ui.contactEmail')">
             <UInput v-model="contactEmail" type="email" @input="markDirty" />
           </UFormField>
-          <UFormField label="Homepage">
-            <UInput v-model="homepage" type="url" placeholder="https://example.org" @input="markDirty" />
+          <UFormField :label="$t('ui.homepage')">
+            <UInput v-model="homepage" type="url" :placeholder="$t('ui.homepageExample')" @input="markDirty" />
           </UFormField>
         </div>
       </section>
@@ -249,7 +249,7 @@ useHead({ title: "Edit plan" });
           Teams
         </h2>
         <div class="flex gap-2">
-          <UInput v-model="newTeamName" class="grow" placeholder="Team name" @keyup.enter="addTeam" /><UButton :disabled="!newTeamName.trim()" @click="addTeam">
+          <UInput v-model="newTeamName" class="grow" :placeholder="$t('ui.teamName')" @keyup.enter="addTeam" /><UButton :disabled="!newTeamName.trim()" @click="addTeam">
             Add team
           </UButton>
         </div>
@@ -270,7 +270,7 @@ useHead({ title: "Edit plan" });
           Members
         </h2>
         <div class="flex gap-2">
-          <UInput v-model="newMemberName" class="grow" placeholder="Member name" @keyup.enter="addMember" /><UButton :disabled="!newMemberName.trim()" @click="addMember">
+          <UInput v-model="newMemberName" class="grow" :placeholder="$t('ui.memberName')" @keyup.enter="addMember" /><UButton :disabled="!newMemberName.trim()" @click="addMember">
             Add member
           </UButton>
         </div>
@@ -281,7 +281,7 @@ useHead({ title: "Edit plan" });
                 Remove
               </UButton>
             </div>
-            <select v-model="member.teamIds" multiple class="w-full rounded-lg border bg-transparent p-2 text-sm" aria-label="Member teams" @change="markDirty">
+            <select v-model="member.teamIds" multiple class="w-full rounded-lg border bg-transparent p-2 text-sm" :aria-label="$t('ui.memberTeams')" @change="markDirty">
               <option v-for="team in teams" :key="team.id" :value="team.id">
                 {{ team.name }}
               </option>
@@ -297,10 +297,10 @@ useHead({ title: "Edit plan" });
         <h2 class="text-xl font-bold">
           Schedule configuration
         </h2>
-        <UFormField label="Duty roles" hint="One per line: role name | match or gameday">
+        <UFormField :label="$t('ui.dutyRoles')" :hint="$t('ui.dutyRolesHintDetailed')">
           <UTextarea v-model="rolesText" :rows="5" class="w-full" @input="markDirty" />
         </UFormField>
-        <UFormField label="Locations" hint="One per line: location name | optional URL">
+        <UFormField :label="$t('ui.locations')" :hint="$t('ui.locationsHint')">
           <UTextarea v-model="locationsText" :rows="4" class="w-full" @input="markDirty" />
         </UFormField>
       </section>
@@ -310,7 +310,7 @@ useHead({ title: "Edit plan" });
           Share this plan
         </h2>
         <div class="flex flex-col gap-2 sm:flex-row">
-          <UInput :model-value="shareUrl" readonly aria-label="Share link" class="grow" />
+          <UInput :model-value="shareUrl" readonly :aria-label="$t('ui.shareLink')" class="grow" />
           <UButton @click="copyShareUrl">
             Copy share link
           </UButton>

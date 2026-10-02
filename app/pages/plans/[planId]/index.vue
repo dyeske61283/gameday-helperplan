@@ -204,7 +204,7 @@ const totalAssignedSlots = computed(() => {
         <UInput
           v-model="searchQuery"
           icon="i-lucide-search"
-          placeholder="Filter by your name, team, or date..."
+          :placeholder="$t('ui.filterDuties')"
           size="lg"
           class="grow"
           clearable
@@ -231,7 +231,7 @@ const totalAssignedSlots = computed(() => {
 
     <!-- Gamedays Chronological Timeline -->
     <div v-if="filteredGamedays.length > 0" class="flex justify-end">
-      <div class="inline-flex rounded-xl border border-neutral-200 dark:border-neutral-800 p-1" role="group" aria-label="Schedule view">
+      <div class="inline-flex rounded-xl border border-neutral-200 dark:border-neutral-800 p-1" role="group" :aria-label="$t('ui.scheduleView')">
         <UButton :variant="viewMode === 'timeline' ? 'soft' : 'ghost'" icon="i-lucide-list" size="sm" @click="viewMode = 'timeline'">
           Timeline
         </UButton>
