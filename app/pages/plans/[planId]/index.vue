@@ -13,6 +13,7 @@ const viewMode = ref<"timeline" | "calendar">("timeline");
 usePlanInit();
 
 const planId = computed(() => String(route.params.planId));
+const showNavigationPrototype = computed(() => import.meta.dev && route.query.prototype === "navigation");
 
 function planLink(path = "") {
   const pathname = `/plans/${planId.value}${path}`;
@@ -131,6 +132,12 @@ const totalAssignedSlots = computed(() => {
       {{ $t("ui.schedule.returnStart") }}
     </UButton>
   </UContainer>
+  <PrototypePlanNavigation
+    v-else-if="showNavigationPrototype"
+    :plan="planStore.plan"
+    :plan-id="planId"
+    :plan-key="planStore.key"
+  />
   <UContainer v-else class="py-8 md:py-12 max-w-5xl space-y-8">
     <!-- Header with Club Info & Quick Actions -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-neutral-200 dark:border-neutral-800">
