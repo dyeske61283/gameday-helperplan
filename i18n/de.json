@@ -285,7 +285,9 @@
       "teamHint": "Fügen Sie pro Zeile ein Team hinzu. Spieltermine können später verwaltet werden.",
       "continueMembers": "Weiter zu den Mitgliedern",
       "membersAndDuties": "Mitglieder hinzufügen und Aufgaben konfigurieren",
-      "finish": "Mitglieder hinzufügen und abschließen"
+      "finish": "Mitglieder hinzufügen und abschließen",
+      "unavailableTitle": "Die Einrichtung eines neuen Plans ist noch nicht verfügbar.",
+      "unavailableDescription": "Öffne einen bestehenden Plan über einen geteilten Link."
     },
     "schedule": {
       "loadingPlan": "Plan wird geladen...",
@@ -335,7 +337,10 @@
       "shareThisPlan": "Diesen Plan teilen",
       "reloadFromServer": "Vom Server neu laden",
       "addMember": "Mitglied hinzufügen",
-      "noMembersYet": "Noch keine Mitglieder."
+      "noMembersYet": "Noch keine Mitglieder.",
+      "unavailableTitle": "Die Planeinrichtung ist noch nicht verfügbar.",
+      "unavailableDescription": "Kehre zum Plan zurück, während die Bearbeitung vorbereitet wird.",
+      "returnToPlan": "Zum Plan zurück"
     },
     "teams": {
       "manageYourClubTeamsLicensesAndMemberRoles": "Verwalten Sie Ihre Vereinsteams, Lizenzen und Mitgliederrollen.",
