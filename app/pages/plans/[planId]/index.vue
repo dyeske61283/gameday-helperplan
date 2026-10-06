@@ -13,10 +13,24 @@ const viewMode = ref<"timeline" | "calendar">("timeline");
 usePlanInit();
 
 const planId = computed(() => String(route.params.planId));
+const shareUrl = computed(() => planStore.key ? createPlanLink(planId.value, planStore.key) : "");
+const shareState = ref<"idle" | "copied" | "failed">("idle");
 
 function planLink(path = "") {
   const pathname = `/plans/${planId.value}${path}`;
   return planStore.key ? createPlanLink(planId.value, planStore.key, pathname) : `${pathname}${route.hash}`;
+}
+
+async function copyShareUrl() {
+  if (!shareUrl.value)
+    return;
+  try {
+    await navigator.clipboard.writeText(shareUrl.value);
+    shareState.value = "copied";
+  }
+  catch {
+    shareState.value = "failed";
+  }
 }
 
 // Computed active member match if search matches a member
@@ -175,6 +189,23 @@ const totalAssignedSlots = computed(() => {
         </UButton>
       </div>
     </div>
+
+    <section v-if="shareUrl" aria-labelledby="share-heading" class="space-y-3 rounded-xl border border-primary/30 p-5">
+      <h2 id="share-heading" class="text-xl font-bold">
+        {{ $t("ui.planSetup.shareThisPlan") }}
+      </h2>
+      <div class="flex flex-col gap-2 sm:flex-row">
+        <UInput :model-value="shareUrl" readonly aria-label="Share link" class="grow" /><UButton @click="copyShareUrl">
+          {{ $t("ui.common.copyShareLink") }}
+        </UButton>
+      </div>
+      <p v-if="shareState === 'copied'" role="status" class="text-sm text-success">
+        {{ $t("ui.common.shareCopied") }}
+      </p>
+      <p v-else-if="shareState === 'failed'" role="alert" class="text-sm text-error">
+        {{ $t("ui.common.shareCopyFailed") }}
+      </p>
+    </section>
 
     <!-- Quick Stats Bar -->
     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">

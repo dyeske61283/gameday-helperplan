@@ -52,7 +52,7 @@ async function createPlan() {
       planStore.addMember({ name });
     planStore.configureRoles(roles);
 
-    if (!await planStore.savePlan()) {
+    if (!await planStore.finalizePlan()) {
       error.value = planStore.error || "Could not save the plan.";
       return;
     }
