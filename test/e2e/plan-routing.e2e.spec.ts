@@ -9,6 +9,7 @@ const seededPlanId = "f530083d-8c74-4f10-931a-dd877ee7b52c";
 const seededPlanUrl = process.env.E2E_PLAN_URL || `/plans/${seededPlanId}#key=tWVZ4hmOA7LFsrNViX1X6w`;
 const testHost = process.env.TEST_HOST;
 const testUrl = (pathname: string) => testHost ? new URL(pathname, testHost).toString() : url(pathname);
+const seededPlanHash = new URL(seededPlanUrl, testHost || "http://localhost").hash;
 
 describe("plan-scoped routing", async () => {
   await setup({ host: testHost, dev: true });
@@ -40,12 +41,12 @@ describe("plan-scoped routing", async () => {
     const matchUrl = new URL(matchHref!, page.url());
     const planId = matchUrl.pathname.split("/")[2];
     expect(planId).toBeTruthy();
-    expect(matchUrl.hash).toBe("#key=tWVZ4hmOA7LFsrNViX1X6w");
+    expect(matchUrl.hash).toBe(seededPlanHash);
     await page.goto(matchUrl.toString(), { waitUntil: "domcontentloaded" });
     expect(new URL(page.url()).pathname).toMatch(/^\/plans\/[^/]+\/matches\/[^/]+$/);
     const allFixturesUrl = new URL(await page.getByText("All fixtures").getAttribute("href")!, page.url());
     expect(allFixturesUrl.pathname).toBe(`/plans/${planId}`);
-    expect(allFixturesUrl.hash).toBe("#key=tWVZ4hmOA7LFsrNViX1X6w");
+    expect(allFixturesUrl.hash).toBe(seededPlanHash);
     expect(await page.getByText("Claiming as").count()).toBe(0);
 
     const planUrl = new URL(page.url());
@@ -66,7 +67,7 @@ describe("plan-scoped routing", async () => {
   it("lets the cockpit own member selection", async () => {
     const page = await createPage();
     await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
-    await page.goto(testUrl(`/plans/${seededPlanId}/cockpit#key=tWVZ4hmOA7LFsrNViX1X6w`), { waitUntil: "domcontentloaded" });
+    await page.goto(testUrl(`/plans/${seededPlanId}/cockpit${seededPlanHash}`), { waitUntil: "domcontentloaded" });
 
     await page.getByRole("heading", { name: "My Duties" }).waitFor();
     const memberProfile = page.getByLabel("Member profile");
