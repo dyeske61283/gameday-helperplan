@@ -352,16 +352,15 @@ export const usePlanStore = defineStore("plan", () => {
     plan.value.lastUpdated = new Date();
   }
 
-  async function finalizePlan() {
+  async function finalizePlan(): Promise<boolean> {
     if (!plan.value)
-      return;
+      return false;
 
-    const id = crypto.randomUUID();
-    const newKey = await generateKey();
-
-    plan.value.id = id;
-    key.value = newKey;
-    await savePlan();
+    if (!plan.value.id)
+      plan.value.id = crypto.randomUUID();
+    if (!key.value)
+      key.value = await generateKey();
+    return savePlan();
   }
 
   // --- Domain Methods: Teams ---

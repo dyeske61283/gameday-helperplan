@@ -1,5 +1,5 @@
 import { createPage, setup, url } from "@nuxt/test-utils/e2e";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("new plan setup", async () => {
   await setup({ dev: true });
@@ -18,6 +18,15 @@ describe("new plan setup", async () => {
     await page.getByLabel("Members").fill("Test Volunteer");
     await page.getByRole("button", { name: "Create plan" }).click();
     await page.getByRole("heading", { name: "Browser Club" }).waitFor();
+    const shareUrl = await page.getByLabel("Share link").inputValue();
+    expect(new URL(shareUrl).pathname).toMatch(/^\/plans\/[^/]+$/);
+    expect(new URL(shareUrl).hash).toMatch(/^#key=[\w-]+$/);
+
+    const freshPage = await createPage();
+    await freshPage.context().addCookies([{ name: "i18n_redirected", value: "en", url: url("/") }]);
+    await freshPage.goto(shareUrl, { waitUntil: "domcontentloaded" });
+    await freshPage.getByRole("heading", { name: "Browser Club" }).waitFor();
+    await freshPage.close();
     await page.reload({ waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "Browser Club" }).waitFor();
     await page.close();
