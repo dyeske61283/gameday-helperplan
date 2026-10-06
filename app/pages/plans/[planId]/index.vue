@@ -2,6 +2,7 @@
 import type { Match } from "~/utils/plan-types";
 import { usePlanStore } from "~/stores/plan";
 import { buildCalendarLayout } from "~/utils/calendar-layout";
+import { copyToClipboard } from "~/utils/clipboard";
 import { generateMemberICal } from "~/utils/ical-export";
 import { createPlanLink } from "~/utils/plan-links";
 
@@ -25,12 +26,9 @@ async function copyShareUrl() {
   if (!shareUrl.value)
     return;
   try {
-    await navigator.clipboard.writeText(shareUrl.value);
-    shareState.value = "copied";
+    shareState.value = await copyToClipboard(shareUrl.value) ? "copied" : "failed";
   }
-  catch {
-    shareState.value = "failed";
-  }
+  catch { shareState.value = "failed"; }
 }
 
 // Computed active member match if search matches a member

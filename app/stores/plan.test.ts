@@ -129,6 +129,15 @@ describe("usePlanStore", () => {
     vi.unstubAllGlobals();
   });
 
+  it("keeps the default gameday role scope when configuring new-plan role names", () => {
+    const store = usePlanStore();
+    store.createNewPlan("plan-id", "plan-key");
+
+    store.configureRoles(["Timekeeper", "Scorekeeper", "Floor Manager"]);
+
+    expect(store.roles.map(role => role.scope)).toEqual(["gameday", "match", "match"]);
+  });
+
   describe("migrateIfNeeded", () => {
     it("should migrate an old plan to the current version", () => {
       const oldPlan = {

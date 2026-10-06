@@ -347,7 +347,7 @@ export const usePlanStore = defineStore("plan", () => {
       id: `role-${index + 1}`,
       name,
       requiredSkillId: "",
-      scope: "match" as const,
+      scope: plan.value?.config.roles[index]?.scope ?? "match",
     }));
     plan.value.lastUpdated = new Date();
   }

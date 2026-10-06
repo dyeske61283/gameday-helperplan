@@ -97,4 +97,33 @@ describe("plan-scoped routing", async () => {
     expect(await page.evaluate(planId => JSON.parse(localStorage.getItem("gameday-selected-member") || "{}")?.[planId], seededPlanId)).toBe(selectedMember);
     await page.close();
   }, 90000);
+
+  it("copies a canonical share link and reports clipboard failure", async () => {
+    const page = await createPage();
+    await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
+    await page.goto(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl), { waitUntil: "domcontentloaded" });
+    await page.getByText("Season fixtures, helper schedules, and real-time duty tracking.").waitFor();
+    await page.getByRole("button", { name: "Copy share link" }).click();
+    const status = page.getByRole("status");
+    await status.waitFor();
+    expect(await status.textContent()).toContain("copied");
+    await page.close();
+  }, 90000);
+
+  it("shows a recovery message when sharing cannot copy", async () => {
+    const page = await createPage();
+    await page.addInitScript(() => Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: async () => { throw new Error("denied"); } },
+    }));
+    await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
+    await page.goto(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl), { waitUntil: "domcontentloaded" });
+    await page.getByText("Season fixtures, helper schedules, and real-time duty tracking.").waitFor();
+    await page.getByRole("button", { name: "Copy share link" }).click();
+    const alert = page.getByRole("alert");
+    await alert.waitFor();
+    expect(await alert.textContent()).toContain("Could not copy");
+    await page.close();
+  }, 90000);
 });

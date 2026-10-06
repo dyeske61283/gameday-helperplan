@@ -4,12 +4,16 @@
 import type { SeasonPlan } from "../../../utils/plan-types";
 import { toRaw } from "vue";
 import { usePlanStore } from "../../../stores/plan";
+import { copyToClipboard } from "../../../utils/clipboard";
 import { createPlanLink } from "../../../utils/plan-links";
 
 const route = useRoute();
 const planStore = usePlanStore();
 const toast = useToast();
 usePlanInit();
+
+onMounted(() => planStore.setEditing(true));
+onUnmounted(() => planStore.setEditing(false));
 
 const planLink = computed(() => planStore.key ? `/plans/${route.params.planId}#key=${planStore.key}` : `/plans/${route.params.planId}${route.hash}`);
 const scheduleLink = computed(() => planLink.value);
@@ -44,6 +48,7 @@ function syncDrafts() {
 watch(() => planStore.plan, syncDrafts, { immediate: true });
 function markDirty() {
   isDirty.value = true;
+  planStore.setEditing(true);
 }
 
 const teams = computed(() => Object.values(draft.value?.teams ?? {}));
@@ -104,7 +109,7 @@ async function save() {
   draft.value.club = { ...draft.value.club, name: clubName.value.trim(), contactEmail: contactEmail.value.trim(), homepage: homepage.value.trim(), lastUpdated: new Date() };
   draft.value.season = season.value.trim();
   draft.value.config.roles = rolesText.value.split("\n").map((line, index) => {
-    const [name, scope = "match"] = line.split("|").map(value => value.trim());
+    const [name, scope = planStore.roles[index]?.scope ?? "match"] = line.split("|").map(value => value.trim());
     const previous = planStore.roles[index];
     return { id: previous?.id ?? `role-${index + 1}`, name: name ?? "", scope: scope === "gameday" ? "gameday" as const : "match" as const, requiredSkillId: previous?.requiredSkillId ?? "" };
   }).filter(role => Boolean(role.name));
@@ -120,16 +125,20 @@ async function save() {
     member.name = member.name.trim();
     member.updatedAt = new Date();
   });
-  if (await planStore.savePlan(draft.value))
+  if (await planStore.savePlan(draft.value)) {
     isDirty.value = false;
-  else
+    planStore.setEditing(false);
+  }
+  else {
     toast.add({ title: "ui.saveFailed", description: planStore.error || "ui.couldNotSavePlan", color: "error" });
+  }
 }
 
 async function reload() {
   if (!planStore.plan || !planStore.key)
     return;
   isDirty.value = false;
+  planStore.setEditing(true);
   await planStore.loadPlan(planStore.plan.id, planStore.key);
 }
 
@@ -137,12 +146,9 @@ async function copyShareUrl() {
   if (!shareUrl.value)
     return;
   try {
-    await navigator.clipboard.writeText(shareUrl.value);
-    shareState.value = "copied";
+    shareState.value = await copyToClipboard(shareUrl.value) ? "copied" : "failed";
   }
-  catch {
-    shareState.value = "failed";
-  }
+  catch { shareState.value = "failed"; }
 }
 
 useHead({ title: "Edit plan" });
@@ -165,7 +171,10 @@ useHead({ title: "Edit plan" });
       </UButton>
     </main>
     <main v-else-if="!planStore.plan" class="py-16 text-center">
-      {{ $t("ui.schedule.thisPlanIsUnavailable") }}
+      <p>{{ $t("ui.schedule.thisPlanIsUnavailable") }}</p>
+      <UButton to="/" class="mt-4">
+        {{ $t("ui.schedule.returnStart") }}
+      </UButton>
     </main>
     <main v-else class="space-y-8">
       <header class="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-start sm:justify-between">
