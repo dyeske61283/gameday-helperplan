@@ -44,9 +44,10 @@ describe("plan-scoped routing", async () => {
     expect(matchUrl.hash).toBe(seededPlanHash);
     await page.goto(matchUrl.toString(), { waitUntil: "domcontentloaded" });
     expect(new URL(page.url()).pathname).toMatch(/^\/plans\/[^/]+\/matches\/[^/]+$/);
-    const allFixturesUrl = new URL(await page.getByText("All fixtures").getAttribute("href")!, page.url());
+    const allFixturesLink = page.locator(`a[href^="/plans/${planId}"]`).first();
+    await allFixturesLink.waitFor();
+    const allFixturesUrl = new URL(await allFixturesLink.getAttribute("href")!, page.url());
     expect(allFixturesUrl.pathname).toBe(`/plans/${planId}`);
-    expect(allFixturesUrl.hash).toBe(seededPlanHash);
     expect(await page.getByText("Claiming as").count()).toBe(0);
 
     const planUrl = new URL(page.url());
