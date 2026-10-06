@@ -65,6 +65,25 @@ describe("plan-scoped routing", async () => {
     await page.close();
   }, 90000);
 
+  it("edits, saves, reloads, and recovers from a failed plan load", async () => {
+    const page = await createPage();
+    await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
+    await page.goto(testUrl(`/plans/${seededPlanId}/setup${seededPlanHash}`), { waitUntil: "domcontentloaded" });
+    await page.getByText("Plan setup", { exact: true }).waitFor();
+
+    const clubName = page.locator("input").first();
+    await clubName.fill("Browser Edited Club");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await page.getByText("All changes saved", { exact: true }).waitFor();
+    await page.getByRole("button", { name: "Reload from server" }).click();
+    expect(await clubName.inputValue()).toBe("Browser Edited Club");
+
+    await page.goto(testUrl("/plans/00000000-0000-0000-0000-000000000000/setup#key=test-key"), { waitUntil: "domcontentloaded" });
+    await page.getByRole("heading", { name: "Could not load plan" }).waitFor();
+    await page.getByRole("link", { name: "Return to plan" }).waitFor();
+    await page.close();
+  }, 90000);
+
   it("lets the cockpit own member selection", async () => {
     const page = await createPage();
     await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);

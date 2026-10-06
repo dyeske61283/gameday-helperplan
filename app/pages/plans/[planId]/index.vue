@@ -165,6 +165,14 @@ const totalAssignedSlots = computed(() => {
         >
           {{ $t("ui.schedule.teamsRoster") }}
         </UButton>
+        <UButton
+          :to="planLink('/setup')"
+          icon="i-lucide-settings"
+          variant="outline"
+          class="rounded-full"
+        >
+          {{ $t("ui.editPlan") }}
+        </UButton>
       </div>
     </div>
 
