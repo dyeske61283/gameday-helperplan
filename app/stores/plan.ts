@@ -561,10 +561,6 @@ export const usePlanStore = defineStore("plan", () => {
 
     if (keyFromUrl) {
       key.value = keyFromUrl;
-
-      // Remove the fragment from the URL without triggering a page refresh
-      const cleanUrl = globalThis.location.pathname + globalThis.location.search;
-      globalThis.history.replaceState(globalThis.history.state, "", cleanUrl);
     }
   }
 

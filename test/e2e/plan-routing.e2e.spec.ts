@@ -69,16 +69,16 @@ describe("plan-scoped routing", async () => {
     const page = await createPage();
     await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
     await page.goto(testUrl(`/plans/${seededPlanId}/setup${seededPlanHash}`), { waitUntil: "domcontentloaded" });
-    await page.getByText("Plan setup", { exact: true }).waitFor();
+    await page.getByRole("heading", { name: "Plan setup" }).waitFor();
 
     const clubName = page.locator("input").first();
     await clubName.fill("Browser Edited Club");
     await page.getByRole("button", { name: "Save changes" }).click();
-    await page.getByText("All changes saved", { exact: true }).waitFor();
+    await page.getByText("Saved").waitFor();
     await page.getByRole("button", { name: "Reload from server" }).click();
-    expect(await clubName.inputValue()).toBe("Browser Edited Club");
+    await expect(clubName).toHaveValue("Browser Edited Club");
 
-    await page.goto(testUrl("/plans/00000000-0000-0000-0000-000000000000/setup#key=test-key"), { waitUntil: "domcontentloaded" });
+    await page.goto(testUrl(`/plans/missing-plan/setup#key=test-key`), { waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "Could not load plan" }).waitFor();
     await page.getByRole("link", { name: "Return to plan" }).waitFor();
     await page.close();

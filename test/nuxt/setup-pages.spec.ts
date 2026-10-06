@@ -5,11 +5,11 @@ import PlanSetupPage from "../../app/pages/plans/[planId]/setup.vue";
 import BaseSetupPage from "../../app/pages/setup.vue";
 
 describe("plan setup", () => {
-  it("renders the unavailable new-plan state with a route back home", async () => {
+  it("renders the new-plan setup form", async () => {
     const component = await mountSuspended(BaseSetupPage);
 
-    expect(component.text()).toContain("New plan setup is not available yet.");
-    expect(component.find("a[href='/']").exists()).toBe(true);
+    expect(component.text()).toContain("Set up a new plan");
+    expect(component.find("button").exists()).toBe(true);
   });
 
   it("renders a recoverable load failure for an unavailable existing plan", async () => {

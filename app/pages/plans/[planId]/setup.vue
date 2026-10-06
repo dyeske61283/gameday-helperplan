@@ -49,10 +49,6 @@ function markDirty() {
 const teams = computed(() => Object.values(draft.value?.teams ?? {}));
 const members = computed(() => Object.values(draft.value?.members ?? {}));
 
-function touch() {
-  isDirty.value = true;
-}
-
 function addTeam() {
   const name = newTeamName.value.trim();
   if (!name || !draft.value)
@@ -68,7 +64,7 @@ function removeTeam(teamId: string) {
     return;
   delete draft.value.teams[teamId];
   Object.values(draft.value.members).forEach(member => member.teamIds = member.teamIds.filter(id => id !== teamId));
-  touch();
+  markDirty();
 }
 
 function addMember() {
@@ -84,40 +80,38 @@ function addMember() {
 function removeMember(memberId: string) {
   if (draft.value)
     delete draft.value.members[memberId];
-  touch();
+  markDirty();
 }
 
 function validate() {
   if (!clubName.value.trim() || !season.value.trim())
-    return "Club name and season are required.";
+    return "ui.checkPlanDetails";
   if (!draft.value || Object.values(draft.value.teams).some(team => !team.name.trim()) || Object.values(draft.value.members).some(member => !member.name.trim()))
-    return "Team and member names cannot be empty.";
+    return "ui.teamMemberNamesRequired";
   if (contactEmail.value && (!contactEmail.value.includes("@") || !contactEmail.value.includes(".")))
-    return "Enter a valid contact email.";
+    return "ui.validEmailRequired";
   if (homepage.value && !/^https?:\/\//.test(homepage.value))
-    return "Homepage must start with http:// or https://.";
+    return "ui.homepageProtocolRequired";
   return null;
 }
 
 async function save() {
   const validationError = validate();
-  if (validationError || !planStore.plan) {
-    toast.add({ title: "Check your changes", description: validationError || "Plan is unavailable.", color: "error" });
+  if (validationError || !planStore.plan || !draft.value) {
+    toast.add({ title: "ui.checkChanges", description: validationError || "ui.planUnavailable", color: "error" });
     return;
   }
-  if (!draft.value)
-    return;
   draft.value.club = { ...draft.value.club, name: clubName.value.trim(), contactEmail: contactEmail.value.trim(), homepage: homepage.value.trim(), lastUpdated: new Date() };
   draft.value.season = season.value.trim();
   draft.value.config.roles = rolesText.value.split("\n").map((line, index) => {
     const [name, scope = "match"] = line.split("|").map(value => value.trim());
     const previous = planStore.roles[index];
     return { id: previous?.id ?? `role-${index + 1}`, name: name ?? "", scope: scope === "gameday" ? "gameday" as const : "match" as const, requiredSkillId: previous?.requiredSkillId ?? "" };
-  }).filter((role): role is NonNullable<typeof role> & { name: string } => Boolean(role.name));
+  }).filter(role => Boolean(role.name));
   draft.value.config.locations = locationsText.value.split("\n").map((line, index) => {
     const [name, link] = line.split("|").map(value => value.trim());
     return { id: planStore.locations[index]?.id ?? `location-${index + 1}`, name: name ?? "", ...(link ? { link } : {}) };
-  }).filter((location): location is NonNullable<typeof location> & { name: string } => Boolean(location.name));
+  }).filter(location => Boolean(location.name));
   Object.values(draft.value.teams).forEach((team) => {
     team.name = team.name.trim();
     team.updatedAt = new Date();
@@ -126,14 +120,10 @@ async function save() {
     member.name = member.name.trim();
     member.updatedAt = new Date();
   });
-  const saved = await planStore.savePlan(draft.value);
-  if (!saved) {
-    toast.add({ title: "Save failed", description: planStore.error || "Could not save the plan.", color: "error" });
-  }
-  else {
+  if (await planStore.savePlan(draft.value))
     isDirty.value = false;
-    toast.add({ title: "Plan saved", description: "Changes synced to the shared plan.", color: "success" });
-  }
+  else
+    toast.add({ title: "ui.saveFailed", description: planStore.error || "ui.couldNotSavePlan", color: "error" });
 }
 
 async function reload() {
@@ -141,8 +131,6 @@ async function reload() {
     return;
   isDirty.value = false;
   await planStore.loadPlan(planStore.plan.id, planStore.key);
-  if (planStore.error)
-    toast.add({ title: "Reload failed", description: planStore.error, color: "error" });
 }
 
 async function copyShareUrl() {
@@ -173,141 +161,128 @@ useHead({ title: "Edit plan" });
         {{ planStore.error }}
       </p>
       <UButton :to="planLink">
-        Return to plan
+        {{ $t("ui.planSetup.returnToPlan") }}
       </UButton>
     </main>
     <main v-else-if="!planStore.plan" class="py-16 text-center">
-      This plan is unavailable.
+      {{ $t("ui.schedule.thisPlanIsUnavailable") }}
     </main>
     <main v-else class="space-y-8">
       <header class="flex flex-col gap-4 border-b pb-6 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p class="text-sm text-primary">
-            Plan setup
+            {{ $t("ui.planSetup.planSetup") }}
           </p>
           <h1 class="text-3xl font-bold">
-            {{ planStore.plan.club.name || "Edit shared plan" }}
+            {{ planStore.plan.club.name || $t("ui.editPlan") }}
           </h1>
           <p class="text-on-surface-variant">
-            Changes are encrypted and shared with everyone using this link.
+            {{ $t("ui.planSetup.changesAreEncryptedAndSharedWithEveryoneUsingThisLink") }}
           </p>
         </div>
         <div class="flex gap-2">
           <UButton :to="scheduleLink" variant="outline">
-            View schedule
+            {{ $t("ui.planSetup.viewSchedule") }}
           </UButton>
           <UButton :loading="planStore.isLoading" @click="save">
-            Save changes
+            {{ $t("ui.planSetup.saveChanges") }}
           </UButton>
         </div>
       </header>
-
       <div v-if="planStore.error" class="rounded-lg bg-error/10 p-4 text-error">
         {{ planStore.error }}
       </div>
       <section class="space-y-4 rounded-xl border p-5">
         <h2 class="text-xl font-bold">
-          Plan details
+          {{ $t("ui.planSetup.planDetails") }}
         </h2>
         <div class="grid gap-4 sm:grid-cols-2">
           <UFormField label="Club name" required>
             <UInput v-model="clubName" @input="markDirty" />
           </UFormField>
           <UFormField label="Season" required>
-            <UInput v-model="season" placeholder="2026/2027" @input="markDirty" />
+            <UInput v-model="season" @input="markDirty" />
           </UFormField>
           <UFormField label="Contact email">
             <UInput v-model="contactEmail" type="email" @input="markDirty" />
           </UFormField>
           <UFormField label="Homepage">
-            <UInput v-model="homepage" type="url" placeholder="https://example.org" @input="markDirty" />
+            <UInput v-model="homepage" type="url" @input="markDirty" />
           </UFormField>
         </div>
       </section>
-
       <section class="space-y-4 rounded-xl border p-5">
         <h2 class="text-xl font-bold">
-          Teams
+          {{ $t("ui.setup.teams") }}
         </h2>
         <div class="flex gap-2">
-          <UInput v-model="newTeamName" class="grow" placeholder="Team name" @keyup.enter="addTeam" /><UButton :disabled="!newTeamName.trim()" @click="addTeam">
-            Add team
+          <UInput v-model="newTeamName" class="grow" /><UButton :disabled="!newTeamName.trim()" @click="addTeam">
+            {{ $t("ui.planSetup.addTeam") }}
           </UButton>
         </div>
-        <div class="space-y-2">
-          <div v-for="team in teams" :key="team.id" class="flex gap-2">
-            <UInput v-model="team.name" class="grow" @input="markDirty" /><UButton color="error" variant="ghost" @click="removeTeam(team.id)">
-              Remove
+        <div v-for="team in teams" :key="team.id" class="flex gap-2">
+          <UInput v-model="team.name" class="grow" @input="markDirty" /><UButton color="error" variant="ghost" @click="removeTeam(team.id)">
+            {{ $t("ui.common.remove") }}
+          </UButton>
+        </div>
+        <p v-if="!teams.length" class="text-sm text-on-surface-variant">
+          {{ $t("ui.planSetup.noTeamsYet") }}
+        </p>
+      </section>
+      <section class="space-y-4 rounded-xl border p-5">
+        <h2 class="text-xl font-bold">
+          {{ $t("ui.common.members") }}
+        </h2>
+        <div class="flex gap-2">
+          <UInput v-model="newMemberName" class="grow" /><UButton :disabled="!newMemberName.trim()" @click="addMember">
+            {{ $t("ui.planSetup.addMember") }}
+          </UButton>
+        </div>
+        <div v-for="member in members" :key="member.id" class="space-y-2 rounded-lg border p-3">
+          <div class="flex gap-2">
+            <UInput v-model="member.name" class="grow" @input="markDirty" /><UButton color="error" variant="ghost" @click="removeMember(member.id)">
+              {{ $t("ui.common.remove") }}
             </UButton>
-          </div>
-          <p v-if="!teams.length" class="text-sm text-on-surface-variant">
-            No teams yet.
-          </p>
+          </div><select v-model="member.teamIds" multiple aria-label="Member teams" class="w-full rounded-lg border bg-transparent p-2 text-sm" @change="markDirty">
+            <option v-for="team in teams" :key="team.id" :value="team.id">
+              {{ team.name }}
+            </option>
+          </select>
         </div>
+        <p v-if="!members.length" class="text-sm text-on-surface-variant">
+          {{ $t("ui.planSetup.noMembersYet") }}
+        </p>
       </section>
-
       <section class="space-y-4 rounded-xl border p-5">
         <h2 class="text-xl font-bold">
-          Members
+          {{ $t("ui.planSetup.scheduleConfiguration") }}
         </h2>
-        <div class="flex gap-2">
-          <UInput v-model="newMemberName" class="grow" placeholder="Member name" @keyup.enter="addMember" /><UButton :disabled="!newMemberName.trim()" @click="addMember">
-            Add member
-          </UButton>
-        </div>
-        <div class="space-y-3">
-          <div v-for="member in members" :key="member.id" class="space-y-2 rounded-lg border p-3">
-            <div class="flex gap-2">
-              <UInput v-model="member.name" class="grow" @input="markDirty" /><UButton color="error" variant="ghost" @click="removeMember(member.id)">
-                Remove
-              </UButton>
-            </div>
-            <select v-model="member.teamIds" multiple class="w-full rounded-lg border bg-transparent p-2 text-sm" aria-label="Member teams" @change="markDirty">
-              <option v-for="team in teams" :key="team.id" :value="team.id">
-                {{ team.name }}
-              </option>
-            </select>
-          </div>
-          <p v-if="!members.length" class="text-sm text-on-surface-variant">
-            No members yet.
-          </p>
-        </div>
-      </section>
-
-      <section class="space-y-4 rounded-xl border p-5">
-        <h2 class="text-xl font-bold">
-          Schedule configuration
-        </h2>
-        <UFormField label="Duty roles" hint="One per line: role name | match or gameday">
+        <UFormField label="Duty roles">
           <UTextarea v-model="rolesText" :rows="5" class="w-full" @input="markDirty" />
         </UFormField>
-        <UFormField label="Locations" hint="One per line: location name | optional URL">
+        <UFormField label="Locations">
           <UTextarea v-model="locationsText" :rows="4" class="w-full" @input="markDirty" />
         </UFormField>
       </section>
-
       <section v-if="shareUrl" aria-labelledby="share-heading" class="space-y-3 rounded-xl border border-primary/30 p-5">
         <h2 id="share-heading" class="text-xl font-bold">
-          Share this plan
+          {{ $t("ui.planSetup.shareThisPlan") }}
         </h2>
         <div class="flex flex-col gap-2 sm:flex-row">
-          <UInput :model-value="shareUrl" readonly aria-label="Share link" class="grow" />
-          <UButton @click="copyShareUrl">
-            Copy share link
+          <UInput :model-value="shareUrl" readonly aria-label="Share link" class="grow" /><UButton @click="copyShareUrl">
+            {{ $t("ui.common.copyShareLink") }}
           </UButton>
         </div>
         <p v-if="shareState === 'copied'" role="status" class="text-sm text-success">
-          Share link copied.
+          {{ $t("ui.common.shareCopied") }}
         </p>
         <p v-else-if="shareState === 'failed'" role="alert" class="text-sm text-error">
-          Could not copy the share link. Copy it from the field above.
+          {{ $t("ui.common.shareCopyFailed") }}
         </p>
       </section>
-
       <footer class="flex items-center justify-between border-t pt-6">
-        <span class="text-sm text-on-surface-variant">{{ isDirty ? "Unsaved changes" : "All changes saved" }}</span>
-        <UButton variant="outline" :loading="planStore.isLoading" @click="reload">
-          Reload from server
+        <span class="text-sm text-on-surface-variant">{{ isDirty ? $t("ui.common.saveChanges") : $t("ui.saved") }}</span><UButton variant="outline" :loading="planStore.isLoading" @click="reload">
+          {{ $t("ui.planSetup.reloadFromServer") }}
         </UButton>
       </footer>
     </main>
