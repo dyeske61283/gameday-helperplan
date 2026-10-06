@@ -285,7 +285,9 @@
       "teamHint": "Add one team per line. You can manage fixtures later.",
       "continueMembers": "Continue to Members",
       "membersAndDuties": "Add Members & Configure Duties",
-      "finish": "Add Members & Finish"
+      "finish": "Add Members & Finish",
+      "unavailableTitle": "New plan setup is not available yet.",
+      "unavailableDescription": "Use a shared plan link to open an existing plan."
     },
     "schedule": {
       "loadingPlan": "Loading plan...",
@@ -335,7 +337,10 @@
       "shareThisPlan": "Share this plan",
       "reloadFromServer": "Reload from server",
       "addMember": "Add member",
-      "noMembersYet": "No members yet."
+      "noMembersYet": "No members yet.",
+      "unavailableTitle": "Plan setup is not available yet.",
+      "unavailableDescription": "Return to the plan while editing is being prepared.",
+      "returnToPlan": "Return to plan"
     },
     "teams": {
       "manageYourClubTeamsLicensesAndMemberRoles": "Manage your club teams, licenses, and member roles.",

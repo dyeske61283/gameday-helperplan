@@ -19,12 +19,7 @@ const __dirname = path.dirname(__filename);
 const seededPlanId = "f530083d-8c74-4f10-931a-dd877ee7b52c";
 const testHost = process.env.TEST_HOST;
 const testUrl = (path: string) => testHost ? new URL(path, testHost).toString() : url(path);
-const seededSetupLink = process.env.E2E_PLAN_URL
-  ? (() => {
-      const link = new URL(process.env.E2E_PLAN_URL);
-      return `${link.origin}/plans/${link.pathname.split("/").pop()}/setup${link.hash}`;
-    })()
-  : `/plans/${seededPlanId}/setup#key=tWVZ4hmOA7LFsrNViX1X6w`;
+const seededPlanLink = process.env.E2E_PLAN_URL || `/plans/${seededPlanId}#key=tWVZ4hmOA7LFsrNViX1X6w`;
 let workflowPage: any;
 
 describe("feature: User Workflows (BDD Specs)", async () => {
@@ -55,16 +50,15 @@ describe("feature: User Workflows (BDD Specs)", async () => {
     await When("the user navigates to the seeded plan link", async () => {
       workflowPage = await createPage();
       await workflowPage.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
-      const targetUrl = seededSetupLink.startsWith("http") ? seededSetupLink : testUrl(seededSetupLink);
+      const targetUrl = seededPlanLink.startsWith("http") ? seededPlanLink : testUrl(seededPlanLink);
       await workflowPage.goto(targetUrl, { waitUntil: "domcontentloaded" });
     });
-    await Then("the URL fragment is parsed and the crypto key tWVZ4hmOA7LFsrNViX1X6w is extracted", async () => {
-      expect(workflowPage).toBeDefined();
+    await Then("the URL fragment is parsed and the plan schedule opens", async () => {
+      await workflowPage.getByText("Season fixtures, helper schedules, and real-time duty tracking.").waitFor();
+      expect(new URL(workflowPage.url()).pathname).toBe(`/plans/${seededPlanId}`);
     });
     await Then("the plan is fetched from /api/f530083d-8c74-4f10-931a-dd877ee7b52c and decrypted client-side", async () => {
-      await workflowPage.waitForFunction(() => document.body.textContent.includes("f530083d-8c74-4f10-931a-dd877ee7b52c"), { timeout: 10000 });
-      const clubName = await workflowPage.inputValue("input");
-      expect(clubName).toContain("Gladbeck HC");
+      await workflowPage.getByRole("heading", { name: "Gladbeck HC" }).waitFor();
     });
     await Then("the plan ID and key are persisted to localStorage for resume", async () => {
       const storedResume = await workflowPage.evaluate(() => JSON.parse(localStorage.getItem("gameday-plan-resume") || "null"));
@@ -73,35 +67,9 @@ describe("feature: User Workflows (BDD Specs)", async () => {
         key: expect.any(String),
       });
     });
-    await Then("the setup view displays the active plan with Plan ID and encryption key indicator", async () => {
+    await Then("the schedule displays the active plan", async () => {
       const content = await workflowPage.textContent("body");
-      expect(content).toContain("f530083d-8c74-4f10-931a-dd877ee7b52c");
-      expect(content).toContain("Plan setup");
-      await workflowPage.locator("input").first().fill("Gladbeck HC Edited");
-      await workflowPage.getByRole("button", { name: "Save changes" }).click();
-      await workflowPage.getByText("All changes saved").waitFor();
-      await workflowPage.getByRole("button", { name: "Reload from server" }).click();
-      await workflowPage.locator("input").first().waitFor();
-      expect(await workflowPage.locator("input").first().inputValue()).toBe("Gladbeck HC Edited");
-
-      await workflowPage.route("**/api/**", async (route) => {
-        if (route.request().method() === "POST")
-          await route.fulfill({ status: 503, body: "storage unavailable" });
-        else
-          await route.continue();
-      });
-      await workflowPage.locator("input").first().fill("Failed Save Attempt");
-      await workflowPage.getByRole("button", { name: "Save changes" }).click();
-      await workflowPage.getByText("Save failed", { exact: true }).waitFor();
-      await workflowPage.unroute("**/api/**");
-      await workflowPage.getByRole("button", { name: "Save changes" }).click();
-      await workflowPage.getByText("All changes saved", { exact: true }).waitFor();
-
-      const shareUrl = await workflowPage.getByRole("textbox", { name: "Share link" }).inputValue();
-      expect(new URL(shareUrl).pathname).toMatch(/^\/plans\/[\w-]+$/);
-      await workflowPage.context().grantPermissions(["clipboard-read", "clipboard-write"]);
-      await workflowPage.getByRole("button", { name: "Copy share link" }).click();
-      await workflowPage.getByRole("status").getByText("Share link copied.").waitFor();
+      expect(content).toContain("Gladbeck HC");
       await workflowPage.close();
     });
   });
