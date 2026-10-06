@@ -11,7 +11,7 @@ useHead({ title: () => t("ui.editPlan") });
 
 <template>
   <UContainer class="py-16">
-    <main class="mx-auto max-w-xl space-y-6 text-center">
+    <section class="mx-auto max-w-xl space-y-6 text-center">
       <h1 class="text-3xl font-bold">
         {{ $t("ui.planSetup.unavailableTitle") }}
       </h1>
@@ -21,6 +21,6 @@ useHead({ title: () => t("ui.editPlan") });
       <UButton :to="planLink">
         {{ $t("ui.planSetup.returnToPlan") }}
       </UButton>
-    </main>
+    </section>
   </UContainer>
 </template>

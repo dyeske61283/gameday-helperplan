@@ -6,7 +6,7 @@ useHead({ title: () => t("ui.setUpPlan") });
 
 <template>
   <UContainer class="py-16">
-    <main class="mx-auto max-w-xl space-y-6 text-center">
+    <section class="mx-auto max-w-xl space-y-6 text-center">
       <h1 class="text-3xl font-bold">
         {{ $t("ui.setup.unavailableTitle") }}
       </h1>
@@ -16,6 +16,6 @@ useHead({ title: () => t("ui.setUpPlan") });
       <UButton to="/">
         {{ $t("ui.common.backToHome") }}
       </UButton>
-    </main>
+    </section>
   </UContainer>
 </template>
