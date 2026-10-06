@@ -12,13 +12,13 @@ describe("plan setup", () => {
     expect(component.find("a[href='/']").exists()).toBe(true);
   });
 
-  it("renders unavailable existing-plan setup with a canonical plan link", async () => {
+  it("renders a recoverable load failure for an unavailable existing plan", async () => {
     const component = await mountSuspended(PlanSetupPage, {
       route: "/plans/plan-123/setup#key=test-key",
     });
 
     await flushPromises();
-    expect(component.text()).toContain("Plan setup is not available yet.");
+    expect(component.text()).toContain("Could not load plan");
     expect(component.find("a[href='/plans/plan-123#key=test-key']").exists()).toBe(true);
   });
 });
