@@ -103,7 +103,7 @@ describe("plan-scoped routing", async () => {
     await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
     await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
     await page.goto(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl), { waitUntil: "domcontentloaded" });
-    await page.getByText("Season fixtures, helper schedules, and real-time duty tracking.").waitFor();
+    await page.getByRole("button", { name: "Copy share link" }).waitFor();
     await page.getByRole("button", { name: "Copy share link" }).click();
     const status = page.getByRole("status").filter({ hasText: "Share link copied." });
     await status.waitFor();
@@ -119,7 +119,7 @@ describe("plan-scoped routing", async () => {
     }));
     await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
     await page.goto(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl), { waitUntil: "domcontentloaded" });
-    await page.getByText("Season fixtures, helper schedules, and real-time duty tracking.").waitFor();
+    await page.getByRole("button", { name: "Copy share link" }).waitFor();
     await page.getByRole("button", { name: "Copy share link" }).click();
     const alert = page.getByRole("alert");
     await alert.waitFor();
