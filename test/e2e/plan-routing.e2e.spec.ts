@@ -19,9 +19,15 @@ const editPlanId = new URL(editPlanUrl, testHost || "http://localhost").pathname
 
 function monitorSharePage(page: Page) {
   const apiResponses: string[] = [];
+  const documentResponses: string[] = [];
   const errors: string[] = [];
   page.on("response", (response) => {
-    if (/^\/api\/[0-9a-f-]+$/i.test(new URL(response.url()).pathname))
+    const url = new URL(response.url());
+    if (response.request().resourceType() === "document") {
+      const errorId = response.headers()["x-error-id"] || "none";
+      documentResponses.push(`${response.status()} ${url.pathname} error-id=${errorId}`);
+    }
+    if (/^\/api\/[0-9a-f-]+$/i.test(url.pathname))
       apiResponses.push(`${response.request().method()} ${response.status()}`);
   });
   page.on("console", (message) => {
@@ -61,7 +67,7 @@ function monitorSharePage(page: Page) {
             unavailable: /This plan is unavailable|Dieser Plan ist nicht verfügbar/.test(text),
           };
         });
-        throw new Error(`Share page did not become ready: ${JSON.stringify({ state, apiResponses, errors })}`);
+        throw new Error(`Share page did not become ready: ${JSON.stringify({ state, documentResponses, apiResponses, errors })}`);
       }
     }
   };
