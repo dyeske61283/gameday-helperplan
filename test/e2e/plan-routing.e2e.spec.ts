@@ -105,7 +105,10 @@ describe("plan-scoped routing", async () => {
 
   it("copies a canonical share link and reports clipboard failure", async () => {
     const page = await createPage();
-    await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
+    await page.addInitScript(() => Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
+      value: { writeText: () => Promise.resolve() },
+    }));
     await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
     await page.goto(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl), { waitUntil: "domcontentloaded" });
     await page.getByRole("button", { name: "Copy share link" }).waitFor();
