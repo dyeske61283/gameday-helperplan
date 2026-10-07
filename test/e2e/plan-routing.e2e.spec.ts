@@ -5,17 +5,22 @@ import { createPage, setup, url } from "@nuxt/test-utils/e2e";
 import { beforeAll, describe, expect, it } from "vitest";
 /* eslint-disable node/no-process-env */
 
-const seededPlanId = "f530083d-8c74-4f10-931a-dd877ee7b52c";
-const seededPlanUrl = process.env.E2E_PLAN_URL || `/plans/${seededPlanId}#key=tWVZ4hmOA7LFsrNViX1X6w`;
+const defaultPlanId = "f530083d-8c74-4f10-931a-dd877ee7b52c";
+const defaultPlanUrl = `/plans/${defaultPlanId}#key=tWVZ4hmOA7LFsrNViX1X6w`;
+const seededPlanUrl = process.env.E2E_ROUTING_PLAN_URL || process.env.E2E_PLAN_URL || defaultPlanUrl;
+const editPlanUrl = process.env.E2E_EDIT_PLAN_URL || seededPlanUrl;
 const testHost = process.env.TEST_HOST;
 const testUrl = (pathname: string) => testHost ? new URL(pathname, testHost).toString() : url(pathname);
 const seededPlanHash = new URL(seededPlanUrl, testHost || "http://localhost").hash;
+const seededPlanId = new URL(seededPlanUrl, testHost || "http://localhost").pathname.split("/")[2] || defaultPlanId;
+const editPlanHash = new URL(editPlanUrl, testHost || "http://localhost").hash;
+const editPlanId = new URL(editPlanUrl, testHost || "http://localhost").pathname.split("/")[2] || defaultPlanId;
 
 describe("plan-scoped routing", async () => {
   await setup({ host: testHost, dev: true });
 
   beforeAll(async () => {
-    if (process.env.E2E_PLAN_URL)
+    if (process.env.E2E_ROUTING_PLAN_URL || process.env.E2E_PLAN_URL)
       return;
     const fixture = JSON.parse(fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../fixtures/encrypted-plan-2025-2026.json"), "utf8"));
     await fetch(testUrl(`/api/${seededPlanId}`), {
@@ -68,7 +73,7 @@ describe("plan-scoped routing", async () => {
   it("edits, saves, reloads, and recovers from a failed plan load", async () => {
     const page = await createPage();
     await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
-    await page.goto(testUrl(`/plans/${seededPlanId}/setup${seededPlanHash}`), { waitUntil: "domcontentloaded" });
+    await page.goto(testUrl(`/plans/${editPlanId}/setup${editPlanHash}`), { waitUntil: "domcontentloaded" });
     await page.getByLabel("Club name").waitFor();
 
     const clubName = page.locator("input").first();

@@ -36,15 +36,19 @@ jobs:
           echo "TEST_HOST=$URL" >> $GITHUB_ENV
           echo "deployment_url=$URL" >> $GITHUB_OUTPUT
 
-      - name: Seed E2E plan
+      - name: Seed isolated E2E plans
         run: |
-          OUTPUT=$(SEED_BASE_URL="$TEST_HOST" pnpm seed:plan)
-          echo "$OUTPUT"
-          PLAN_URL=$(printf '%s\n' "$OUTPUT" | sed -n 's/^SEED_PLAN_URL=//p')
-          echo "E2E_PLAN_URL=$PLAN_URL" >> "$GITHUB_ENV"
+          seed_plan() {
+            SEED_BASE_URL="$TEST_HOST" \
+            SEED_PLAN_ID="$(node -e 'console.log(require("node:crypto").randomUUID())')" \
+            pnpm seed:plan | sed -n 's/^SEED_PLAN_URL=//p'
+          }
+          echo "E2E_WORKFLOW_PLAN_URL=$(seed_plan)" >> "$GITHUB_ENV"
+          echo "E2E_ROUTING_PLAN_URL=$(seed_plan)" >> "$GITHUB_ENV"
+          echo "E2E_EDIT_PLAN_URL=$(seed_plan)" >> "$GITHUB_ENV"
           {
-            echo "## Seeded E2E plan"
-            echo "[Open the seeded plan]($PLAN_URL)"
+            echo "## E2E test data"
+            echo "Seeded independent workflow, routing/sharing, and editing plans."
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Run Vitest tests
         run: pnpm test
