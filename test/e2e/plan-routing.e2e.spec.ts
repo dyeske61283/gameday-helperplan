@@ -29,23 +29,33 @@ function monitorSharePage(page: Page) {
       errors.push(message.text().replace(/#key=\S*/g, "#key=<REDACTED>").slice(0, 200));
   });
 
-  return async () => {
-    try {
-      await page.getByRole("button", { name: "Copy share link" }).waitFor({ timeout: 15000 });
-    }
-    catch {
-      const state = await page.evaluate(() => {
-        const text = document.body.textContent ?? "";
-        return {
-          locale: document.documentElement.lang,
-          headings: [...document.querySelectorAll("h1, h2")].map(element => element.textContent?.trim()).filter(Boolean),
-          buttons: [...document.querySelectorAll("button")].map(element => element.textContent?.trim()).filter(Boolean),
-          loading: /Loading plan|Plan wird geladen/.test(text),
-          loadError: /Could not open this plan|Dieser Plan konnte nicht geöffnet werden/.test(text),
-          unavailable: /This plan is unavailable|Dieser Plan ist nicht verfügbar/.test(text),
-        };
-      });
-      throw new Error(`Share page did not become ready: ${JSON.stringify({ state, apiResponses, errors })}`);
+  return async (targetUrl: string) => {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const response = await page.goto(targetUrl, { waitUntil: "domcontentloaded" });
+      // Retry one transient preview-server error; persistent failures still report page/API state below.
+      if (response && response.status() >= 500 && attempt === 0) {
+        await page.waitForTimeout(500);
+        continue;
+      }
+
+      try {
+        await page.getByRole("button", { name: "Copy share link" }).waitFor({ timeout: 15000 });
+        return;
+      }
+      catch {
+        const state = await page.evaluate(() => {
+          const text = document.body.textContent ?? "";
+          return {
+            locale: document.documentElement.lang,
+            headings: [...document.querySelectorAll("h1, h2")].map(element => element.textContent?.trim()).filter(Boolean),
+            buttons: [...document.querySelectorAll("button")].map(element => element.textContent?.trim()).filter(Boolean),
+            loading: /Loading plan|Plan wird geladen/.test(text),
+            loadError: /Could not open this plan|Dieser Plan konnte nicht geöffnet werden/.test(text),
+            unavailable: /This plan is unavailable|Dieser Plan ist nicht verfügbar/.test(text),
+          };
+        });
+        throw new Error(`Share page did not become ready: ${JSON.stringify({ state, apiResponses, errors })}`);
+      }
     }
   };
 }
@@ -145,8 +155,7 @@ describe("plan-scoped routing", async () => {
       value: { writeText: () => Promise.resolve() },
     }));
     await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
-    await page.goto(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl), { waitUntil: "domcontentloaded" });
-    await waitForShareControl();
+    await waitForShareControl(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl));
     await page.getByRole("button", { name: "Copy share link" }).click();
     const status = page.getByRole("status").filter({ hasText: "Share link copied." });
     await status.waitFor();
@@ -162,8 +171,7 @@ describe("plan-scoped routing", async () => {
       value: { writeText: async () => { throw new Error("denied"); } },
     }));
     await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
-    await page.goto(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl), { waitUntil: "domcontentloaded" });
-    await waitForShareControl();
+    await waitForShareControl(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl));
     await page.getByRole("button", { name: "Copy share link" }).click();
     const alert = page.getByRole("alert");
     await alert.waitFor();
