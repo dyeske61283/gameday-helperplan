@@ -47,6 +47,13 @@ function monitorSharePage(page: Page) {
           const text = document.body.textContent ?? "";
           return {
             locale: document.documentElement.lang,
+            keyInUrl: new URLSearchParams(location.hash.slice(1)).has("key"),
+            resumeMatchesPlan: (() => {
+              try {
+                return JSON.parse(localStorage.getItem("gameday-plan-resume") || "null")?.id === location.pathname.split("/")[2];
+              }
+              catch { return false; }
+            })(),
             headings: [...document.querySelectorAll("h1, h2")].map(element => element.textContent?.trim()).filter(Boolean),
             buttons: [...document.querySelectorAll("button")].map(element => element.textContent?.trim()).filter(Boolean),
             loading: /Loading plan|Plan wird geladen/.test(text),
