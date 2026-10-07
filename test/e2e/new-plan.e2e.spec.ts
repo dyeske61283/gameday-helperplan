@@ -52,8 +52,14 @@ describe("new plan setup", async () => {
   it("shows a save failure without leaving setup", async () => {
     const page = await createPage();
     await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: url("/") }]);
-    await page.route("**/api/**", async route => route.fulfill({ status: 500, body: "save failed" }));
+    await page.route("**/api/**", async (route) => {
+      if (route.request().method() === "POST")
+        await route.fulfill({ status: 500, body: "save failed" });
+      else
+        await route.continue();
+    });
     await page.goto(url("/setup"), { waitUntil: "domcontentloaded" });
+    await page.waitForLoadState("networkidle");
     await page.getByRole("heading", { name: "Set up a new plan" }).waitFor();
     await page.getByRole("button", { name: "Start setup" }).click();
     await page.getByLabel("Club name").fill("Failure Club");

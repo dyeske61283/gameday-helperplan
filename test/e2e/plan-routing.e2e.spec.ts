@@ -69,14 +69,14 @@ describe("plan-scoped routing", async () => {
     const page = await createPage();
     await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
     await page.goto(testUrl(`/plans/${seededPlanId}/setup${seededPlanHash}`), { waitUntil: "domcontentloaded" });
-    await page.getByRole("heading", { name: "Plan setup" }).waitFor();
+    await page.getByLabel("Club name").waitFor();
 
     const clubName = page.locator("input").first();
     await clubName.fill("Browser Edited Club");
     await page.getByRole("button", { name: "Save changes" }).click();
     await page.getByText("Saved").waitFor();
     await page.getByRole("button", { name: "Reload from server" }).click();
-    await expect(clubName).toHaveValue("Browser Edited Club");
+    expect(await clubName.inputValue()).toBe("Browser Edited Club");
 
     await page.goto(testUrl(`/plans/missing-plan/setup#key=test-key`), { waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "Could not load plan" }).waitFor();
@@ -105,7 +105,7 @@ describe("plan-scoped routing", async () => {
     await page.goto(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl), { waitUntil: "domcontentloaded" });
     await page.getByText("Season fixtures, helper schedules, and real-time duty tracking.").waitFor();
     await page.getByRole("button", { name: "Copy share link" }).click();
-    const status = page.getByRole("status");
+    const status = page.getByRole("status").filter({ hasText: "Share link copied." });
     await status.waitFor();
     expect(await status.textContent()).toContain("copied");
     await page.close();
