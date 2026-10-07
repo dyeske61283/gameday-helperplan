@@ -1,6 +1,18 @@
 import type { H3Event } from "h3";
 import { getRequestHeader, getRequestURL, getResponseStatus, setResponseHeader } from "h3";
 
+function errorId(event: H3Event) {
+  if (typeof event.context.serverErrorId === "string")
+    return event.context.serverErrorId;
+
+  const incomingRequestId = getRequestHeader(event, "x-request-id");
+  const id = incomingRequestId && /^[\w-]{1,80}$/.test(incomingRequestId)
+    ? incomingRequestId
+    : crypto.randomUUID();
+  event.context.serverErrorId = id;
+  return id;
+}
+
 function logServerError(error: unknown, event: H3Event, source: string) {
   const errorStatus = typeof error === "object" && error && "statusCode" in error
     ? Number(error.statusCode)
@@ -10,10 +22,7 @@ function logServerError(error: unknown, event: H3Event, source: string) {
     return;
 
   event.context.serverErrorLogged = true;
-  const incomingRequestId = getRequestHeader(event, "x-request-id");
-  const requestId = incomingRequestId && /^[\w-]{1,80}$/.test(incomingRequestId)
-    ? incomingRequestId
-    : crypto.randomUUID();
+  const requestId = errorId(event);
   const details = error instanceof Error ? error : new Error(String(error));
 
   if (source !== "afterResponse")
@@ -40,6 +49,11 @@ export default defineNitroPlugin((nitroApp) => {
   nitroApp.hooks.hook("error", async (error, { event }) => {
     if (event)
       logServerError(error, event, "nitro");
+  });
+
+  nitroApp.hooks.hook("beforeResponse", (event) => {
+    if (getResponseStatus(event) >= 500)
+      setResponseHeader(event, "x-error-id", errorId(event));
   });
 
   nitroApp.hooks.hook("afterResponse", (event) => {
