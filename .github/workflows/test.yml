@@ -32,8 +32,11 @@ jobs:
           OUTPUT=$(node scripts/get-deno-url.js)
           echo "$OUTPUT"
           URL=$(printf '%s\n' "$OUTPUT" | sed -n 's/^DEPLOYMENT_URL_OUTPUT=//p')
+          REVISION_ID=$(printf '%s\n' "$OUTPUT" | sed -n 's/^DEPLOYMENT_REVISION_ID_OUTPUT=//p')
           test -n "$URL"
+          test -n "$REVISION_ID"
           echo "TEST_HOST=$URL" >> $GITHUB_ENV
+          echo "DENO_DEPLOY_REVISION_ID=$REVISION_ID" >> $GITHUB_ENV
           echo "deployment_url=$URL" >> $GITHUB_OUTPUT
 
       - name: Seed isolated E2E plans
@@ -52,6 +55,25 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Run Vitest tests
         run: pnpm test
+
+      - name: Show Deno runtime errors on test failure
+        if: failure()
+        continue-on-error: true
+        env:
+          DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
+          DENO_DEPLOY_REVISION_ID: ${{ env.DENO_DEPLOY_REVISION_ID }}
+        run: |
+          AUTH_HEADER="$DENO_DEPLOY_TOKEN"
+          case "$AUTH_HEADER" in Bearer\ *) ;; *) AUTH_HEADER="Bearer $AUTH_HEADER" ;; esac
+          START=$(date -u -d '10 minutes ago' +'%Y-%m-%dT%H:%M:%SZ')
+          END=$(date -u +'%Y-%m-%dT%H:%M:%SZ')
+          curl --fail --silent --show-error --get \
+            -H "Authorization: $AUTH_HEADER" \
+            --data-urlencode "start=$START" \
+            --data-urlencode "end=$END" \
+            --data-urlencode "revision_id=$DENO_DEPLOY_REVISION_ID" \
+            "https://api.deno.com/v2/apps/helperplan/logs" \
+            | jq -r '.logs[] | select(.level == "error" or (.message | contains("plan_request_started")) or (.message | contains("server_http_error"))) | "\(.timestamp) [\(.level)] \(.message)"'
 
       - name: Run Accessibility tests
         run: pnpm test:a11y
