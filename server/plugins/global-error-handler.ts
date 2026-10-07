@@ -42,6 +42,21 @@ function logServerError(error: unknown, event: H3Event, source: string) {
 }
 
 export default defineNitroPlugin((nitroApp) => {
+  nitroApp.hooks.hook("request", (event) => {
+    const path = getRequestURL(event).pathname;
+    if (!/^\/plans\/[^/]+/.test(path))
+      return;
+
+    const requestId = errorId(event);
+    setResponseHeader(event, "x-request-id", requestId);
+    console.warn(JSON.stringify({
+      event: "plan_request_started",
+      requestId,
+      method: event.method,
+      path,
+    }));
+  });
+
   nitroApp.h3App.options.onError = (error, event) => {
     logServerError(error, event, "h3");
   };
