@@ -193,7 +193,7 @@ const totalAssignedSlots = computed(() => {
         {{ $t("ui.planSetup.shareThisPlan") }}
       </h2>
       <div class="flex flex-col gap-2 sm:flex-row">
-        <UInput :model-value="shareUrl" readonly aria-label="Share link" class="grow" /><UButton @click="copyShareUrl">
+        <UInput :model-value="shareUrl" readonly :aria-label="$t('ui.shareLink')" class="grow" /><UButton @click="copyShareUrl">
           {{ $t("ui.common.copyShareLink") }}
         </UButton>
       </div>

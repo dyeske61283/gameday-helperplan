@@ -10,6 +10,7 @@ import { createPlanLink } from "../../../utils/plan-links";
 const route = useRoute();
 const planStore = usePlanStore();
 const toast = useToast();
+const { t } = useI18n();
 usePlanInit();
 
 onMounted(() => planStore.setEditing(true));
@@ -151,17 +152,17 @@ async function copyShareUrl() {
   catch { shareState.value = "failed"; }
 }
 
-useHead({ title: "Edit plan" });
+useHead({ title: t("ui.editPlan") });
 </script>
 
 <template>
   <UContainer class="max-w-4xl space-y-8 py-8">
     <div v-if="planStore.isLoading && !planStore.plan" class="py-16 text-center">
-      Loading plan...
+      {{ $t("ui.schedule.loadingPlan") }}
     </div>
     <main v-else-if="planStore.error && !planStore.plan" class="mx-auto max-w-xl space-y-4 py-16 text-center">
       <h1 class="text-2xl font-bold">
-        Could not load plan
+        {{ $t("ui.planSetup.couldNotLoadPlan") }}
       </h1>
       <p class="text-error">
         {{ planStore.error }}
@@ -206,16 +207,16 @@ useHead({ title: "Edit plan" });
           {{ $t("ui.planSetup.planDetails") }}
         </h2>
         <div class="grid gap-4 sm:grid-cols-2">
-          <UFormField label="Club name" required>
+          <UFormField :label="$t('ui.clubName')" required>
             <UInput v-model="clubName" @input="markDirty" />
           </UFormField>
-          <UFormField label="Season" required>
+          <UFormField :label="$t('ui.season')" required>
             <UInput v-model="season" @input="markDirty" />
           </UFormField>
-          <UFormField label="Contact email">
+          <UFormField :label="$t('ui.contactEmail')">
             <UInput v-model="contactEmail" type="email" @input="markDirty" />
           </UFormField>
-          <UFormField label="Homepage">
+          <UFormField :label="$t('ui.homepage')">
             <UInput v-model="homepage" type="url" @input="markDirty" />
           </UFormField>
         </div>
@@ -252,7 +253,7 @@ useHead({ title: "Edit plan" });
             <UInput v-model="member.name" class="grow" @input="markDirty" /><UButton color="error" variant="ghost" @click="removeMember(member.id)">
               {{ $t("ui.common.remove") }}
             </UButton>
-          </div><select v-model="member.teamIds" multiple aria-label="Member teams" class="w-full rounded-lg border bg-transparent p-2 text-sm" @change="markDirty">
+          </div><select v-model="member.teamIds" multiple :aria-label="$t('ui.memberTeams')" class="w-full rounded-lg border bg-transparent p-2 text-sm" @change="markDirty">
             <option v-for="team in teams" :key="team.id" :value="team.id">
               {{ team.name }}
             </option>
@@ -266,10 +267,10 @@ useHead({ title: "Edit plan" });
         <h2 class="text-xl font-bold">
           {{ $t("ui.planSetup.scheduleConfiguration") }}
         </h2>
-        <UFormField label="Duty roles">
+        <UFormField :label="$t('ui.dutyRoles')">
           <UTextarea v-model="rolesText" :rows="5" class="w-full" @input="markDirty" />
         </UFormField>
-        <UFormField label="Locations">
+        <UFormField :label="$t('ui.locations')">
           <UTextarea v-model="locationsText" :rows="4" class="w-full" @input="markDirty" />
         </UFormField>
       </section>
@@ -278,7 +279,7 @@ useHead({ title: "Edit plan" });
           {{ $t("ui.planSetup.shareThisPlan") }}
         </h2>
         <div class="flex flex-col gap-2 sm:flex-row">
-          <UInput :model-value="shareUrl" readonly aria-label="Share link" class="grow" /><UButton @click="copyShareUrl">
+          <UInput :model-value="shareUrl" readonly :aria-label="$t('ui.shareLink')" class="grow" /><UButton @click="copyShareUrl">
             {{ $t("ui.common.copyShareLink") }}
           </UButton>
         </div>
