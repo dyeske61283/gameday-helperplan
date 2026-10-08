@@ -94,6 +94,17 @@ describe("usePlanStore", () => {
     vi.unstubAllGlobals();
   });
 
+  it("finalizes a configured plan without changing its shared identity", async () => {
+    vi.stubGlobal("$fetch", vi.fn().mockResolvedValue({}));
+    const store = usePlanStore();
+    store.createNewPlan("plan-id", "plan-key", { clubName: "Club", season: "2026/2027" });
+
+    await expect(store.finalizePlan()).resolves.toBe(true);
+    expect(store.plan?.id).toBe("plan-id");
+    expect(store.key).toBe("plan-key");
+    vi.unstubAllGlobals();
+  });
+
   it("defers newer SSE plans while an editor is dirty", async () => {
     let source: { onmessage?: (event: MessageEvent) => Promise<void>; close: () => void } | undefined;
     vi.stubGlobal("EventSource", class {
@@ -116,6 +127,15 @@ describe("usePlanStore", () => {
     store.applyPendingUpdate();
     expect(store.plan?.club.name).toBe("Remote edit");
     vi.unstubAllGlobals();
+  });
+
+  it("keeps the default gameday role scope when configuring new-plan role names", () => {
+    const store = usePlanStore();
+    store.createNewPlan("plan-id", "plan-key");
+
+    store.configureRoles(["Timekeeper", "Scorekeeper", "Floor Manager"]);
+
+    expect(store.roles.map(role => role.scope)).toEqual(["gameday", "match", "match"]);
   });
 
   describe("migrateIfNeeded", () => {

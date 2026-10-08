@@ -5,20 +5,20 @@ import PlanSetupPage from "../../app/pages/plans/[planId]/setup.vue";
 import BaseSetupPage from "../../app/pages/setup.vue";
 
 describe("plan setup", () => {
-  it("renders the unavailable new-plan state with a route back home", async () => {
+  it("renders the new-plan setup form", async () => {
     const component = await mountSuspended(BaseSetupPage);
 
-    expect(component.text()).toContain("New plan setup is not available yet.");
-    expect(component.find("a[href='/']").exists()).toBe(true);
+    expect(component.text()).toContain("Set up a new plan");
+    expect(component.find("button").exists()).toBe(true);
   });
 
-  it("renders unavailable existing-plan setup with a canonical plan link", async () => {
+  it("renders a recoverable load failure for an unavailable existing plan", async () => {
     const component = await mountSuspended(PlanSetupPage, {
       route: "/plans/plan-123/setup#key=test-key",
     });
 
     await flushPromises();
-    expect(component.text()).toContain("Plan setup is not available yet.");
+    expect(component.text()).toContain("Could not load plan");
     expect(component.find("a[href='/plans/plan-123#key=test-key']").exists()).toBe(true);
   });
 });

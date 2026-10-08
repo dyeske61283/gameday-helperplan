@@ -24,6 +24,16 @@ export function usePlanInit() {
 
     const queryId = (route.params.planId as string | undefined) || (route.query.planId as string | undefined);
     const keyFromStore = planStore.key;
+    let storedResume = planStore.resumeState;
+    if (!storedResume && typeof globalThis.localStorage?.getItem === "function") {
+      try {
+        const serialized = globalThis.localStorage.getItem("gameday-plan-resume");
+        storedResume = serialized ? JSON.parse(serialized) as { id: string; key: string } : null;
+      }
+      catch {
+        storedResume = null;
+      }
+    }
 
     if (queryId && keyFromStore) {
       // Coming from a fresh shared link – load from server
@@ -37,8 +47,8 @@ export function usePlanInit() {
       // Already loaded during this session (e.g. navigated from setup) – keep it
     }
     else if (queryId) {
-      if (planStore.resumeState?.id === queryId && planStore.resumeState.key) {
-        await planStore.loadPlan(queryId, planStore.resumeState.key);
+      if (storedResume?.id === queryId && storedResume.key) {
+        await planStore.loadPlan(queryId, storedResume.key);
         if (planStore.plan?.id !== queryId)
           planStore.plan = null;
       }
@@ -46,9 +56,9 @@ export function usePlanInit() {
         planStore.plan = null;
       }
     }
-    else if (planStore.resumeState?.id && planStore.resumeState.key) {
+    else if (storedResume?.id && storedResume.key) {
       // Session resumed from localStorage (e.g. browser refresh on /dashboard)
-      await planStore.loadPlan(planStore.resumeState.id, planStore.resumeState.key);
+      await planStore.loadPlan(storedResume.id, storedResume.key);
     }
     else {
       // No shared or resumed plan: link-first pages render their empty state.

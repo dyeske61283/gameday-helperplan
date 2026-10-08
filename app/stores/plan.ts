@@ -347,21 +347,20 @@ export const usePlanStore = defineStore("plan", () => {
       id: `role-${index + 1}`,
       name,
       requiredSkillId: "",
-      scope: "match" as const,
+      scope: plan.value?.config.roles[index]?.scope ?? "match",
     }));
     plan.value.lastUpdated = new Date();
   }
 
-  async function finalizePlan() {
+  async function finalizePlan(): Promise<boolean> {
     if (!plan.value)
-      return;
+      return false;
 
-    const id = crypto.randomUUID();
-    const newKey = await generateKey();
-
-    plan.value.id = id;
-    key.value = newKey;
-    await savePlan();
+    if (!plan.value.id)
+      plan.value.id = crypto.randomUUID();
+    if (!key.value)
+      key.value = await generateKey();
+    return savePlan();
   }
 
   // --- Domain Methods: Teams ---
@@ -561,10 +560,6 @@ export const usePlanStore = defineStore("plan", () => {
 
     if (keyFromUrl) {
       key.value = keyFromUrl;
-
-      // Remove the fragment from the URL without triggering a page refresh
-      const cleanUrl = globalThis.location.pathname + globalThis.location.search;
-      globalThis.history.replaceState(globalThis.history.state, "", cleanUrl);
     }
   }
 
