@@ -50,12 +50,38 @@ export default eventHandler(async (event) => {
     let unwatch: Awaited<ReturnType<typeof storage.watch>> | undefined;
     let isClosed = false;
     const eventStream = createEventStream(event);
+    const denoEvent = event as typeof event & {
+      runtime?: { deno?: { info?: { completed?: Promise<unknown> } } };
+    };
+    denoEvent.runtime?.deno?.info?.completed?.catch(error => console.warn("Deno plan stream request closed", error));
 
-    eventStream.onClosed(async () => {
+    async function stopWatching() {
+      const stop = unwatch;
+      unwatch = undefined;
+      if (!stop)
+        return;
+      try {
+        await stop();
+      }
+      catch (error) {
+        console.warn("Failed to stop closed plan watcher", error);
+      }
+    }
+
+    async function closeEventStream() {
       isClosed = true;
-      await eventStream.close();
-      if (unwatch)
-        await unwatch();
+      try {
+        await eventStream.close();
+      }
+      catch (error) {
+        console.warn("Failed to close plan event stream", error);
+      }
+      await stopWatching();
+    }
+
+    eventStream.onClosed(() => {
+      isClosed = true;
+      void stopWatching();
     });
 
     if (plan) {
@@ -69,8 +95,7 @@ export default eventHandler(async (event) => {
         if (planIdIncludingPrefix !== `${storageName}:${id}`)
           return;
         if (planUpdateEvent === "remove") {
-          isClosed = true;
-          await eventStream.close();
+          await closeEventStream();
           return;
         }
 
@@ -78,21 +103,19 @@ export default eventHandler(async (event) => {
           try {
             const latestPlan = await storage.getItem(id);
             if (!latestPlan || isClosed) {
-              isClosed = true;
-              await eventStream.close();
+              await closeEventStream();
               return;
             }
             await eventStream.push((await hydrateChunks(latestPlan, id)).blob);
           }
           catch (error) {
-            isClosed = true;
             console.error("Failed to push update to event stream", error);
-            await eventStream.close();
-            if (unwatch)
-              await unwatch();
+            await closeEventStream();
           }
         }
       });
+      if (isClosed)
+        await stopWatching();
     }
     catch (error) {
       console.error("Storage watch failed", error);
