@@ -17,6 +17,8 @@ function catchDenoStreamDisconnects() {
   if (!("Deno" in globalThis) || typeof globalThis.addEventListener !== "function")
     return;
 
+  // Deno can reject H3 SSE requests with "resource closed" on normal client navigation.
+  // Suppress only these transport-close errors; unrelated rejections must still surface.
   globalThis.addEventListener("unhandledrejection", (event) => {
     const reason = event.reason;
     const message = reason instanceof Error ? reason.message : String(reason);
