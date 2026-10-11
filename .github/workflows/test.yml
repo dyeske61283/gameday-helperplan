@@ -73,7 +73,7 @@ jobs:
             --data-urlencode "end=$END" \
             --data-urlencode "revision_id=$DENO_DEPLOY_REVISION_ID" \
             "https://api.deno.com/v2/apps/helperplan/logs" \
-            | jq -r '.logs[] | select(.level == "error" or (.message | contains("plan_request_started")) or (.message | contains("server_http_error"))) | "\(.timestamp) [\(.level)] \(.message)"'
+            | jq -r '.logs[] | select(.level == "error" or (.message | contains("plan_request_started")) or (.message | contains("server_http_error")) or (.message | contains("deno_stream_client_disconnect"))) | "\(.timestamp) [\(.level)] \(.message)"'
 
       - name: Run Accessibility tests
         run: pnpm test:a11y

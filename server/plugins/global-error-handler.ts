@@ -13,6 +13,25 @@ function errorId(event: H3Event) {
   return id;
 }
 
+function catchDenoStreamDisconnects() {
+  if (!("Deno" in globalThis) || typeof globalThis.addEventListener !== "function")
+    return;
+
+  globalThis.addEventListener("unhandledrejection", (event) => {
+    const reason = event.reason;
+    const message = reason instanceof Error ? reason.message : String(reason);
+    if (!/resource closed|HTTP response was not sent successfully/i.test(message))
+      return;
+
+    event.preventDefault();
+    console.warn(JSON.stringify({
+      event: "deno_stream_client_disconnect",
+      message,
+      stack: reason instanceof Error ? reason.stack : undefined,
+    }));
+  });
+}
+
 function logServerError(error: unknown, event: H3Event, source: string) {
   const errorStatus = typeof error === "object" && error && "statusCode" in error
     ? Number(error.statusCode)
@@ -42,6 +61,8 @@ function logServerError(error: unknown, event: H3Event, source: string) {
 }
 
 export default defineNitroPlugin((nitroApp) => {
+  catchDenoStreamDisconnects();
+
   nitroApp.hooks.hook("request", (event) => {
     const path = getRequestURL(event).pathname;
     if (!/^\/plans\/[^/]+/.test(path))

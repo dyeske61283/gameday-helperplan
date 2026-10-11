@@ -24,8 +24,10 @@ function monitorSharePage(page: Page) {
   page.on("response", (response) => {
     const url = new URL(response.url());
     if (response.request().resourceType() === "document") {
-      const errorId = response.headers()["x-error-id"] || "none";
-      documentResponses.push(`${response.status()} ${url.pathname} error-id=${errorId}`);
+      const headers = response.headers();
+      const requestId = headers["x-request-id"] || "none";
+      const errorId = headers["x-error-id"] || "none";
+      documentResponses.push(`${response.status()} ${url.pathname} request-id=${requestId} error-id=${errorId}`);
     }
     if (/^\/api\/[0-9a-f-]+$/i.test(url.pathname))
       apiResponses.push(`${response.request().method()} ${response.status()}`);
