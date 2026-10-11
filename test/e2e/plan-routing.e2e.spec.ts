@@ -108,7 +108,7 @@ describe("plan-scoped routing", async () => {
     expect(matchUrl.hash).toBe(seededPlanHash);
     await page.goto(matchUrl.toString(), { waitUntil: "domcontentloaded" });
     expect(new URL(page.url()).pathname).toMatch(/^\/plans\/[^/]+\/matches\/[^/]+$/);
-    const allFixturesLink = page.locator(`a[href^="/plans/${planId}"]`).first();
+    const allFixturesLink = page.getByRole("link", { name: /All fixtures/ });
     await allFixturesLink.waitFor();
     const allFixturesUrl = new URL(await allFixturesLink.getAttribute("href")!, page.url());
     expect(allFixturesUrl.pathname).toBe(`/plans/${planId}`);
