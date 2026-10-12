@@ -16,10 +16,11 @@ const When = step;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const seededPlanId = "f530083d-8c74-4f10-931a-dd877ee7b52c";
+const defaultPlanId = "f530083d-8c74-4f10-931a-dd877ee7b52c";
 const testHost = process.env.TEST_HOST;
 const testUrl = (path: string) => testHost ? new URL(path, testHost).toString() : url(path);
-const seededPlanLink = process.env.E2E_PLAN_URL || `/plans/${seededPlanId}#key=tWVZ4hmOA7LFsrNViX1X6w`;
+const seededPlanLink = process.env.E2E_WORKFLOW_PLAN_URL || process.env.E2E_PLAN_URL || `/plans/${defaultPlanId}#key=tWVZ4hmOA7LFsrNViX1X6w`;
+const seededPlanId = new URL(seededPlanLink, testHost || "http://localhost").pathname.split("/")[2] || defaultPlanId;
 let workflowPage: any;
 
 describe("feature: User Workflows (BDD Specs)", async () => {
@@ -32,7 +33,7 @@ describe("feature: User Workflows (BDD Specs)", async () => {
   });
 
   beforeAll(async () => {
-    if (process.env.E2E_PLAN_URL)
+    if (process.env.E2E_WORKFLOW_PLAN_URL || process.env.E2E_PLAN_URL)
       return;
     // Seed plan f530083d-8c74-4f10-931a-dd877ee7b52c into test storage
     const encryptedFixture = JSON.parse(
@@ -63,7 +64,7 @@ describe("feature: User Workflows (BDD Specs)", async () => {
     await Then("the plan ID and key are persisted to localStorage for resume", async () => {
       const storedResume = await workflowPage.evaluate(() => JSON.parse(localStorage.getItem("gameday-plan-resume") || "null"));
       expect(storedResume).toMatchObject({
-        id: "f530083d-8c74-4f10-931a-dd877ee7b52c",
+        id: seededPlanId,
         key: expect.any(String),
       });
     });

@@ -282,6 +282,9 @@
       "resumeLast": "Letzten Plan fortsetzen",
       "clubInfo": "Vereinsinformationen",
       "teams": "Teams",
+      "teamsMembersAndDuties": "Teams, Mitglieder und Aufgaben",
+      "onePerLine": "Ein Eintrag pro Zeile.",
+      "createPlan": "Plan erstellen",
       "teamHint": "Fügen Sie pro Zeile ein Team hinzu. Spieltermine können später verwaltet werden.",
       "continueMembers": "Weiter zu den Mitgliedern",
       "membersAndDuties": "Mitglieder hinzufügen und Aufgaben konfigurieren",
@@ -338,6 +341,7 @@
       "reloadFromServer": "Vom Server neu laden",
       "addMember": "Mitglied hinzufügen",
       "noMembersYet": "Noch keine Mitglieder.",
+      "couldNotLoadPlan": "Plan konnte nicht geladen werden",
       "unavailableTitle": "Die Planeinrichtung ist noch nicht verfügbar.",
       "unavailableDescription": "Kehre zum Plan zurück, während die Bearbeitung vorbereitet wird.",
       "returnToPlan": "Zum Plan zurück"

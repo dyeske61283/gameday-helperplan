@@ -81,6 +81,7 @@ async function main() {
     process.exit(1);
   }
 
+  console.log(`DEPLOYMENT_REVISION_ID_OUTPUT=${ready.id}`);
   console.log(`DEPLOYMENT_URL_OUTPUT=${url}`);
   return 0;
 }

@@ -2,6 +2,7 @@
 import type { Match } from "~/utils/plan-types";
 import { usePlanStore } from "~/stores/plan";
 import { buildCalendarLayout } from "~/utils/calendar-layout";
+import { copyToClipboard } from "~/utils/clipboard";
 import { generateMemberICal } from "~/utils/ical-export";
 import { createPlanLink } from "~/utils/plan-links";
 
@@ -13,10 +14,21 @@ const viewMode = ref<"timeline" | "calendar">("timeline");
 usePlanInit();
 
 const planId = computed(() => String(route.params.planId));
+const shareUrl = computed(() => planStore.key ? createPlanLink(planId.value, planStore.key) : "");
+const shareState = ref<"idle" | "copied" | "failed">("idle");
 
 function planLink(path = "") {
   const pathname = `/plans/${planId.value}${path}`;
   return planStore.key ? createPlanLink(planId.value, planStore.key, pathname) : `${pathname}${route.hash}`;
+}
+
+async function copyShareUrl() {
+  if (!shareUrl.value)
+    return;
+  try {
+    shareState.value = await copyToClipboard(shareUrl.value) ? "copied" : "failed";
+  }
+  catch { shareState.value = "failed"; }
 }
 
 // Computed active member match if search matches a member
@@ -165,8 +177,33 @@ const totalAssignedSlots = computed(() => {
         >
           {{ $t("ui.schedule.teamsRoster") }}
         </UButton>
+        <UButton
+          :to="planLink('/setup')"
+          icon="i-lucide-settings"
+          variant="outline"
+          class="rounded-full"
+        >
+          {{ $t("ui.editPlan") }}
+        </UButton>
       </div>
     </div>
+
+    <section v-if="shareUrl" aria-labelledby="share-heading" class="space-y-3 rounded-xl border border-primary/30 p-5">
+      <h2 id="share-heading" class="text-xl font-bold">
+        {{ $t("ui.planSetup.shareThisPlan") }}
+      </h2>
+      <div class="flex flex-col gap-2 sm:flex-row">
+        <UInput :model-value="shareUrl" readonly :aria-label="$t('ui.shareLink')" class="grow" /><UButton @click="copyShareUrl">
+          {{ $t("ui.common.copyShareLink") }}
+        </UButton>
+      </div>
+      <p v-if="shareState === 'copied'" role="status" class="text-sm text-success">
+        {{ $t("ui.common.shareCopied") }}
+      </p>
+      <p v-else-if="shareState === 'failed'" role="alert" class="text-sm text-error">
+        {{ $t("ui.common.shareCopyFailed") }}
+      </p>
+    </section>
 
     <!-- Quick Stats Bar -->
     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">

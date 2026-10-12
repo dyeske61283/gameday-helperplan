@@ -13,6 +13,8 @@ if (!baseUrl) {
 }
 
 const plan = JSON.parse(await fs.readFile(planPath, "utf8"));
+if (process.env.SEED_PLAN_ID)
+  plan.id = process.env.SEED_PLAN_ID;
 const key = await webcrypto.subtle.generateKey({ name: "AES-GCM", length: 128 }, true, ["encrypt", "decrypt"]);
 const jwk = await webcrypto.subtle.exportKey("jwk", key);
 const payload = new TextEncoder().encode(JSON.stringify(plan));
