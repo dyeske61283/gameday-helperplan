@@ -138,8 +138,9 @@ async function save() {
 async function reload() {
   if (!planStore.plan || !planStore.key)
     return;
-  isDirty.value = false;
+  // Buffer SSE updates while the authoritative server reload replaces the draft.
   planStore.setEditing(true);
+  isDirty.value = false;
   await planStore.loadPlan(planStore.plan.id, planStore.key);
 }
 

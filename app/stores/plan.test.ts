@@ -133,7 +133,7 @@ describe("usePlanStore", () => {
     const store = usePlanStore();
     store.createNewPlan("plan-id", "plan-key");
 
-    store.configureRoles(["Timekeeper", "Scorekeeper", "Floor Manager"]);
+    store.configureRoles(["Timekeeper", "Scorekeeper", "Floor Manager"], ["gameday", "match", "match"]);
 
     expect(store.roles.map(role => role.scope)).toEqual(["gameday", "match", "match"]);
   });

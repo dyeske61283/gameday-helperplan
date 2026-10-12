@@ -4,6 +4,7 @@ import type {
   Match,
   Member,
   NewPlanMetadata,
+  Role,
   SeasonPlan,
   Team,
 } from "../utils/plan-types";
@@ -15,7 +16,7 @@ import { useDecryption, useEncryption } from "../composables/use-crypto";
 import { autoAssignMatchDuties, completeClosedAssignments, isMemberEligibleForSlot } from "../utils/helper-assignment";
 import { CURRENT_SCHEMA_VERSION } from "../utils/plan-types";
 
-const RESUME_KEY = "gameday-plan-resume";
+export const PLAN_RESUME_KEY = "gameday-plan-resume";
 const MEMBER_KEY = "gameday-selected-member";
 const _FRAGMENT_PREFIX = "key=";
 
@@ -73,7 +74,7 @@ export const usePlanStore = defineStore("plan", () => {
   const eventSource = ref<EventSource | null>(null);
   let completionTimer: ReturnType<typeof setInterval> | undefined;
 
-  const resumeState = useLocalStorage<{ id: string; key: string } | null>(RESUME_KEY, null, {
+  const resumeState = useLocalStorage<{ id: string; key: string } | null>(PLAN_RESUME_KEY, null, {
     serializer: {
       read: (value) => {
         try {
@@ -340,14 +341,14 @@ export const usePlanStore = defineStore("plan", () => {
     };
   }
 
-  function configureRoles(names: string[]) {
+  function configureRoles(names: string[], scopes: Role["scope"][]) {
     if (!plan.value)
       return;
     plan.value.config.roles = names.map((name, index) => ({
       id: `role-${index + 1}`,
       name,
       requiredSkillId: "",
-      scope: plan.value?.config.roles[index]?.scope ?? "match",
+      scope: scopes[index] ?? "match",
     }));
     plan.value.lastUpdated = new Date();
   }

@@ -1,5 +1,5 @@
 import { useRoute } from "vue-router";
-import { usePlanStore } from "../stores/plan";
+import { PLAN_RESUME_KEY, usePlanStore } from "../stores/plan";
 
 /**
  * Composable to consistently initialize the plan on every sub-page
@@ -27,7 +27,7 @@ export function usePlanInit() {
     let storedResume = planStore.resumeState;
     if (!storedResume && typeof globalThis.localStorage?.getItem === "function") {
       try {
-        const serialized = globalThis.localStorage.getItem("gameday-plan-resume");
+        const serialized = globalThis.localStorage.getItem(PLAN_RESUME_KEY);
         storedResume = serialized ? JSON.parse(serialized) as { id: string; key: string } : null;
       }
       catch {

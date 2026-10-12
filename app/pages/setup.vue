@@ -51,7 +51,7 @@ async function createPlan() {
       planStore.addTeam(name);
     for (const name of entries(membersText.value))
       planStore.addMember({ name });
-    planStore.configureRoles(roles);
+    planStore.configureRoles(roles, planStore.roles.map(role => role.scope));
 
     if (!await planStore.finalizePlan()) {
       error.value = planStore.error || t("ui.couldNotSavePlan");
