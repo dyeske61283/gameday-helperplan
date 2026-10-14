@@ -35,7 +35,7 @@ async function runAuditDarkAndLight(page, url, totalViolations, readyText) {
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto(url);
   if (readyText)
-    await page.getByText(readyText, { exact: true }).waitFor({ timeout: 15000 });
+    await page.getByRole("heading", { name: readyText }).waitFor({ timeout: 15000 });
   else
     await page.waitForTimeout(2000);
   totalViolations += await runAudit(page, "Light Mode");
@@ -44,7 +44,7 @@ async function runAuditDarkAndLight(page, url, totalViolations, readyText) {
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto(url);
   if (readyText)
-    await page.getByText(readyText, { exact: true }).waitFor({ timeout: 15000 });
+    await page.getByRole("heading", { name: readyText }).waitFor({ timeout: 15000 });
   else
     await page.waitForTimeout(2000);
   totalViolations += await runAudit(page, "Dark Mode");
