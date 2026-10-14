@@ -90,3 +90,24 @@ after the POST succeeds. The printed URL is a bearer secret. The expected
 checks are that the plan loads from the canonical path, the parent lists
 fixtures, the known match resolves, and an eligible selected member can claim
 an open duty without needing a legacy route.
+
+## Browser Release Gates
+
+Run the plan-scoped browser workflows locally with:
+
+```sh
+pnpm exec vitest run --project=e2e test/e2e/plan-routing.e2e.spec.ts
+```
+
+The routing spec verifies the link-first base state, schedule/calendar toggle,
+direct shared match links, member selection and claiming through cockpit reload,
+team/member create and edit, guest assignment persistence, plan-context links,
+and recoverable load failure. It expects all 9 browser tests to pass.
+
+Run the full browser project with `pnpm test:e2e`, the complete suite with
+`pnpm test`, and accessibility checks with `pnpm test:a11y`. The CI workflow
+seeds separate workflow, routing, and editing plans, runs `pnpm test`, then
+`pnpm test:a11y`. When `E2E_ROUTING_PLAN_URL` is present, the accessibility
+check audits the schedule, direct match, cockpit, teams, and assignments routes
+in light and dark mode in addition to the root-linked pages. CI passes when
+Vitest and accessibility checks exit successfully with no axe violations.

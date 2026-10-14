@@ -5,17 +5,18 @@ import { createTestContext, loadFixture, startServer, stopServer, url } from "@n
 import { chromium } from "playwright";
 
 async function runAudit(page, name) {
-  console.log(`--- Running accessibility audit for: ${page.url()} ${name} ---`);
+  const pathname = new URL(page.url()).pathname;
+  console.log(`--- Running accessibility audit for: ${pathname} ${name} ---`);
   const results = await new AxeBuilder({ page })
     .exclude(".nuxt-devtools-panel-content")
     .exclude("nuxt-devtools-frame")
     .analyze();
 
   if (results.violations.length === 0) {
-    console.log(`No accessibility violations found for  ${page.url()} ${name}!`);
+    console.log(`No accessibility violations found for ${pathname} ${name}!`);
   }
   else {
-    console.log(`Found ${results.violations.length} violations for ${page.url()} ${name}:`);
+    console.log(`Found ${results.violations.length} violations for ${pathname} ${name}:`);
     results.violations.forEach((violation) => {
       console.log(`Violation: ${violation.id}`);
       console.log(`Impact: ${violation.impact}`);
@@ -79,9 +80,27 @@ async function runAuditDarkAndLight(page, url, totalViolations) {
         totalViolations = await runAuditDarkAndLight(page, url(link), totalViolations);
       }
     }
+
+    // eslint-disable-next-line node/no-process-env
+    const sharedPlanUrl = process.env.E2E_ROUTING_PLAN_URL || process.env.E2E_PLAN_URL;
+    if (sharedPlanUrl) {
+      const sharedPlan = new URL(sharedPlanUrl, host || url("/"));
+      const planId = sharedPlan.pathname.split("/")[2];
+      const planRoutes = [
+        `/plans/${planId}`,
+        `/plans/${planId}/matches/match-2025-09-21-maenner-i-0`,
+        `/plans/${planId}/cockpit`,
+        `/plans/${planId}/teams`,
+        `/plans/${planId}/assignments`,
+      ];
+      for (const route of planRoutes) {
+        totalViolations = await runAuditDarkAndLight(page, `${sharedPlan.origin}${route}${sharedPlan.hash}`, totalViolations);
+      }
+    }
   }
   catch (error) {
     console.error("Error during audit:", error);
+    process.exitCode = 1;
   }
   finally {
     await browser.close();
@@ -90,7 +109,7 @@ async function runAuditDarkAndLight(page, url, totalViolations) {
     }
   }
 
-  if (totalViolations > 0) {
+  if (totalViolations > 0 || process.exitCode) {
     console.log(`Total violations found: ${totalViolations}`);
     process.exit(1);
   }
