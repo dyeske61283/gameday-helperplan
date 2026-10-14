@@ -101,13 +101,15 @@ pnpm exec vitest run --project=e2e test/e2e/plan-routing.e2e.spec.ts
 
 The routing spec verifies the link-first base state, schedule/calendar toggle,
 direct shared match links, member selection and claiming through cockpit reload,
-team/member create and edit, guest assignment persistence, plan-context links,
-and recoverable load failure. It expects all 9 browser tests to pass.
+team/member create and edit, guest-to-member assignment updates, plan-context
+links, and recoverable load failure. The member-selection dialog is audited in
+light and dark mode. It expects all 9 browser tests to pass.
 
 Run the full browser project with `pnpm test:e2e`, the complete suite with
 `pnpm test`, and accessibility checks with `pnpm test:a11y`. The CI workflow
 seeds separate workflow, routing, and editing plans, runs `pnpm test`, then
 `pnpm test:a11y`. When `E2E_ROUTING_PLAN_URL` is present, the accessibility
 check audits the schedule, direct match, cockpit, teams, and assignments routes
-in light and dark mode in addition to the root-linked pages. CI passes when
-Vitest and accessibility checks exit successfully with no axe violations.
+in light and dark mode in addition to the root-linked pages. It waits for known
+fixture content before auditing plan routes. CI passes when Vitest and
+accessibility checks exit successfully with no axe violations.

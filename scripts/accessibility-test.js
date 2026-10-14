@@ -31,16 +31,22 @@ async function runAudit(page, name) {
   return results.violations.length;
 }
 
-async function runAuditDarkAndLight(page, url, totalViolations) {
+async function runAuditDarkAndLight(page, url, totalViolations, readyText) {
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto(url);
-  await page.waitForTimeout(2000);
+  if (readyText)
+    await page.getByText(readyText, { exact: true }).waitFor({ timeout: 15000 });
+  else
+    await page.waitForTimeout(2000);
   totalViolations += await runAudit(page, "Light Mode");
 
   // Dark mode
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto(url);
-  await page.waitForTimeout(2000);
+  if (readyText)
+    await page.getByText(readyText, { exact: true }).waitFor({ timeout: 15000 });
+  else
+    await page.waitForTimeout(2000);
   totalViolations += await runAudit(page, "Dark Mode");
 
   return totalViolations;
@@ -61,6 +67,7 @@ async function runAuditDarkAndLight(page, url, totalViolations) {
 
   const browser = await chromium.launch();
   const context = await browser.newContext();
+  await context.addCookies([{ name: "i18n_redirected", value: "en", url: host || url("/") }]);
   const page = await context.newPage();
   let totalViolations = 0;
 
@@ -87,14 +94,14 @@ async function runAuditDarkAndLight(page, url, totalViolations) {
       const sharedPlan = new URL(sharedPlanUrl, host || url("/"));
       const planId = sharedPlan.pathname.split("/")[2];
       const planRoutes = [
-        `/plans/${planId}`,
-        `/plans/${planId}/matches/match-2025-09-21-maenner-i-0`,
-        `/plans/${planId}/cockpit`,
-        `/plans/${planId}/teams`,
-        `/plans/${planId}/assignments`,
+        { path: `/plans/${planId}`, readyText: "Gladbeck HC" },
+        { path: `/plans/${planId}/matches/match-2025-09-21-maenner-i-0`, readyText: "SG Menden (Sauerland) vs Gast" },
+        { path: `/plans/${planId}/cockpit`, readyText: "My duties" },
+        { path: `/plans/${planId}/teams`, readyText: "Teams" },
+        { path: `/plans/${planId}/assignments`, readyText: "Duty Assignments" },
       ];
-      for (const route of planRoutes) {
-        totalViolations = await runAuditDarkAndLight(page, `${sharedPlan.origin}${route}${sharedPlan.hash}`, totalViolations);
+      for (const { path, readyText } of planRoutes) {
+        totalViolations = await runAuditDarkAndLight(page, `${sharedPlan.origin}${path}${sharedPlan.hash}`, totalViolations, readyText);
       }
     }
   }

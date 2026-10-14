@@ -4,7 +4,9 @@ import { webcrypto } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { AxeBuilder } from "@axe-core/playwright";
 import { createPage, setup, url } from "@nuxt/test-utils/e2e";
+import { chromium } from "playwright";
 import { beforeAll, describe, expect, it } from "vitest";
 /* eslint-disable node/no-process-env */
 
@@ -121,25 +123,32 @@ describe("plan-scoped routing", async () => {
     const planId = matchUrl.pathname.split("/")[2];
     expect(planId).toBeTruthy();
     expect(matchUrl.hash).toBe(seededPlanHash);
-    await page.goto(matchUrl.toString(), { waitUntil: "domcontentloaded" });
+    await matchLink.click();
     expect(new URL(page.url()).pathname).toMatch(/^\/plans\/[^/]+\/matches\/[^/]+$/);
     const allFixturesLink = page.getByRole("link", { name: /All fixtures/ });
-    await allFixturesLink.waitFor();
     const allFixturesUrl = new URL(await allFixturesLink.getAttribute("href")!, page.url());
     expect(allFixturesUrl.pathname).toBe(`/plans/${planId}`);
+    expect(allFixturesUrl.hash).toBe(seededPlanHash);
     expect(await page.getByText("Claiming as").count()).toBe(0);
+    await allFixturesLink.click();
+    await page.getByRole("heading", { name: "Gladbeck HC" }).waitFor();
 
-    const planUrl = new URL(page.url());
-    planUrl.pathname = `/plans/${planId}/cockpit`;
-    await page.goto(planUrl.toString(), { waitUntil: "domcontentloaded" });
-    expect(new URL(page.url()).pathname).toBe(`/plans/${planId}/cockpit`);
+    const teamsLink = page.getByRole("link", { name: "Teams & Roster" });
+    const teamsUrl = new URL(await teamsLink.getAttribute("href")!, page.url());
+    expect(teamsUrl.pathname).toBe(`/plans/${planId}/teams`);
+    expect(teamsUrl.hash).toBe(seededPlanHash);
+    await teamsLink.click();
+    await page.getByRole("heading", { name: "Teams" }).waitFor();
 
-    planUrl.pathname = `/plans/${planId}/teams`;
-    await page.goto(planUrl.toString(), { waitUntil: "domcontentloaded" });
-    expect(new URL(page.url()).pathname).toBe(`/plans/${planId}/teams`);
+    await page.goBack();
+    await page.getByRole("heading", { name: "Gladbeck HC" }).waitFor();
 
-    planUrl.pathname = `/plans/${planId}/assignments`;
-    await page.goto(planUrl.toString(), { waitUntil: "domcontentloaded" });
+    const assignmentsLink = page.getByRole("link", { name: "Manage Duties" });
+    const assignmentsUrl = new URL(await assignmentsLink.getAttribute("href")!, page.url());
+    expect(assignmentsUrl.pathname).toBe(`/plans/${planId}/assignments`);
+    expect(assignmentsUrl.hash).toBe(seededPlanHash);
+    await assignmentsLink.click();
+    await page.getByRole("heading", { name: "Duty Assignments" }).waitFor();
     expect(new URL(page.url()).pathname).toBe(`/plans/${planId}/assignments`);
 
     const missingMatchUrl = new URL(`/plans/${planId}/matches/missing-match`, page.url());
@@ -188,8 +197,11 @@ describe("plan-scoped routing", async () => {
     });
     expect(saveResponse.ok).toBe(true);
 
-    const page = await createPage();
-    await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
+    const browser = await chromium.launch();
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+    await context.addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
     await page.goto(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl), { waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "Gladbeck HC" }).waitFor();
     await page.getByRole("button", { name: "Calendar" }).click();
@@ -199,6 +211,15 @@ describe("plan-scoped routing", async () => {
     await page.goto(testUrl(`/plans/${seededPlanId}/matches/${matchId}${seededPlanHash}`), { waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: /SG Menden \(Sauerland\) vs Gast/ }).waitFor();
     await page.getByRole("button", { name: "Select member" }).click();
+    const dialog = page.getByRole("dialog");
+    const auditDialog = async () => {
+      await dialog.evaluate(async element => Promise.all(element.getAnimations({ subtree: true }).map(animation => animation.finished.catch(() => undefined))));
+      const { violations } = await new AxeBuilder({ page }).include("[role=\"dialog\"]").analyze();
+      expect(violations.map(({ id, impact, nodes }) => ({ id, impact, nodes: nodes.map(({ target, failureSummary }) => ({ target, failureSummary })) }))).toEqual([]);
+    };
+    await auditDialog();
+    await page.emulateMedia({ colorScheme: "dark" });
+    await auditDialog();
     await page.getByLabel("Member profile", { exact: true }).selectOption("member-aaron-zipp");
     expect(await page.getByLabel("Member profile", { exact: true }).inputValue()).toBe("member-aaron-zipp");
     await page.getByRole("button", { name: "Continue claim" }).click();
@@ -215,7 +236,7 @@ describe("plan-scoped routing", async () => {
     await page.reload({ waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "My duties" }).waitFor();
     await page.getByText("SG Menden (Sauerland) vs Gast").waitFor();
-    await page.close();
+    await browser.close();
   }, 90000);
 
   it("creates and edits teams and members through the roster page", async () => {
@@ -273,9 +294,19 @@ describe("plan-scoped routing", async () => {
     await saveAssignment;
     await page.getByText("Browser Guest", { exact: true }).waitFor();
 
+    await page.getByText("Wischer 1", { exact: true }).first().click();
+    const assignmentDialog = page.getByRole("dialog", { name: "Assign Helper to Slot" });
+    await assignmentDialog.getByRole("button", { name: "All Club Members" }).click();
+    await assignmentDialog.getByText("Mustafa Gabler", { exact: true }).click();
+    const reassignResponse = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === `/api/${seededPlanId}`);
+    await assignmentDialog.getByRole("button", { name: "Confirm Assignment" }).click();
+    await reassignResponse;
+    await assignmentDialog.waitFor({ state: "hidden" });
+    await page.getByText("Mustafa Gabler", { exact: true }).first().waitFor();
+
     await page.reload({ waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "Duty Assignments" }).waitFor();
-    await page.getByText("Browser Guest", { exact: true }).waitFor();
+    await page.getByText("Mustafa Gabler", { exact: true }).first().waitFor();
     const scheduleLink = page.getByRole("link", { name: "View Schedule" });
     const scheduleUrl = new URL(await scheduleLink.getAttribute("href")!, page.url());
     expect(scheduleUrl.pathname).toBe(`/plans/${seededPlanId}`);
