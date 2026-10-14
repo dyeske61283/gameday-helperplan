@@ -140,6 +140,8 @@ async function addMember() {
     teamIds: [],
     skillIds: [],
   });
+  if (!newM)
+    return;
   openMemberDetails(newM);
 }
 
@@ -161,6 +163,8 @@ function openEditTeam(teamId: string) {
 }
 
 async function saveTeam() {
+  if (!planStore.plan)
+    return;
   if (isCreatingTeam.value) {
     planStore.addTeam(newTeamName.value);
   }
@@ -194,12 +198,14 @@ async function deleteTeam(teamId: string) {
           <UButton
             icon="i-lucide-users-round"
             variant="outline"
+            :disabled="!planStore.plan"
             @click="addMember"
           >
             {{ $t("ui.teams.addMember") }}
           </UButton>
           <UButton
             icon="i-lucide-plus"
+            :disabled="!planStore.plan"
             @click="openCreateTeam"
           >
             {{ $t("ui.teams.createTeam") }}

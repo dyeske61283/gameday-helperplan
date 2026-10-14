@@ -129,16 +129,6 @@ export const usePlanStore = defineStore("plan", () => {
     return migrated;
   }
 
-  /**
-   * Ensure plan is loaded, falling back to example plan if null
-   */
-  function ensurePlanLoaded(): SeasonPlan {
-    if (!plan.value) {
-      return loadExamplePlan();
-    }
-    return plan.value;
-  }
-
   async function loadPlan(id: string, decryptionKey: string) {
     isLoading.value = true;
     error.value = null;
@@ -366,8 +356,9 @@ export const usePlanStore = defineStore("plan", () => {
 
   // --- Domain Methods: Teams ---
 
-  function addTeam(name: string): Team {
-    const currentPlan = ensurePlanLoaded();
+  function addTeam(name: string): Team | null {
+    if (!plan.value)
+      return null;
     const newId = `team-${crypto.randomUUID().substring(0, 8)}`;
     const now = new Date();
     const newTeam: Team = {
@@ -376,8 +367,8 @@ export const usePlanStore = defineStore("plan", () => {
       isManual: true,
       updatedAt: now,
     };
-    currentPlan.teams[newId] = newTeam;
-    currentPlan.lastUpdated = now;
+    plan.value.teams[newId] = newTeam;
+    plan.value.lastUpdated = now;
     return newTeam;
   }
 
@@ -403,8 +394,9 @@ export const usePlanStore = defineStore("plan", () => {
 
   // --- Domain Methods: Members ---
 
-  function addMember(data: Partial<Omit<Member, "id" | "updatedAt">> & { name: string }): Member {
-    const currentPlan = ensurePlanLoaded();
+  function addMember(data: Partial<Omit<Member, "id" | "updatedAt">> & { name: string }): Member | null {
+    if (!plan.value)
+      return null;
     const newId = `member-${crypto.randomUUID().substring(0, 8)}`;
     const now = new Date();
     const newMember: Member = {
@@ -415,8 +407,8 @@ export const usePlanStore = defineStore("plan", () => {
       isManual: data.isManual ?? true,
       updatedAt: now,
     };
-    currentPlan.members[newId] = newMember;
-    currentPlan.lastUpdated = now;
+    plan.value.members[newId] = newMember;
+    plan.value.lastUpdated = now;
     return newMember;
   }
 
@@ -583,7 +575,6 @@ export const usePlanStore = defineStore("plan", () => {
     membersList,
     gamedaysList,
     loadExamplePlan,
-    ensurePlanLoaded,
     loadPlan,
     watchPlan,
     stopWatching,
