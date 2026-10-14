@@ -18,4 +18,4 @@ Generate a fresh random 12-byte IV for every encryption operation and store or t
 
 ## Implementation State
 
-The issue is identified but not implemented. Do not describe current encryption as nonce-safe until the client and persisted payload format are updated.
+Implementation is deferred. The client still uses a fixed zero IV, so current encryption is not nonce-safe. Closing the broad backlog issue retires that tracking item only; it does not implement this proposal. Re-scope the migration before work resumes, including compatibility with existing encrypted plans.
