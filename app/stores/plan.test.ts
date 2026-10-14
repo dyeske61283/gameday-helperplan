@@ -193,12 +193,20 @@ describe("usePlanStore", () => {
       expect(Object.keys(store.teams).length).toBeGreaterThan(0);
     });
 
-    it("should ensure plan is loaded on demand", () => {
+    it("does not load example data when adding a team without a plan", () => {
       const store = usePlanStore();
       expect(store.plan).toBeNull();
 
-      store.ensurePlanLoaded();
-      expect(store.plan).not.toBeNull();
+      expect(store.addTeam("New Team")).toBeNull();
+      expect(store.plan).toBeNull();
+    });
+
+    it("does not load example data when adding a member without a plan", () => {
+      const store = usePlanStore();
+      expect(store.plan).toBeNull();
+
+      expect(store.addMember({ name: "New Member" })).toBeNull();
+      expect(store.plan).toBeNull();
     });
   });
 
@@ -207,11 +215,11 @@ describe("usePlanStore", () => {
       const store = usePlanStore();
       store.createNewPlan("test-plan", "test-key");
 
-      const newTeam = store.addTeam("Men 1");
+      const newTeam = store.addTeam("Men 1")!;
       expect(store.teams[newTeam.id]).toBeDefined();
       expect(store.teams[newTeam.id]?.name).toBe("Men 1");
 
-      const member = store.addMember({ name: "John Doe", teamIds: [newTeam.id] });
+      const member = store.addMember({ name: "John Doe", teamIds: [newTeam.id] })!;
       expect(store.members[member.id]?.teamIds).toContain(newTeam.id);
 
       store.updateTeam(newTeam.id, "Men Senior");
@@ -228,7 +236,7 @@ describe("usePlanStore", () => {
       const store = usePlanStore();
       store.createNewPlan("test-plan", "test-key");
 
-      const member = store.addMember({ name: "Jane Doe", skillIds: ["referee"] });
+      const member = store.addMember({ name: "Jane Doe", skillIds: ["referee"] })!;
       expect(store.members[member.id]).toBeDefined();
       expect(store.members[member.id]?.name).toBe("Jane Doe");
 
@@ -402,7 +410,7 @@ describe("usePlanStore", () => {
     it("claims an open eligible slot without replacing an assignment", () => {
       const store = usePlanStore();
       store.createNewPlan("test-plan-id", "test-key");
-      const member = store.addMember({ name: "Capable Helper", skillIds: ["referee"] });
+      const member = store.addMember({ name: "Capable Helper", skillIds: ["referee"] })!;
       store.plan!.config.roles.push({ id: "referee-duty", name: "Referee", scope: "match", requiredSkillId: "referee" });
       store.plan!.matches.m1 = {
         id: "m1",
@@ -418,14 +426,14 @@ describe("usePlanStore", () => {
 
       expect(store.plan!.matches.m1!.slots[0]!.assignedMemberId).toBe(member.id);
       expect(store.plan!.matches.m1!.slots[0]!.assignmentStatus).toBe("ASSIGNED");
-      const otherMember = store.addMember({ name: "Other Helper" });
+      const otherMember = store.addMember({ name: "Other Helper" })!;
       expect(() => store.claimSlot("m1", "slot-1", otherMember.id)).toThrow("already been claimed");
     });
 
     it("rejects an ineligible member", () => {
       const store = usePlanStore();
       store.createNewPlan("test-plan-id", "test-key");
-      const member = store.addMember({ name: "Unlicensed Helper" });
+      const member = store.addMember({ name: "Unlicensed Helper" })!;
       store.plan!.config.roles.push({ id: "referee-duty", name: "Referee", scope: "match", requiredSkillId: "referee" });
       store.plan!.matches.m1 = {
         id: "m1",
@@ -458,7 +466,7 @@ describe("usePlanStore", () => {
 
       const store = usePlanStore();
       store.createNewPlan("test-plan-id", "test-key");
-      const member = store.addMember({ name: "Capable Helper", skillIds: ["referee"] });
+      const member = store.addMember({ name: "Capable Helper", skillIds: ["referee"] })!;
       store.plan!.config.roles.push({ id: "referee-duty", name: "Referee", scope: "match", requiredSkillId: "referee" });
       store.plan!.matches.m1 = {
         id: "m1",
