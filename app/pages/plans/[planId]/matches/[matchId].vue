@@ -102,7 +102,7 @@ async function resumeClaim() {
           <div>
             <p class="font-semibold">
               {{ roleName(slot) }}
-            </p><p class="text-sm text-neutral-500">
+            </p><p class="text-sm" style="color: var(--color-on-surface-variant)">
               {{ slot.assignedMemberId ? planStore.members[slot.assignedMemberId]?.name : slot.assignmentStatus === 'CANCELLED' ? $t("ui.cancelled") : $t("ui.open") }}
             </p>
           </div>
@@ -120,11 +120,13 @@ async function resumeClaim() {
       <NuxtLink :to="cockpitLink" class="text-sm text-primary">
         {{ $t("ui.match.openPersonalCockpit") }}
       </NuxtLink>
-      <UModal v-model:open="isMemberPickerOpen" :title="$t('ui.chooseMember')">
+      <UModal v-model:open="isMemberPickerOpen" :title="$t('ui.chooseMember')" :ui="{ title: '!text-[var(--color-on-surface)]' }">
         <template #body>
           <div class="space-y-4">
-            <p>{{ $t('ui.chooseMemberHint') }}</p>
-            <select v-model="planStore.selectedMemberId" class="w-full rounded-lg border p-2" :aria-label="$t('ui.memberProfile')">
+            <p style="color: var(--color-on-surface-variant)">
+              {{ $t('ui.chooseMemberHint') }}
+            </p>
+            <select v-model="planStore.selectedMemberId" class="w-full rounded-lg border p-2 bg-surface-container-lowest" style="color: var(--color-on-surface)" :aria-label="$t('ui.memberProfile')">
               <option :value="null">
                 {{ $t("ui.match.selectAMember") }}
               </option>
