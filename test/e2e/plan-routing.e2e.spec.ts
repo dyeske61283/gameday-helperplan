@@ -115,6 +115,7 @@ describe("plan-scoped routing", async () => {
     await page.getByRole("button", { name: "Calendar" }).click();
     await page.locator("[id^='calendar-']").first().waitFor();
     await page.getByRole("button", { name: "Timeline" }).click();
+    expect(await page.locator("[id^='calendar-']").count()).toBe(0);
 
     const matchLink = page.locator("a[href*='/matches/']").first();
     const matchHref = await matchLink.getAttribute("href");
