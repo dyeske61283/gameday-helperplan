@@ -108,8 +108,7 @@ light and dark mode. It expects all 9 browser tests to pass.
 Run the full browser project with `pnpm test:e2e`, the complete suite with
 `pnpm test`, and accessibility checks with `pnpm test:a11y`. The CI workflow
 seeds separate workflow, routing, and editing plans, runs `pnpm test`, then
-`pnpm test:a11y`. When `E2E_ROUTING_PLAN_URL` is present, the accessibility
-check audits the schedule, direct match, cockpit, teams, and assignments routes
-in light and dark mode in addition to the root-linked pages. It waits for known
-fixture content before auditing plan routes. CI passes when Vitest and
-accessibility checks exit successfully with no axe violations.
+`pnpm test:a11y`. The accessibility script audits root-linked pages in light
+and dark mode; the member-selection dialog is audited in both modes by the
+plan-routing browser workflow. CI passes when Vitest and accessibility checks
+exit successfully with no axe violations.

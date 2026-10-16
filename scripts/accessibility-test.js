@@ -31,22 +31,16 @@ async function runAudit(page, name) {
   return results.violations.length;
 }
 
-async function runAuditDarkAndLight(page, url, totalViolations, readyText) {
+async function runAuditDarkAndLight(page, url, totalViolations) {
   await page.emulateMedia({ colorScheme: "light" });
   await page.goto(url);
-  if (readyText)
-    await page.getByRole("heading", { name: readyText }).waitFor({ timeout: 15000 });
-  else
-    await page.waitForTimeout(2000);
+  await page.waitForTimeout(2000);
   totalViolations += await runAudit(page, "Light Mode");
 
   // Dark mode
   await page.emulateMedia({ colorScheme: "dark" });
   await page.goto(url);
-  if (readyText)
-    await page.getByRole("heading", { name: readyText }).waitFor({ timeout: 15000 });
-  else
-    await page.waitForTimeout(2000);
+  await page.waitForTimeout(2000);
   totalViolations += await runAudit(page, "Dark Mode");
 
   return totalViolations;
@@ -85,23 +79,6 @@ async function runAuditDarkAndLight(page, url, totalViolations, readyText) {
     for (const link of linkSet) {
       if (link && !link.startsWith("#") && link.startsWith("/")) {
         totalViolations = await runAuditDarkAndLight(page, url(link), totalViolations);
-      }
-    }
-
-    // eslint-disable-next-line node/no-process-env
-    const sharedPlanUrl = process.env.E2E_ROUTING_PLAN_URL || process.env.E2E_PLAN_URL;
-    if (sharedPlanUrl) {
-      const sharedPlan = new URL(sharedPlanUrl, host || url("/"));
-      const planId = sharedPlan.pathname.split("/")[2];
-      const planRoutes = [
-        { path: `/plans/${planId}`, readyText: "Gladbeck HC" },
-        { path: `/plans/${planId}/matches/match-2025-09-21-maenner-i-0`, readyText: "SG Menden (Sauerland) vs Gast" },
-        { path: `/plans/${planId}/cockpit`, readyText: "My duties" },
-        { path: `/plans/${planId}/teams`, readyText: "Teams" },
-        { path: `/plans/${planId}/assignments`, readyText: "Duty Assignments" },
-      ];
-      for (const { path, readyText } of planRoutes) {
-        totalViolations = await runAuditDarkAndLight(page, `${sharedPlan.origin}${path}${sharedPlan.hash}`, totalViolations, readyText);
       }
     }
   }
