@@ -1,8 +1,12 @@
 import type { Page } from "playwright";
+import { Buffer } from "node:buffer";
+import { webcrypto } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { AxeBuilder } from "@axe-core/playwright";
 import { createPage, setup, url } from "@nuxt/test-utils/e2e";
+import { chromium } from "playwright";
 import { beforeAll, describe, expect, it } from "vitest";
 /* eslint-disable node/no-process-env */
 
@@ -13,6 +17,7 @@ const editPlanUrl = process.env.E2E_EDIT_PLAN_URL || seededPlanUrl;
 const testHost = process.env.TEST_HOST;
 const testUrl = (pathname: string) => testHost ? new URL(pathname, testHost).toString() : url(pathname);
 const seededPlanHash = new URL(seededPlanUrl, testHost || "http://localhost").hash;
+const seededPlanKey = new URL(seededPlanUrl, testHost || "http://localhost").hash.slice("#key=".length);
 const seededPlanId = new URL(seededPlanUrl, testHost || "http://localhost").pathname.split("/")[2] || defaultPlanId;
 const editPlanHash = new URL(editPlanUrl, testHost || "http://localhost").hash;
 const editPlanId = new URL(editPlanUrl, testHost || "http://localhost").pathname.split("/")[2] || defaultPlanId;
@@ -79,14 +84,26 @@ describe("plan-scoped routing", async () => {
   await setup({ host: testHost, dev: true });
 
   beforeAll(async () => {
-    if (process.env.E2E_ROUTING_PLAN_URL || process.env.E2E_PLAN_URL)
-      return;
-    const fixture = JSON.parse(fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../fixtures/encrypted-plan-2025-2026.json"), "utf8"));
-    await fetch(testUrl(`/api/${seededPlanId}`), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ blob: fixture.blob }),
-    });
+    if (!process.env.E2E_ROUTING_PLAN_URL && !process.env.E2E_PLAN_URL) {
+      const fixture = JSON.parse(fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../fixtures/encrypted-plan-2025-2026.json"), "utf8"));
+      await fetch(testUrl(`/api/${seededPlanId}`), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ blob: fixture.blob }),
+      });
+    }
+  });
+
+  it("shows the link-first empty state at the base route without resuming a plan", async () => {
+    const page = await createPage();
+    await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
+    await page.goto(testUrl("/"), { waitUntil: "domcontentloaded" });
+
+    await page.getByRole("heading", { name: "Open your helper plan" }).waitFor();
+    await page.getByText("A shared plan link is required to get started.").waitFor();
+    expect(await page.getByRole("button", { name: "Resume plan" }).count()).toBe(0);
+    expect(await page.getByRole("link", { name: "Set up a new plan" }).count()).toBe(1);
+    await page.close();
   });
 
   it("keeps schedule, match, cockpit, team, and assignment navigation in plan context", async () => {
@@ -98,6 +115,7 @@ describe("plan-scoped routing", async () => {
     await page.getByRole("button", { name: "Calendar" }).click();
     await page.locator("[id^='calendar-']").first().waitFor();
     await page.getByRole("button", { name: "Timeline" }).click();
+    expect(await page.locator("[id^='calendar-']").count()).toBe(0);
 
     const matchLink = page.locator("a[href*='/matches/']").first();
     const matchHref = await matchLink.getAttribute("href");
@@ -106,26 +124,194 @@ describe("plan-scoped routing", async () => {
     const planId = matchUrl.pathname.split("/")[2];
     expect(planId).toBeTruthy();
     expect(matchUrl.hash).toBe(seededPlanHash);
-    await page.goto(matchUrl.toString(), { waitUntil: "domcontentloaded" });
+    await matchLink.click();
     expect(new URL(page.url()).pathname).toMatch(/^\/plans\/[^/]+\/matches\/[^/]+$/);
     const allFixturesLink = page.getByRole("link", { name: /All fixtures/ });
-    await allFixturesLink.waitFor();
     const allFixturesUrl = new URL(await allFixturesLink.getAttribute("href")!, page.url());
     expect(allFixturesUrl.pathname).toBe(`/plans/${planId}`);
+    expect(allFixturesUrl.hash).toBe(seededPlanHash);
     expect(await page.getByText("Claiming as").count()).toBe(0);
+    await allFixturesLink.click();
+    await page.getByRole("heading", { name: "Gladbeck HC" }).waitFor();
 
-    const planUrl = new URL(page.url());
-    planUrl.pathname = `/plans/${planId}/cockpit`;
-    await page.goto(planUrl.toString(), { waitUntil: "domcontentloaded" });
-    expect(new URL(page.url()).pathname).toBe(`/plans/${planId}/cockpit`);
+    const teamsLink = page.getByRole("link", { name: "Teams & Roster" });
+    const teamsUrl = new URL(await teamsLink.getAttribute("href")!, page.url());
+    expect(teamsUrl.pathname).toBe(`/plans/${planId}/teams`);
+    expect(teamsUrl.hash).toBe(seededPlanHash);
+    await teamsLink.click();
+    await page.getByRole("heading", { name: "Teams" }).waitFor();
 
-    planUrl.pathname = `/plans/${planId}/teams`;
-    await page.goto(planUrl.toString(), { waitUntil: "domcontentloaded" });
-    expect(new URL(page.url()).pathname).toBe(`/plans/${planId}/teams`);
+    await page.goBack();
+    await page.getByRole("heading", { name: "Gladbeck HC" }).waitFor();
 
-    planUrl.pathname = `/plans/${planId}/assignments`;
-    await page.goto(planUrl.toString(), { waitUntil: "domcontentloaded" });
+    const assignmentsLink = page.getByRole("link", { name: "Manage Duties" });
+    const assignmentsUrl = new URL(await assignmentsLink.getAttribute("href")!, page.url());
+    expect(assignmentsUrl.pathname).toBe(`/plans/${planId}/assignments`);
+    expect(assignmentsUrl.hash).toBe(seededPlanHash);
+    await assignmentsLink.click();
+    await page.getByRole("heading", { name: "Duty Assignments" }).waitFor();
     expect(new URL(page.url()).pathname).toBe(`/plans/${planId}/assignments`);
+
+    const missingMatchUrl = new URL(`/plans/${planId}/matches/missing-match`, page.url());
+    missingMatchUrl.hash = seededPlanHash;
+    await page.goto(missingMatchUrl.toString(), { waitUntil: "domcontentloaded" });
+    await page.getByRole("heading", { name: "Match not found" }).waitFor();
+    const backToFixturesLink = page.getByRole("link", { name: "Back to fixtures" });
+    await expect.poll(async () => new URL(await backToFixturesLink.getAttribute("href")!, page.url()).hash, { timeout: 10000 }).toBe(seededPlanHash);
+    const backToFixtures = new URL(await backToFixturesLink.getAttribute("href")!, page.url());
+    expect(backToFixtures.pathname).toBe(`/plans/${planId}`);
+    expect(backToFixtures.hash).toBe(seededPlanHash);
+    await page.close();
+  }, 90000);
+
+  it("claims a duty from a direct shared match link and sees it in the cockpit after refresh", async () => {
+    const response = await fetch(testUrl(`/api/${seededPlanId}`));
+    expect(response.ok).toBe(true);
+    const { blob } = await response.json();
+    const key = await webcrypto.subtle.importKey("jwk", {
+      k: seededPlanKey,
+      alg: "A128GCM",
+      ext: true,
+      key_ops: ["encrypt", "decrypt"],
+      kty: "oct",
+    }, { name: "AES-GCM" }, false, ["decrypt", "encrypt"]);
+    const plaintext = await webcrypto.subtle.decrypt(
+      { name: "AES-GCM", iv: new Uint8Array(12) },
+      key,
+      new Uint8Array(Buffer.from(blob, "base64")),
+    );
+    const plan = JSON.parse(new TextDecoder().decode(plaintext));
+    const matchId = "match-2025-09-21-maenner-i-0";
+    const slot = plan.matches[matchId].slots[0];
+    slot.assignedMemberId = null;
+    slot.customHelperName = null;
+    slot.assignmentStatus = "OPEN";
+    const encrypted = await webcrypto.subtle.encrypt(
+      { name: "AES-GCM", iv: new Uint8Array(12) },
+      key,
+      new TextEncoder().encode(JSON.stringify(plan)),
+    );
+    const saveResponse = await fetch(testUrl(`/api/${seededPlanId}`), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ blob: Buffer.from(encrypted).toString("base64") }),
+    });
+    expect(saveResponse.ok).toBe(true);
+
+    const browser = await chromium.launch();
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
+    await context.addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
+    await page.goto(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl), { waitUntil: "domcontentloaded" });
+    await page.getByRole("heading", { name: "Gladbeck HC" }).waitFor();
+    await page.getByRole("button", { name: "Calendar" }).click();
+    await page.locator("[id^='calendar-']").first().waitFor();
+    await page.getByRole("button", { name: "Timeline" }).click();
+
+    await page.goto(testUrl(`/plans/${seededPlanId}/matches/${matchId}${seededPlanHash}`), { waitUntil: "domcontentloaded" });
+    await page.getByRole("heading", { name: /SG Menden \(Sauerland\) vs Gast/ }).waitFor();
+    await page.getByRole("button", { name: "Select member" }).click();
+    const dialog = page.getByRole("dialog");
+    const auditDialog = async () => {
+      await dialog.evaluate(async element => Promise.all(element.getAnimations({ subtree: true }).map(animation => animation.finished.catch(() => undefined))));
+      const { violations } = await new AxeBuilder({ page }).include("[role=\"dialog\"]").analyze();
+      expect(violations.map(({ id, impact, nodes }) => ({ id, impact, nodes: nodes.map(({ target, failureSummary }) => ({ target, failureSummary })) }))).toEqual([]);
+    };
+    await auditDialog();
+    await page.emulateMedia({ colorScheme: "dark" });
+    await auditDialog();
+    await page.getByLabel("Member profile", { exact: true }).selectOption("member-aaron-zipp");
+    expect(await page.getByLabel("Member profile", { exact: true }).inputValue()).toBe("member-aaron-zipp");
+    await page.getByRole("button", { name: "Continue claim" }).click();
+    await page.getByText("Duty claimed", { exact: true }).waitFor({ timeout: 10000 });
+
+    const cockpitLink = page.getByRole("link", { name: "Open personal cockpit" });
+    const cockpitUrl = new URL(await cockpitLink.getAttribute("href")!, page.url());
+    expect(cockpitUrl.pathname).toBe(`/plans/${seededPlanId}/cockpit`);
+    expect(cockpitUrl.hash).toBe(seededPlanHash);
+    await cockpitLink.click();
+    await page.getByRole("heading", { name: "My duties" }).waitFor();
+    await page.getByText("SG Menden (Sauerland) vs Gast").waitFor();
+    expect(await page.getByLabel("Member profile", { exact: true }).inputValue()).toBe("member-aaron-zipp");
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await page.getByRole("heading", { name: "My duties" }).waitFor();
+    await page.getByText("SG Menden (Sauerland) vs Gast").waitFor();
+    await browser.close();
+  }, 90000);
+
+  it("creates and edits teams and members through the roster page", async () => {
+    const page = await createPage();
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
+    await page.goto(testUrl(`/plans/${seededPlanId}/teams${seededPlanHash}`), { waitUntil: "domcontentloaded" });
+    await page.getByRole("heading", { name: "Teams" }).waitFor();
+
+    await page.getByRole("button", { name: "Create Team" }).click();
+    await page.getByLabel("Team Name").fill("E2E Team");
+    const createTeamSave = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === `/api/${seededPlanId}`);
+    await page.getByRole("button", { name: "Create", exact: true }).click();
+    await createTeamSave;
+    await page.getByRole("button", { name: "E2E Team" }).click();
+
+    await page.getByRole("button", { name: "Add Member" }).click();
+    await page.getByLabel("Full Name").fill("E2E Volunteer");
+    await page.getByRole("switch", { name: "Referee License" }).click();
+    await page.getByRole("checkbox", { name: "E2E Team" }).check();
+    const createMemberSave = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === `/api/${seededPlanId}`);
+    await page.getByRole("button", { name: "Save Changes" }).click();
+    await createMemberSave;
+    await page.getByText("E2E Volunteer", { exact: true }).waitFor();
+
+    await page.getByRole("button", { name: "Edit Name" }).click();
+    await page.getByLabel("Team Name").fill("E2E Renamed Team");
+    const editTeamSave = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === `/api/${seededPlanId}`);
+    await page.getByRole("button", { name: "Save", exact: true }).click();
+    await editTeamSave;
+    await page.getByText("E2E Volunteer", { exact: true }).waitFor();
+    await page.getByText("E2E Volunteer", { exact: true }).click();
+    await page.getByLabel("Full Name").fill("E2E Helper");
+    const editMemberSave = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === `/api/${seededPlanId}`);
+    await page.getByRole("button", { name: "Save Changes" }).click();
+    await editMemberSave;
+
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await page.getByRole("button", { name: "E2E Renamed Team" }).click();
+    await page.getByText("E2E Helper", { exact: true }).waitFor();
+    await page.close();
+  }, 90000);
+
+  it("assigns a guest helper and preserves plan context when returning to the schedule", async () => {
+    const page = await createPage();
+    await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
+    await page.goto(testUrl(`/plans/${seededPlanId}/assignments${seededPlanHash}`), { waitUntil: "domcontentloaded" });
+    await page.getByRole("heading", { name: "Duty Assignments" }).waitFor();
+
+    await page.getByText("Wischer 1", { exact: true }).first().click();
+    await page.getByRole("dialog", { name: "Assign Helper to Slot" }).waitFor();
+    await page.getByLabel("Or Custom Guest / Volunteer Name").fill("Browser Guest");
+    const saveAssignment = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === `/api/${seededPlanId}`);
+    await page.getByRole("button", { name: "Confirm Assignment" }).click();
+    await saveAssignment;
+    await page.getByText("Browser Guest", { exact: true }).waitFor();
+
+    await page.getByText("Wischer 1", { exact: true }).first().click();
+    const assignmentDialog = page.getByRole("dialog", { name: "Assign Helper to Slot" });
+    await assignmentDialog.getByRole("button", { name: "All Club Members" }).click();
+    await assignmentDialog.getByText("Mustafa Gabler", { exact: true }).click();
+    const reassignResponse = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === `/api/${seededPlanId}`);
+    await assignmentDialog.getByRole("button", { name: "Confirm Assignment" }).click();
+    await reassignResponse;
+    await assignmentDialog.waitFor({ state: "hidden" });
+    await page.getByText("Mustafa Gabler", { exact: true }).first().waitFor();
+
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await page.getByRole("heading", { name: "Duty Assignments" }).waitFor();
+    await page.getByText("Mustafa Gabler", { exact: true }).first().waitFor();
+    const scheduleLink = page.getByRole("link", { name: "View Schedule" });
+    const scheduleUrl = new URL(await scheduleLink.getAttribute("href")!, page.url());
+    expect(scheduleUrl.pathname).toBe(`/plans/${seededPlanId}`);
+    expect(scheduleUrl.hash).toBe(seededPlanHash);
     await page.close();
   }, 90000);
 
