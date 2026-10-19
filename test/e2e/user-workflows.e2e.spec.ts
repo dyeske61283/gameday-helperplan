@@ -39,10 +39,14 @@ describe("feature: User Workflows (BDD Specs)", async () => {
     const encryptedFixture = JSON.parse(
       fs.readFileSync(path.resolve(__dirname, "../fixtures/encrypted-plan-2025-2026.json"), "utf-8"),
     );
+    const currentResponse = await fetch(testUrl(`/api/${seededPlanId}`));
+    if (!currentResponse.ok && currentResponse.status !== 404)
+      throw new Error(`Could not read seeded plan: ${currentResponse.status}`);
+    const expectedRevision = currentResponse.ok ? (await currentResponse.json()).revision ?? 0 : 0;
     await fetch(testUrl(`/api/${seededPlanId}`), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ blob: encryptedFixture.blob }),
+      body: JSON.stringify({ blob: encryptedFixture.blob, expectedRevision }),
     });
   });
 

@@ -86,10 +86,14 @@ describe("plan-scoped routing", async () => {
   beforeAll(async () => {
     if (!process.env.E2E_ROUTING_PLAN_URL && !process.env.E2E_PLAN_URL) {
       const fixture = JSON.parse(fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../fixtures/encrypted-plan-2025-2026.json"), "utf8"));
+      const currentResponse = await fetch(testUrl(`/api/${seededPlanId}`));
+      if (!currentResponse.ok && currentResponse.status !== 404)
+        throw new Error(`Could not read seeded plan: ${currentResponse.status}`);
+      const expectedRevision = currentResponse.ok ? (await currentResponse.json()).revision ?? 0 : 0;
       await fetch(testUrl(`/api/${seededPlanId}`), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ blob: fixture.blob }),
+        body: JSON.stringify({ blob: fixture.blob, expectedRevision }),
       });
     }
   });
@@ -167,7 +171,7 @@ describe("plan-scoped routing", async () => {
   it("claims a duty from a direct shared match link and sees it in the cockpit after refresh", async () => {
     const response = await fetch(testUrl(`/api/${seededPlanId}`));
     expect(response.ok).toBe(true);
-    const { blob } = await response.json();
+    const { blob, revision } = await response.json();
     const key = await webcrypto.subtle.importKey("jwk", {
       k: seededPlanKey,
       alg: "A128GCM",
@@ -194,7 +198,7 @@ describe("plan-scoped routing", async () => {
     const saveResponse = await fetch(testUrl(`/api/${seededPlanId}`), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ blob: Buffer.from(encrypted).toString("base64") }),
+      body: JSON.stringify({ blob: Buffer.from(encrypted).toString("base64"), expectedRevision: revision }),
     });
     expect(saveResponse.ok).toBe(true);
 
@@ -223,7 +227,28 @@ describe("plan-scoped routing", async () => {
     await auditDialog();
     await page.getByLabel("Member profile", { exact: true }).selectOption("member-aaron-zipp");
     expect(await page.getByLabel("Member profile", { exact: true }).inputValue()).toBe("member-aaron-zipp");
+
+    let rejectedClaim = false;
+    await page.route(`**/api/${seededPlanId}`, async (route) => {
+      if (route.request().method() === "POST" && !rejectedClaim) {
+        rejectedClaim = true;
+        await route.fulfill({
+          status: 409,
+          contentType: "application/json",
+          body: JSON.stringify({ statusCode: 409, statusMessage: "Conflict" }),
+        });
+      }
+      else {
+        await route.continue();
+      }
+    });
     await page.getByRole("button", { name: "Continue claim" }).click();
+    await page.getByText("Could not claim duty", { exact: true }).waitFor({ timeout: 10000 });
+    expect(await page.getByText("Duty claimed", { exact: true }).count()).toBe(0);
+    await page.getByRole("button", { name: "Claim" }).waitFor();
+    expect(rejectedClaim).toBe(true);
+    await page.unroute(`**/api/${seededPlanId}`);
+    await page.getByRole("button", { name: "Claim" }).click();
     await page.getByText("Duty claimed", { exact: true }).waitFor({ timeout: 10000 });
 
     const cockpitLink = page.getByRole("link", { name: "Open personal cockpit" });

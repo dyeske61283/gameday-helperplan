@@ -61,12 +61,14 @@ describe("usePlanStore", () => {
 
   it("commits an isolated edit only after save succeeds and reloads it", async () => {
     let savedBlob = "";
-    vi.stubGlobal("$fetch", vi.fn(async (_url: string, options?: { method?: string; body?: { blob: string } }) => {
+    let savedRevision = 0;
+    vi.stubGlobal("$fetch", vi.fn(async (_url: string, options?: { method?: string; body?: { blob: string; expectedRevision: number } }) => {
       if (options?.method === "POST") {
         savedBlob = options.body!.blob;
-        return {};
+        savedRevision = options.body!.expectedRevision + 1;
+        return { revision: savedRevision };
       }
-      return { blob: savedBlob };
+      return { blob: savedBlob, revision: savedRevision };
     }));
     const store = usePlanStore();
     store.createNewPlan("test-plan-id", "test-key", { clubName: "Original", season: "2026/2027" });
@@ -120,12 +122,19 @@ describe("usePlanStore", () => {
     const update = structuredClone(toRaw(store.plan!));
     update.rev = 2;
     update.club.name = "Remote edit";
-    await source?.onmessage?.({ data: JSON.stringify(update) } as MessageEvent);
+    await source?.onmessage?.({ data: JSON.stringify({ blob: JSON.stringify(update), revision: 2 }) } as MessageEvent);
 
     expect(store.plan?.club.name).toBe("Original");
     expect(store.pendingUpdate?.club.name).toBe("Remote edit");
     store.applyPendingUpdate();
     expect(store.plan?.club.name).toBe("Remote edit");
+    let expectedRevision: number | undefined;
+    vi.stubGlobal("$fetch", vi.fn(async (_url: string, options?: { body?: { expectedRevision: number } }) => {
+      expectedRevision = options?.body?.expectedRevision;
+      return { revision: 3 };
+    }));
+    await store.savePlan();
+    expect(expectedRevision).toBe(2);
     vi.unstubAllGlobals();
   });
 
@@ -456,12 +465,14 @@ describe("usePlanStore", () => {
 
     it("keeps a claimed duty after save and reload", async () => {
       let savedBlob = "";
-      vi.stubGlobal("$fetch", vi.fn(async (_url: string, options?: { method?: string; body?: { blob: string } }) => {
+      let savedRevision = 0;
+      vi.stubGlobal("$fetch", vi.fn(async (_url: string, options?: { method?: string; body?: { blob: string; expectedRevision: number } }) => {
         if (options?.method === "POST") {
           savedBlob = options.body!.blob;
-          return {};
+          savedRevision = options.body!.expectedRevision + 1;
+          return { revision: savedRevision };
         }
-        return { blob: savedBlob };
+        return { blob: savedBlob, revision: savedRevision };
       }));
 
       const store = usePlanStore();

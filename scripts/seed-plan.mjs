@@ -20,11 +20,16 @@ const jwk = await webcrypto.subtle.exportKey("jwk", key);
 const payload = new TextEncoder().encode(JSON.stringify(plan));
 const encrypted = await webcrypto.subtle.encrypt({ name: "AES-GCM", iv: new Uint8Array(12) }, key, payload);
 const blob = Buffer.from(encrypted).toString("base64");
+const planUrl = `${baseUrl.replace(/\/$/, "")}/api/${plan.id}`;
+const currentResponse = await fetch(planUrl);
+if (!currentResponse.ok && currentResponse.status !== 404)
+  throw new Error(`Could not read existing plan: ${currentResponse.status} ${await currentResponse.text()}`);
+const expectedRevision = currentResponse.ok ? (await currentResponse.json()).revision ?? 0 : 0;
 
-const response = await fetch(`${baseUrl.replace(/\/$/, "")}/api/${plan.id}`, {
+const response = await fetch(planUrl, {
   method: "POST",
   headers: { "content-type": "application/json" },
-  body: JSON.stringify({ blob }),
+  body: JSON.stringify({ blob, expectedRevision }),
 });
 
 if (!response.ok)

@@ -65,11 +65,13 @@ export function migrateIfNeeded(loadedPlan: Omit<SeasonPlan, "schemaVersion"> & 
 
 export const usePlanStore = defineStore("plan", () => {
   const plan = ref<SeasonPlan | null>(null);
+  const storageRevision = ref(0);
   const key = ref<string | null>(null);
   const readOnly = ref(false);
   const isLoading = ref(false);
   const error = ref<string | null>(null);
   const pendingUpdate = ref<SeasonPlan | null>(null);
+  const pendingStorageRevision = ref<number | null>(null);
   const isEditing = ref(false);
   const eventSource = ref<EventSource | null>(null);
   let completionTimer: ReturnType<typeof setInterval> | undefined;
@@ -126,6 +128,7 @@ export const usePlanStore = defineStore("plan", () => {
     const cloned = JSON.parse(JSON.stringify(examplePlan)) as SeasonPlan;
     const migrated = migrateIfNeeded(cloned);
     plan.value = migrated;
+    storageRevision.value = 0;
     return migrated;
   }
 
@@ -135,7 +138,7 @@ export const usePlanStore = defineStore("plan", () => {
     key.value = decryptionKey;
 
     try {
-      const response = await $fetch<{ blob: string }>(`/api/${id}`);
+      const response = await $fetch<{ blob: string; revision?: number }>(`/api/${id}`);
 
       if (!response.blob) {
         throw new Error("No plan data found");
@@ -149,6 +152,8 @@ export const usePlanStore = defineStore("plan", () => {
       completeClosedAssignments(loadedPlan);
 
       plan.value = loadedPlan;
+      storageRevision.value = response.revision ?? 0;
+      pendingStorageRevision.value = null;
       resumeState.value = { id, key: decryptionKey };
     }
     catch (err: unknown) {
@@ -183,7 +188,21 @@ export const usePlanStore = defineStore("plan", () => {
 
     eventSource.value.onmessage = async (event) => {
       try {
-        const encryptedBlob = event.data;
+        let update = { blob: event.data, revision: storageRevision.value };
+        try {
+          const parsed = JSON.parse(event.data) as { blob?: unknown; revision?: unknown };
+          if (typeof parsed.blob === "string") {
+            update = {
+              blob: parsed.blob,
+              revision: typeof parsed.revision === "number" ? parsed.revision : storageRevision.value,
+            };
+          }
+        }
+        catch {
+          // Older servers streamed the encrypted blob without revision metadata.
+        }
+
+        const encryptedBlob = update.blob;
         if (!encryptedBlob)
           return;
 
@@ -194,10 +213,14 @@ export const usePlanStore = defineStore("plan", () => {
           console.warn("Real-time update received: Rev", updatedPlan.rev);
           updatedPlan = migrateIfNeeded(updatedPlan);
           completeClosedAssignments(updatedPlan);
-          if (isEditing.value)
+          if (isEditing.value) {
             pendingUpdate.value = updatedPlan;
-          else
+            pendingStorageRevision.value = update.revision;
+          }
+          else {
             plan.value = updatedPlan;
+            storageRevision.value = Math.max(storageRevision.value, update.revision);
+          }
         }
       }
       catch (err) {
@@ -212,14 +235,19 @@ export const usePlanStore = defineStore("plan", () => {
 
   function setEditing(value: boolean) {
     isEditing.value = value;
-    if (!value)
+    if (!value) {
       pendingUpdate.value = null;
+      pendingStorageRevision.value = null;
+    }
   }
 
   function applyPendingUpdate() {
-    if (pendingUpdate.value)
+    if (pendingUpdate.value) {
       plan.value = pendingUpdate.value;
+      storageRevision.value = pendingStorageRevision.value ?? storageRevision.value;
+    }
     pendingUpdate.value = null;
+    pendingStorageRevision.value = null;
     isEditing.value = false;
   }
 
@@ -253,16 +281,20 @@ export const usePlanStore = defineStore("plan", () => {
       const serializedPlan = JSON.stringify(planToSave);
       const encryptedBlob = await encryptData(serializedPlan, key.value);
 
-      await $fetch(`/api/${planToSave.id}`, {
+      const expectedRevision = storageRevision.value;
+      const response = await $fetch<{ revision?: number }>(`/api/${planToSave.id}`, {
         method: "POST",
         body: {
           blob: encryptedBlob,
+          expectedRevision,
         },
       });
 
+      storageRevision.value = Math.max(storageRevision.value, response.revision ?? expectedRevision + 1);
       if (plan.value === livePlan)
         plan.value = planToSave;
       pendingUpdate.value = null;
+      pendingStorageRevision.value = null;
       resumeState.value = { id: planToSave.id, key: key.value };
       return true;
     }
@@ -280,6 +312,8 @@ export const usePlanStore = defineStore("plan", () => {
 
   function createNewPlan(id: string, newKey: string, metadata?: NewPlanMetadata) {
     key.value = newKey;
+    storageRevision.value = 0;
+    pendingStorageRevision.value = null;
     const now = new Date();
     plan.value = {
       id,
