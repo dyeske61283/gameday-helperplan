@@ -1,7 +1,5 @@
 import type { AutoAssignOptions } from "../utils/helper-assignment";
 import type {
-  Gameday,
-  Match,
   Member,
   NewPlanMetadata,
   Role,
@@ -14,54 +12,11 @@ import { computed, ref, toRaw } from "vue";
 import examplePlan from "../../test/fixtures/plan-2025-2026.json";
 import { useDecryption, useEncryption } from "../composables/use-crypto";
 import { autoAssignMatchDuties, completeClosedAssignments, isMemberEligibleForSlot } from "../utils/helper-assignment";
-import { CURRENT_SCHEMA_VERSION } from "../utils/plan-types";
+import { CURRENT_SCHEMA_VERSION, parseSeasonPlan } from "../utils/plan-types";
 
 export const PLAN_RESUME_KEY = "gameday-plan-resume";
 const MEMBER_KEY = "gameday-selected-member";
 const _FRAGMENT_PREFIX = "key=";
-
-/**
- * Migrate the plan schema if needed.
- */
-export function migrateIfNeeded(loadedPlan: Omit<SeasonPlan, "schemaVersion"> & { schemaVersion: number }): SeasonPlan {
-  if (loadedPlan.schemaVersion < CURRENT_SCHEMA_VERSION) {
-    console.warn(
-      `Migrating plan from version ${loadedPlan.schemaVersion} to ${CURRENT_SCHEMA_VERSION}`,
-    );
-
-    // Normalize legacy occupancy into the explicit assignment lifecycle.
-    if (loadedPlan.matches) {
-      Object.values(loadedPlan.matches).forEach((match: Match) => {
-        if (!match.slots) {
-          match.slots = [];
-        }
-        match.slots.forEach((slot) => {
-          if (!slot.assignmentStatus) {
-            slot.assignmentStatus = slot.assignedMemberId || slot.customHelperName ? "ASSIGNED" : "OPEN";
-          }
-        });
-      });
-    }
-
-    // Ensure all gamedays have a slots array
-    if (loadedPlan.gamedays) {
-      Object.values(loadedPlan.gamedays).forEach((gameday: Gameday) => {
-        if (!gameday.slots) {
-          gameday.slots = [];
-        }
-        gameday.slots.forEach((slot) => {
-          if (!slot.assignmentStatus) {
-            slot.assignmentStatus = slot.assignedMemberId || slot.customHelperName ? "ASSIGNED" : "OPEN";
-          }
-        });
-      });
-    }
-
-    loadedPlan.schemaVersion = CURRENT_SCHEMA_VERSION;
-  }
-
-  return loadedPlan as SeasonPlan;
-}
 
 export const usePlanStore = defineStore("plan", () => {
   const plan = ref<SeasonPlan | null>(null);
@@ -125,8 +80,7 @@ export const usePlanStore = defineStore("plan", () => {
    * Load the example plan fixture into state
    */
   function loadExamplePlan(): SeasonPlan {
-    const cloned = JSON.parse(JSON.stringify(examplePlan)) as SeasonPlan;
-    const migrated = migrateIfNeeded(cloned);
+    const migrated = parseSeasonPlan(examplePlan);
     plan.value = migrated;
     storageRevision.value = 0;
     return migrated;
@@ -145,10 +99,7 @@ export const usePlanStore = defineStore("plan", () => {
       }
 
       const decryptedData = await decryptBlob(response.blob, decryptionKey);
-      let loadedPlan = JSON.parse(decryptedData) as SeasonPlan;
-
-      // Run migration logic
-      loadedPlan = migrateIfNeeded(loadedPlan);
+      const loadedPlan = parseSeasonPlan(JSON.parse(decryptedData));
       completeClosedAssignments(loadedPlan);
 
       plan.value = loadedPlan;
@@ -207,11 +158,10 @@ export const usePlanStore = defineStore("plan", () => {
           return;
 
         const decryptedData = await decryptBlob(encryptedBlob, decryptionKey);
-        let updatedPlan = JSON.parse(decryptedData) as SeasonPlan;
+        const updatedPlan = parseSeasonPlan(JSON.parse(decryptedData));
 
         if (!plan.value || updatedPlan.rev > plan.value.rev) {
           console.warn("Real-time update received: Rev", updatedPlan.rev);
-          updatedPlan = migrateIfNeeded(updatedPlan);
           completeClosedAssignments(updatedPlan);
           if (isEditing.value) {
             pendingUpdate.value = updatedPlan;

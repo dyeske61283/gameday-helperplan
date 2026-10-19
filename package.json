@@ -12,6 +12,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "vitest run",
+    "test:plan-schema": "vitest run app/utils/plan-types.test.ts --project=app",
     "test:api": "vitest run --project=api",
     "test:app": "vitest run --project=app",
     "test:workflow": "vitest run --project=workflow",

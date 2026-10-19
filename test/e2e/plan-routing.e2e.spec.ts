@@ -1,6 +1,6 @@
 import type { Page } from "playwright";
 import { Buffer } from "node:buffer";
-import { webcrypto } from "node:crypto";
+import { randomUUID, webcrypto } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -78,6 +78,36 @@ function monitorSharePage(page: Page) {
       }
     }
   };
+}
+
+async function seedLegacyPlan() {
+  const plan = JSON.parse(fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../fixtures/legacy-plan-v1.json"), "utf8"));
+  const id = randomUUID();
+  const keyBytes = webcrypto.getRandomValues(new Uint8Array(16));
+  const keyString = Buffer.from(keyBytes).toString("base64url");
+  plan.id = id;
+
+  const key = await webcrypto.subtle.importKey("jwk", {
+    k: keyString,
+    alg: "A128GCM",
+    ext: true,
+    key_ops: ["encrypt", "decrypt"],
+    kty: "oct",
+  }, { name: "AES-GCM" }, false, ["encrypt"]);
+  const encrypted = await webcrypto.subtle.encrypt(
+    { name: "AES-GCM", iv: new Uint8Array(12) },
+    key,
+    new TextEncoder().encode(JSON.stringify(plan)),
+  );
+  const response = await fetch(testUrl(`/api/${id}`), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ blob: Buffer.from(encrypted).toString("base64"), expectedRevision: 0 }),
+  });
+  if (!response.ok)
+    throw new Error(`Could not seed legacy plan: ${response.status}`);
+
+  return { id, keyString };
 }
 
 describe("plan-scoped routing", async () => {
@@ -263,6 +293,50 @@ describe("plan-scoped routing", async () => {
     await page.getByRole("heading", { name: "My duties" }).waitFor();
     await page.getByText("SG Menden (Sauerland) vs Gast").waitFor();
     await browser.close();
+  }, 90000);
+
+  it("migrates a legacy shared plan before schedule, claim, refresh, and cockpit use", async () => {
+    const { id, keyString } = await seedLegacyPlan();
+    const page = await createPage();
+    await page.context().addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
+    await page.goto(testUrl(`/plans/${id}#key=${keyString}`), { waitUntil: "domcontentloaded" });
+    await page.getByRole("heading", { name: "Migration Club" }).waitFor();
+    await page.locator("a[href*='/matches/match-1']").waitFor();
+
+    await page.goto(testUrl(`/plans/${id}/matches/match-1#key=${keyString}`), { waitUntil: "domcontentloaded" });
+    await page.getByRole("heading", { name: "Migration Team vs Visitors" }).waitFor();
+    await page.getByRole("button", { name: "Select member" }).click();
+    let picker = page.getByRole("dialog");
+    await picker.getByLabel("Member profile", { exact: true }).selectOption("ineligible");
+    await picker.getByRole("button", { name: "Continue claim" }).click();
+    await page.getByText("Could not claim duty", { exact: true }).waitFor();
+    expect(await page.getByText("Duty claimed", { exact: true }).count()).toBe(0);
+    expect(await page.getByText("Open", { exact: true }).count()).toBe(1);
+
+    await page.evaluate((planId) => {
+      const selected = JSON.parse(localStorage.getItem("gameday-selected-member") || "{}");
+      delete selected[planId];
+      localStorage.setItem("gameday-selected-member", JSON.stringify(selected));
+    }, id);
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await page.getByRole("heading", { name: "Migration Team vs Visitors" }).waitFor();
+    await page.getByRole("button", { name: "Select member" }).click();
+    picker = page.getByRole("dialog");
+    await picker.getByLabel("Member profile", { exact: true }).selectOption("eligible");
+    await picker.getByRole("button", { name: "Continue claim" }).click();
+    await page.getByText("Duty claimed", { exact: true }).waitFor({ timeout: 10000 });
+
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await page.getByRole("heading", { name: "Migration Team vs Visitors" }).waitFor();
+    expect(await page.getByText("Eligible Helper", { exact: true }).count()).toBeGreaterThan(0);
+    await page.getByRole("link", { name: "Open personal cockpit" }).click();
+    await page.getByRole("heading", { name: "My duties" }).waitFor();
+    await page.getByText("Migration Team vs Visitors").first().waitFor();
+    await page.getByText("Volunteer", { exact: true }).waitFor();
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await page.getByRole("heading", { name: "My duties" }).waitFor();
+    await page.getByText("Migration Team vs Visitors").first().waitFor();
+    await page.close();
   }, 90000);
 
   it("creates and edits teams and members through the roster page", async () => {

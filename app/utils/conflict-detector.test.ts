@@ -1,11 +1,12 @@
 import type { SeasonPlan } from "./plan-types";
 import { describe, expect, it } from "vitest";
 import { checkMemberConflict, getMatchConflicts } from "./conflict-detector";
+import { CURRENT_SCHEMA_VERSION } from "./plan-types";
 
 describe("schedule conflict detector", () => {
   const basePlan: SeasonPlan = {
     id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    schemaVersion: 1,
+    schemaVersion: CURRENT_SCHEMA_VERSION,
     rev: 1,
     season: "2025/2026",
     club: { id: "c1", name: "TSV Muster", contactEmail: "", homepage: "", lastUpdated: new Date() },
@@ -31,7 +32,7 @@ describe("schedule conflict detector", () => {
         homeTeamId: "team_damen1",
         awayTeamName: "Gast A",
         slots: [
-          { id: "slot_youth_tk", roleId: "timekeeper", assignedMemberId: "m_alex", updatedAt: new Date() },
+          { id: "slot_youth_tk", roleId: "timekeeper", assignedMemberId: "m_alex", assignmentStatus: "ASSIGNED", updatedAt: new Date() },
         ],
         updatedAt: new Date(),
       },
@@ -87,7 +88,7 @@ describe("schedule conflict detector", () => {
           homeTeamId: "team_damen1",
           awayTeamName: "Gast C",
           slots: [
-            { id: "slot_other_tk", roleId: "timekeeper", assignedMemberId: "m_neutral", updatedAt: new Date() },
+            { id: "slot_other_tk", roleId: "timekeeper", assignedMemberId: "m_neutral", assignmentStatus: "ASSIGNED", updatedAt: new Date() },
           ],
           updatedAt: new Date(),
         },

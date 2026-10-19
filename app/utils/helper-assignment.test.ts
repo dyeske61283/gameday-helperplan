@@ -1,11 +1,12 @@
 import type { SeasonPlan } from "./plan-types";
 import { describe, expect, it } from "vitest";
 import { autoAssignMatchDuties, completeClosedAssignments, getMemberDutyCounts, isMemberEligibleForSlot } from "./helper-assignment";
+import { CURRENT_SCHEMA_VERSION } from "./plan-types";
 
 describe("assign helpers to slots with restrictions and reducing assignment count average", () => {
   const createTestPlan = (): SeasonPlan => ({
     id: "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-    schemaVersion: 1,
+    schemaVersion: CURRENT_SCHEMA_VERSION,
     rev: 1,
     season: "2025/2026",
     club: { id: "c1", name: "TSV Muster", contactEmail: "", homepage: "", lastUpdated: new Date() },
@@ -74,9 +75,9 @@ describe("assign helpers to slots with restrictions and reducing assignment coun
         awayTeamName: "Guest Team",
         helperTeamId: "team_helper",
         slots: [
-          { id: "slot_ref", roleId: "referee", assignedMemberId: null, updatedAt: new Date() },
-          { id: "slot_tk", roleId: "timekeeper", assignedMemberId: null, updatedAt: new Date() },
-          { id: "slot_kiosk", roleId: "kiosk", assignedMemberId: null, updatedAt: new Date() },
+          { id: "slot_ref", roleId: "referee", assignedMemberId: null, assignmentStatus: "OPEN", updatedAt: new Date() },
+          { id: "slot_tk", roleId: "timekeeper", assignedMemberId: null, assignmentStatus: "OPEN", updatedAt: new Date() },
+          { id: "slot_kiosk", roleId: "kiosk", assignedMemberId: null, assignmentStatus: "OPEN", updatedAt: new Date() },
         ],
         updatedAt: new Date(),
       },
@@ -129,9 +130,9 @@ describe("assign helpers to slots with restrictions and reducing assignment coun
       homeTeamId: "team_other",
       awayTeamName: "Guest",
       slots: [
-        { id: "p1", roleId: "kiosk", assignedMemberId: "m_alice", updatedAt: new Date() },
-        { id: "p2", roleId: "kiosk", assignedMemberId: "m_alice", updatedAt: new Date() },
-        { id: "p3", roleId: "kiosk", assignedMemberId: "m_alice", updatedAt: new Date() },
+        { id: "p1", roleId: "kiosk", assignedMemberId: "m_alice", assignmentStatus: "ASSIGNED", updatedAt: new Date() },
+        { id: "p2", roleId: "kiosk", assignedMemberId: "m_alice", assignmentStatus: "ASSIGNED", updatedAt: new Date() },
+        { id: "p3", roleId: "kiosk", assignedMemberId: "m_alice", assignmentStatus: "ASSIGNED", updatedAt: new Date() },
       ],
       updatedAt: new Date(),
     };
@@ -139,7 +140,7 @@ describe("assign helpers to slots with restrictions and reducing assignment coun
     // Both Bob and Charlie could do kiosk, but Charlie has 0 duties and Alice has 3
     // For kiosk slot only:
     plan.matches.m_target!.slots = [
-      { id: "k1", roleId: "kiosk", assignedMemberId: null, updatedAt: new Date() },
+      { id: "k1", roleId: "kiosk", assignedMemberId: null, assignmentStatus: "OPEN", updatedAt: new Date() },
     ];
 
     autoAssignMatchDuties(plan, "m_target", { balanceDutyCounts: true });

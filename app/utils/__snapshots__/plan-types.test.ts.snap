@@ -1,0 +1,555 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`SeasonPlan schema > records the plan schema shape so model changes require an explicit snapshot update 1`] = `
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "club": {
+      "properties": {
+        "contactEmail": {
+          "anyOf": [
+            {
+              "format": "email",
+              "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+              "type": "string",
+            },
+            {
+              "const": "",
+              "type": "string",
+            },
+          ],
+        },
+        "homepage": {
+          "anyOf": [
+            {
+              "format": "uri",
+              "type": "string",
+            },
+            {
+              "const": "",
+              "type": "string",
+            },
+          ],
+        },
+        "id": {
+          "type": "string",
+        },
+        "lastUpdated": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "maximum": 9007199254740991,
+              "type": "integer",
+            },
+            {
+              "format": "date-time",
+              "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+              "type": "string",
+            },
+          ],
+        },
+        "name": {
+          "type": "string",
+        },
+      },
+      "required": [
+        "id",
+        "name",
+        "contactEmail",
+        "homepage",
+        "lastUpdated",
+      ],
+      "type": "object",
+    },
+    "config": {
+      "properties": {
+        "locations": {
+          "items": {
+            "properties": {
+              "id": {
+                "type": "string",
+              },
+              "link": {
+                "format": "uri",
+                "type": "string",
+              },
+              "name": {
+                "type": "string",
+              },
+              "note": {
+                "type": "string",
+              },
+            },
+            "required": [
+              "id",
+              "name",
+            ],
+            "type": "object",
+          },
+          "type": "array",
+        },
+        "roles": {
+          "items": {
+            "properties": {
+              "icon": {
+                "type": "string",
+              },
+              "id": {
+                "type": "string",
+              },
+              "name": {
+                "type": "string",
+              },
+              "requiredSkillId": {
+                "type": "string",
+              },
+              "scope": {
+                "enum": [
+                  "gameday",
+                  "match",
+                ],
+                "type": "string",
+              },
+            },
+            "required": [
+              "id",
+              "name",
+              "scope",
+            ],
+            "type": "object",
+          },
+          "type": "array",
+        },
+      },
+      "required": [
+        "roles",
+        "locations",
+      ],
+      "type": "object",
+    },
+    "gamedays": {
+      "additionalProperties": {
+        "properties": {
+          "closingTime": {
+            "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?$",
+            "type": "string",
+          },
+          "date": {
+            "format": "date",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
+            "type": "string",
+          },
+          "id": {
+            "type": "string",
+          },
+          "locationId": {
+            "type": "string",
+          },
+          "matchIds": {
+            "items": {
+              "type": "string",
+            },
+            "type": "array",
+          },
+          "notes": {
+            "type": "string",
+          },
+          "openingTime": {
+            "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?$",
+            "type": "string",
+          },
+          "slots": {
+            "items": {
+              "properties": {
+                "assignedMemberId": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                },
+                "assignmentStatus": {
+                  "enum": [
+                    "OPEN",
+                    "ASSIGNED",
+                    "COMPLETED",
+                    "CANCELLED",
+                  ],
+                  "type": "string",
+                },
+                "checkedIn": {
+                  "type": "boolean",
+                },
+                "customHelperName": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                },
+                "id": {
+                  "type": "string",
+                },
+                "roleId": {
+                  "type": "string",
+                },
+                "updatedAt": {
+                  "anyOf": [
+                    {
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991,
+                      "type": "integer",
+                    },
+                    {
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                      "type": "string",
+                    },
+                  ],
+                },
+              },
+              "required": [
+                "id",
+                "roleId",
+                "assignedMemberId",
+                "assignmentStatus",
+                "updatedAt",
+              ],
+              "type": "object",
+            },
+            "type": "array",
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991,
+                "type": "integer",
+              },
+              {
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                "type": "string",
+              },
+            ],
+          },
+        },
+        "required": [
+          "id",
+          "date",
+          "locationId",
+          "matchIds",
+          "slots",
+          "updatedAt",
+        ],
+        "type": "object",
+      },
+      "propertyNames": {
+        "type": "string",
+      },
+      "type": "object",
+    },
+    "id": {
+      "format": "uuid",
+      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
+      "type": "string",
+    },
+    "lastUpdated": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991,
+          "type": "integer",
+        },
+        {
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+          "type": "string",
+        },
+      ],
+    },
+    "matches": {
+      "additionalProperties": {
+        "properties": {
+          "awayTeamName": {
+            "type": "string",
+          },
+          "helperTeamId": {
+            "type": "string",
+          },
+          "homeTeamId": {
+            "type": "string",
+          },
+          "id": {
+            "type": "string",
+          },
+          "slots": {
+            "items": {
+              "properties": {
+                "assignedMemberId": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                },
+                "assignmentStatus": {
+                  "enum": [
+                    "OPEN",
+                    "ASSIGNED",
+                    "COMPLETED",
+                    "CANCELLED",
+                  ],
+                  "type": "string",
+                },
+                "checkedIn": {
+                  "type": "boolean",
+                },
+                "customHelperName": {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                    },
+                    {
+                      "type": "null",
+                    },
+                  ],
+                },
+                "id": {
+                  "type": "string",
+                },
+                "roleId": {
+                  "type": "string",
+                },
+                "updatedAt": {
+                  "anyOf": [
+                    {
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991,
+                      "type": "integer",
+                    },
+                    {
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                      "type": "string",
+                    },
+                  ],
+                },
+              },
+              "required": [
+                "id",
+                "roleId",
+                "assignedMemberId",
+                "assignmentStatus",
+                "updatedAt",
+              ],
+              "type": "object",
+            },
+            "type": "array",
+          },
+          "time": {
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+            "type": "string",
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991,
+                "type": "integer",
+              },
+              {
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                "type": "string",
+              },
+            ],
+          },
+        },
+        "required": [
+          "id",
+          "time",
+          "homeTeamId",
+          "awayTeamName",
+          "slots",
+          "updatedAt",
+        ],
+        "type": "object",
+      },
+      "propertyNames": {
+        "type": "string",
+      },
+      "type": "object",
+    },
+    "members": {
+      "additionalProperties": {
+        "properties": {
+          "id": {
+            "type": "string",
+          },
+          "isManual": {
+            "type": "boolean",
+          },
+          "name": {
+            "type": "string",
+          },
+          "skillIds": {
+            "items": {
+              "type": "string",
+            },
+            "type": "array",
+          },
+          "teamIds": {
+            "items": {
+              "type": "string",
+            },
+            "type": "array",
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991,
+                "type": "integer",
+              },
+              {
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                "type": "string",
+              },
+            ],
+          },
+        },
+        "required": [
+          "id",
+          "name",
+          "teamIds",
+          "skillIds",
+          "isManual",
+          "updatedAt",
+        ],
+        "type": "object",
+      },
+      "propertyNames": {
+        "type": "string",
+      },
+      "type": "object",
+    },
+    "rev": {
+      "exclusiveMinimum": 0,
+      "type": "number",
+    },
+    "schemaVersion": {
+      "const": 2,
+      "type": "number",
+    },
+    "season": {
+      "type": "string",
+    },
+    "skills": {
+      "additionalProperties": {
+        "properties": {
+          "id": {
+            "type": "string",
+          },
+          "name": {
+            "type": "string",
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991,
+                "type": "integer",
+              },
+              {
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                "type": "string",
+              },
+            ],
+          },
+        },
+        "required": [
+          "id",
+          "name",
+          "updatedAt",
+        ],
+        "type": "object",
+      },
+      "propertyNames": {
+        "type": "string",
+      },
+      "type": "object",
+    },
+    "teams": {
+      "additionalProperties": {
+        "properties": {
+          "id": {
+            "type": "string",
+          },
+          "isManual": {
+            "type": "boolean",
+          },
+          "league": {
+            "type": "string",
+          },
+          "name": {
+            "type": "string",
+          },
+          "updatedAt": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0,
+                "maximum": 9007199254740991,
+                "type": "integer",
+              },
+              {
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$",
+                "type": "string",
+              },
+            ],
+          },
+        },
+        "required": [
+          "id",
+          "name",
+          "isManual",
+          "updatedAt",
+        ],
+        "type": "object",
+      },
+      "propertyNames": {
+        "type": "string",
+      },
+      "type": "object",
+    },
+  },
+  "required": [
+    "id",
+    "schemaVersion",
+    "rev",
+    "lastUpdated",
+    "club",
+    "season",
+    "members",
+    "teams",
+    "skills",
+    "gamedays",
+    "matches",
+    "config",
+  ],
+  "type": "object",
+}
+`;

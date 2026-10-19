@@ -1,8 +1,9 @@
 import { createPinia, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { toRaw } from "vue";
-import { NewPlanMetadataSchema } from "../utils/plan-types";
-import { migrateIfNeeded, usePlanStore } from "./plan.ts";
+import legacyPlan from "../../test/fixtures/legacy-plan-v1.json";
+import { CURRENT_SCHEMA_VERSION, NewPlanMetadataSchema } from "../utils/plan-types";
+import { usePlanStore } from "./plan.ts";
 
 // Mock dependencies
 vi.mock("../composables/use-crypto", () => ({
@@ -71,16 +72,35 @@ describe("usePlanStore", () => {
       return { blob: savedBlob, revision: savedRevision };
     }));
     const store = usePlanStore();
-    store.createNewPlan("test-plan-id", "test-key", { clubName: "Original", season: "2026/2027" });
+    store.createNewPlan("f530083d-8c74-4f10-931a-dd877ee7b52c", "test-key", { clubName: "Original", season: "2026/2027" });
     const draft = structuredClone(toRaw(store.plan!));
     draft.club.name = "Edited";
 
     await expect(store.savePlan(draft)).resolves.toBe(true);
     expect(store.plan).not.toBeNull();
     expect(store.plan!.club.name).toBe("Edited");
-    await store.loadPlan("test-plan-id", "test-key");
+    await store.loadPlan("f530083d-8c74-4f10-931a-dd877ee7b52c", "test-key");
 
     expect(store.plan?.club.name).toBe("Edited");
+    vi.unstubAllGlobals();
+  });
+
+  it("migrates and validates a legacy plan before publishing it from a shared-link load", async () => {
+    vi.stubGlobal("$fetch", vi.fn().mockResolvedValue({ blob: JSON.stringify(legacyPlan), revision: 4 }));
+    const store = usePlanStore();
+
+    await store.loadPlan(legacyPlan.id, "test-key");
+
+    expect(store.plan?.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
+    expect(store.matches["match-1"]?.slots[0]?.assignmentStatus).toBe("OPEN");
+    expect(store.gamedays["gameday-1"]?.slots[0]?.assignmentStatus).toBe("ASSIGNED");
+    let expectedRevision: number | undefined;
+    vi.stubGlobal("$fetch", vi.fn(async (_url: string, options?: { body?: { expectedRevision: number } }) => {
+      expectedRevision = options?.body?.expectedRevision;
+      return { revision: 5 };
+    }));
+    await store.savePlan();
+    expect(expectedRevision).toBe(4);
     vi.unstubAllGlobals();
   });
 
@@ -115,7 +135,7 @@ describe("usePlanStore", () => {
       }
     });
     const store = usePlanStore();
-    store.createNewPlan("test-plan-id", "test-key", { clubName: "Original", season: "2026/2027" });
+    store.createNewPlan("f530083d-8c74-4f10-931a-dd877ee7b52c", "test-key", { clubName: "Original", season: "2026/2027" });
     store.setEditing(true);
     store.watchPlan();
 
@@ -138,6 +158,34 @@ describe("usePlanStore", () => {
     vi.unstubAllGlobals();
   });
 
+  it("uses the same migration boundary for legacy SSE updates", async () => {
+    let source: { onmessage?: (event: MessageEvent) => Promise<void>; close: () => void } | undefined;
+    vi.stubGlobal("EventSource", class {
+      constructor() {
+        return source = { onmessage: undefined, close() {} };
+      }
+    });
+    const store = usePlanStore();
+    store.createNewPlan(legacyPlan.id, "test-key");
+    store.watchPlan();
+    const remotePlan = structuredClone(legacyPlan);
+    remotePlan.rev = 2;
+
+    await source?.onmessage?.({ data: JSON.stringify({ blob: JSON.stringify(remotePlan), revision: 3 }) } as MessageEvent);
+
+    expect(store.plan?.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
+    expect(store.matches["match-1"]?.slots.map(slot => slot.assignmentStatus)).toEqual(["OPEN", "ASSIGNED"]);
+    let expectedRevision: number | undefined;
+    vi.stubGlobal("$fetch", vi.fn(async (_url: string, options?: { body?: { expectedRevision: number } }) => {
+      expectedRevision = options?.body?.expectedRevision;
+      return { revision: 4 };
+    }));
+    await store.savePlan();
+    expect(expectedRevision).toBe(3);
+    store.stopWatching();
+    vi.unstubAllGlobals();
+  });
+
   it("keeps the default gameday role scope when configuring new-plan role names", () => {
     const store = usePlanStore();
     store.createNewPlan("plan-id", "plan-key");
@@ -145,50 +193,6 @@ describe("usePlanStore", () => {
     store.configureRoles(["Timekeeper", "Scorekeeper", "Floor Manager"], ["gameday", "match", "match"]);
 
     expect(store.roles.map(role => role.scope)).toEqual(["gameday", "match", "match"]);
-  });
-
-  describe("migrateIfNeeded", () => {
-    it("should migrate an old plan to the current version", () => {
-      const oldPlan = {
-        id: "old-id",
-        schemaVersion: 0,
-        club: { id: "1", name: "Old Club" },
-        teams: {},
-        matches: {
-          m1: {
-            id: "m1",
-            homeTeam: "A",
-            awayTeam: "B",
-            slots: [
-              { id: "open", assignedMemberId: null },
-              { id: "assigned", assignedMemberId: "member-1" },
-            ],
-          },
-        },
-      };
-
-      const migratedPlan = migrateIfNeeded(oldPlan as any);
-
-      expect(migratedPlan.schemaVersion).toBe(2);
-      expect(migratedPlan.matches.m1?.slots).toBeDefined();
-      expect(Array.isArray(migratedPlan.matches.m1?.slots)).toBe(true);
-      expect(migratedPlan.matches.m1?.slots[0]?.assignmentStatus).toBe("OPEN");
-      expect(migratedPlan.matches.m1?.slots[1]?.assignmentStatus).toBe("ASSIGNED");
-    });
-
-    it("migrates both match and gameday slot assignment status", () => {
-      const oldPlan = {
-        schemaVersion: 1,
-        matches: { m1: { slots: [{ assignedMemberId: null }] } },
-        gamedays: { g1: { slots: [{ assignedMemberId: "member-1" }] } },
-      };
-
-      const migratedPlan = migrateIfNeeded(oldPlan as any);
-
-      expect(migratedPlan.schemaVersion).toBe(2);
-      expect(migratedPlan.matches.m1?.slots[0]?.assignmentStatus).toBe("OPEN");
-      expect(migratedPlan.gamedays.g1?.slots[0]?.assignmentStatus).toBe("ASSIGNED");
-    });
   });
 
   describe("example plan loading", () => {
@@ -294,6 +298,7 @@ describe("usePlanStore", () => {
             id: "slot-1",
             roleId: "timekeeper",
             assignedMemberId: null,
+            assignmentStatus: "OPEN",
             updatedAt: new Date(0),
           },
         ],
@@ -320,6 +325,7 @@ describe("usePlanStore", () => {
             id: "slot-1",
             roleId: "timekeeper",
             assignedMemberId: "mem-1",
+            assignmentStatus: "ASSIGNED",
             checkedIn: false,
             updatedAt: new Date(0),
           },
@@ -348,6 +354,7 @@ describe("usePlanStore", () => {
             id: "slot-1",
             roleId: "timekeeper",
             assignedMemberId: "mem-1",
+            assignmentStatus: "ASSIGNED",
             customHelperName: "Guest",
             checkedIn: true,
             updatedAt: new Date(0),
@@ -390,6 +397,7 @@ describe("usePlanStore", () => {
             id: "slot-1",
             roleId: "timekeeper",
             assignedMemberId: null,
+            assignmentStatus: "OPEN",
             updatedAt: new Date(0),
           },
         ],
@@ -476,7 +484,7 @@ describe("usePlanStore", () => {
       }));
 
       const store = usePlanStore();
-      store.createNewPlan("test-plan-id", "test-key");
+      store.createNewPlan("f530083d-8c74-4f10-931a-dd877ee7b52c", "test-key");
       const member = store.addMember({ name: "Capable Helper", skillIds: ["referee"] })!;
       store.plan!.config.roles.push({ id: "referee-duty", name: "Referee", scope: "match", requiredSkillId: "referee" });
       store.plan!.matches.m1 = {
@@ -491,7 +499,7 @@ describe("usePlanStore", () => {
       store.claimSlot("m1", "slot-1", member.id);
       await store.savePlan();
       store.plan = null;
-      await store.loadPlan("test-plan-id", "test-key");
+      await store.loadPlan("f530083d-8c74-4f10-931a-dd877ee7b52c", "test-key");
 
       expect(store.plan).not.toBeNull();
       const loadedPlan = store.plan!;

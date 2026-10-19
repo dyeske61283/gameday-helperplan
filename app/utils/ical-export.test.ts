@@ -2,6 +2,7 @@ import type { SeasonPlan } from "./plan-types";
 import { describe, expect, it } from "vitest";
 import examplePlan from "../../test/fixtures/plan-2025-2026.json";
 import { generateICS, generateMemberICal } from "./ical-export";
+import { CURRENT_SCHEMA_VERSION } from "./plan-types";
 
 describe("iCal Calendar Export", () => {
   it("should generate a valid empty VCALENDAR", () => {
@@ -40,7 +41,7 @@ describe("iCal Calendar Export", () => {
   it("should export gameday-level slots assigned to a member", () => {
     const plan: SeasonPlan = {
       id: "test-plan",
-      schemaVersion: 1,
+      schemaVersion: CURRENT_SCHEMA_VERSION,
       rev: 1,
       season: "2025/2026",
       club: { id: "c1", name: "TSV Muster", contactEmail: "", homepage: "", lastUpdated: new Date() },
@@ -64,7 +65,7 @@ describe("iCal Calendar Export", () => {
           openingTime: "12:00",
           closingTime: "19:00",
           slots: [
-            { id: "slot_gd1", roleId: "hall_open", assignedMemberId: "m1", updatedAt: new Date() },
+            { id: "slot_gd1", roleId: "hall_open", assignedMemberId: "m1", assignmentStatus: "ASSIGNED", updatedAt: new Date() },
           ],
           updatedAt: new Date(),
         },

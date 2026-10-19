@@ -18,6 +18,8 @@ jobs:
         with:
           node-version: lts/*
       - run: pnpm install
+      - name: Validate plan schema and migrations
+        run: pnpm test:plan-schema
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps chromium
 
