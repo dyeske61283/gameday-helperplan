@@ -46,6 +46,8 @@ export default eventHandler(async (event) => {
     return Response.json({ error: "Plan not found" }, { status: 404 });
   }
 
+  plan.revision ??= 0;
+
   if (getHeader(event, "accept") === "text/event-stream") {
     let unwatch: Awaited<ReturnType<typeof storage.watch>> | undefined;
     let isClosed = false;
@@ -85,7 +87,7 @@ export default eventHandler(async (event) => {
     });
 
     if (plan) {
-      eventStream.push(plan.blob);
+      eventStream.push(JSON.stringify({ blob: plan.blob, revision: plan.revision }));
     }
 
     try {
@@ -106,7 +108,8 @@ export default eventHandler(async (event) => {
               await closeEventStream();
               return;
             }
-            await eventStream.push((await hydrateChunks(latestPlan, id)).blob);
+            const hydratedPlan = await hydrateChunks(latestPlan, id);
+            await eventStream.push(JSON.stringify({ blob: hydratedPlan.blob, revision: hydratedPlan.revision ?? 0 }));
           }
           catch (error) {
             console.error("Failed to push update to event stream", error);

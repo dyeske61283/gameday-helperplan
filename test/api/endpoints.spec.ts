@@ -17,14 +17,14 @@ describe("api endpoints", async () => {
   it("post /api/[id] stores a plan", async () => {
     const res = await $fetch(`/api/${validId}`, {
       method: "POST",
-      body: { blob: "test-plan-content" },
+      body: { blob: "test-plan-content", expectedRevision: 0 },
     });
-    expect(res).toEqual({ blob: "test-plan-content" });
+    expect(res).toEqual({ blob: "test-plan-content", revision: 1 });
   });
 
   it("gET /api/[id] should retrieve a stored plan", async () => {
     const res = await $fetch(`/api/${validId}`);
-    expect(res).toMatchObject({ blob: "test-plan-content", meta: {} });
+    expect(res).toMatchObject({ blob: "test-plan-content", meta: {}, revision: 1 });
   });
 
   it.each([
@@ -34,10 +34,30 @@ describe("api endpoints", async () => {
   ])("stores and retrieves blobs %s", async (_label, size) => {
     const planId = globalThis.crypto.randomUUID();
     const blob = "x".repeat(size);
-    await $fetch(`/api/${planId}`, { method: "POST", body: { blob } });
+    await $fetch(`/api/${planId}`, { method: "POST", body: { blob, expectedRevision: 0 } });
 
     const res = await $fetch(`/api/${planId}`);
     expect(res.blob).toBe(blob);
+  });
+
+  it("serializes concurrent writes and rejects the stale encrypted blob", async () => {
+    const planId = globalThis.crypto.randomUUID();
+    const initial = await $fetch<{ revision: number }>(`/api/${planId}`, {
+      method: "POST",
+      body: { blob: "opaque-initial-ciphertext", expectedRevision: 0 },
+    });
+    const candidates = ["opaque-encrypted-payload-a", "opaque-encrypted-payload-b"];
+    const responses = await Promise.all(candidates.map(blob => fetch(`/api/${planId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ blob, expectedRevision: initial.revision }),
+    })));
+
+    expect(responses.map(response => response.status).sort()).toEqual([200, 409]);
+    const winnerIndex = responses.findIndex(response => response.ok);
+    const stored = await $fetch<{ blob: string; revision: number }>(`/api/${planId}`);
+    expect(stored.blob).toBe(candidates[winnerIndex]);
+    expect(stored.revision).toBe(initial.revision + 1);
   });
 
   it("get /api/[id] returns 404 for non-existent plan", async () => {
@@ -55,7 +75,7 @@ describe("api endpoints", async () => {
     try {
       await $fetch(`/api/${invalidId}`, {
         method: "POST",
-        body: { blob: "some-content" },
+        body: { blob: "some-content", expectedRevision: 0 },
       });
       expect(true, "Should have thrown a validation error").toBe(false);
     }
@@ -103,9 +123,9 @@ describe("create-save-edit-save workflow", async () => {
 
     const res = await $fetch(`/api/${planId}`, {
       method: "POST",
-      body: { blob: encryptedInitialPlan },
+      body: { blob: encryptedInitialPlan, expectedRevision: 0 },
     });
-    expect(res).toEqual({ blob: encryptedInitialPlan });
+    expect(res).toEqual({ blob: encryptedInitialPlan, revision: 1 });
 
     const retrievedInitialBlob = await fetch(`/api/${planId}`);
     const plan = await retrievedInitialBlob.json();
@@ -117,7 +137,7 @@ describe("create-save-edit-save workflow", async () => {
 
     await $fetch(`/api/${planId}`, {
       method: "POST",
-      body: { blob: String(encryptedEditedPlan) },
+      body: { blob: String(encryptedEditedPlan), expectedRevision: 1 },
     });
 
     const retrievedEditedBlob = await fetch(`/api/${planId}`);

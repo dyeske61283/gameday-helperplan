@@ -2,6 +2,7 @@ export type StoredPlan = {
   blob: string;
   modifiedAt: number;
   meta: object;
+  revision?: number;
   chunkCount?: number;
 };
 
