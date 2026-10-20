@@ -10,9 +10,9 @@ await setup({
 });
 
 describe("api endpoints", async () => {
-  const validId = "81b7a0e7-3f61-43af-9f9c-6808cc56956f";
+  const validId = globalThis.crypto.randomUUID();
   const invalidId = "too-short";
-  const nonExistentId = "52772524-e45e-48a2-b97e-697003a4b797";
+  const nonExistentId = globalThis.crypto.randomUUID();
 
   it("post /api/[id] stores a plan", async () => {
     const res = await $fetch(`/api/${validId}`, {
