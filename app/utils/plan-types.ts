@@ -10,7 +10,7 @@ const serializedDateToDateSchema: ZodType<Date, number | string> = z.union([
 ]).transform(value => new Date(value));
 const isoDateTimeStringToDateSchema: ZodType<Date, string> = z.iso.datetime().transform(millis => new Date(millis));
 
-export const ClubSchema = z.object({
+export const ClubSchema = z.strictObject({
   id: z.string(),
   name: z.string(),
   contactEmail: z.email().or(z.literal("")),
@@ -20,7 +20,7 @@ export const ClubSchema = z.object({
 
 export type Club = z.infer<typeof ClubSchema>;
 
-export const RoleSchema = z.object({
+export const RoleSchema = z.strictObject({
   id: z.string(),
   name: z.string(),
   icon: z.string().optional(),
@@ -30,7 +30,7 @@ export const RoleSchema = z.object({
 
 export type Role = z.infer<typeof RoleSchema>;
 
-export const LocationSchema = z.object({
+export const LocationSchema = z.strictObject({
   id: z.string(),
   name: z.string(),
   link: z.url().optional(), // e.g., Google Maps link
@@ -39,7 +39,7 @@ export const LocationSchema = z.object({
 
 export type Location = z.infer<typeof LocationSchema>;
 
-export const ConfigSchema = z.object({
+export const ConfigSchema = z.strictObject({
   roles: z.array(RoleSchema),
   locations: z.array(LocationSchema),
 });
@@ -49,7 +49,7 @@ export type Config = z.infer<typeof ConfigSchema>;
 export const AssignmentStatusSchema = z.enum(["OPEN", "ASSIGNED", "COMPLETED", "CANCELLED"]);
 export type AssignmentStatus = z.infer<typeof AssignmentStatusSchema>;
 
-export const SlotSchema = z.object({
+export const SlotSchema = z.strictObject({
   id: z.string(), // Unique ID for the slot itself
   roleId: z.string(),
   assignedMemberId: z.string().nullable(),
@@ -61,7 +61,7 @@ export const SlotSchema = z.object({
 
 export type Slot = z.infer<typeof SlotSchema>;
 
-export const GamedaySchema = z.object({
+export const GamedaySchema = z.strictObject({
   id: z.string(),
   date: z.iso.date(),
   locationId: z.string(),
@@ -75,7 +75,7 @@ export const GamedaySchema = z.object({
 
 export type Gameday = z.infer<typeof GamedaySchema>;
 
-export const MatchSchema = z.object({
+export const MatchSchema = z.strictObject({
   id: z.string(),
   time: isoDateTimeStringToDateSchema,
   homeTeamId: z.string(),
@@ -87,7 +87,7 @@ export const MatchSchema = z.object({
 
 export type Match = z.infer<typeof MatchSchema>;
 
-export const MemberSchema = z.object({
+export const MemberSchema = z.strictObject({
   id: z.string(),
   name: z.string(),
   teamIds: z.array(z.string()),
@@ -98,7 +98,7 @@ export const MemberSchema = z.object({
 
 export type Member = z.infer<typeof MemberSchema>;
 
-export const TeamSchema = z.object({
+export const TeamSchema = z.strictObject({
   id: z.string(),
   name: z.string(),
   league: z.string().optional(),
@@ -108,7 +108,7 @@ export const TeamSchema = z.object({
 
 export type Team = z.infer<typeof TeamSchema>;
 
-export const SkillSchema = z.object({
+export const SkillSchema = z.strictObject({
   id: z.string(),
   name: z.string(),
   updatedAt: serializedDateToDateSchema,
@@ -116,7 +116,7 @@ export const SkillSchema = z.object({
 
 export type Skill = z.infer<typeof SkillSchema>;
 
-export const SeasonPlanSchema = z.object({
+export const SeasonPlanSchema = z.strictObject({
   id: z.uuid(),
   schemaVersion: z.literal(CURRENT_SCHEMA_VERSION),
   rev: z.number().positive(),

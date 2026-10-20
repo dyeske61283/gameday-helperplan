@@ -65,6 +65,14 @@ describe("season plan schema", () => {
     expect(() => parseSeasonPlan(invalidCurrent)).toThrow();
   });
 
+  it("rejects unknown current-plan fields instead of silently discarding them", () => {
+    const current = JSON.parse(JSON.stringify(parseSeasonPlan(legacyPlan)));
+    current.matches["match-1"].unmodeledData = "keep or reject, never drop";
+
+    expect(() => parseSeasonPlan(current)).toThrow();
+    expect(current.matches["match-1"].unmodeledData).toBe("keep or reject, never drop");
+  });
+
   it("records the plan schema shape so model changes require an explicit snapshot update", () => {
     expect(SeasonPlanSchema.toJSONSchema({ io: "input" })).toMatchSnapshot();
   });

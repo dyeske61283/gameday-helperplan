@@ -3,8 +3,10 @@
 exports[`season plan schema > records the plan schema shape so model changes require an explicit snapshot update 1`] = `
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
   "properties": {
     "club": {
+      "additionalProperties": false,
       "properties": {
         "contactEmail": {
           "anyOf": [
@@ -62,9 +64,11 @@ exports[`season plan schema > records the plan schema shape so model changes req
       "type": "object",
     },
     "config": {
+      "additionalProperties": false,
       "properties": {
         "locations": {
           "items": {
+            "additionalProperties": false,
             "properties": {
               "id": {
                 "type": "string",
@@ -90,6 +94,7 @@ exports[`season plan schema > records the plan schema shape so model changes req
         },
         "roles": {
           "items": {
+            "additionalProperties": false,
             "properties": {
               "icon": {
                 "type": "string",
@@ -129,6 +134,7 @@ exports[`season plan schema > records the plan schema shape so model changes req
     },
     "gamedays": {
       "additionalProperties": {
+        "additionalProperties": false,
         "properties": {
           "closingTime": {
             "pattern": "^(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?$",
@@ -160,6 +166,7 @@ exports[`season plan schema > records the plan schema shape so model changes req
           },
           "slots": {
             "items": {
+              "additionalProperties": false,
               "properties": {
                 "assignedMemberId": {
                   "anyOf": [
@@ -276,6 +283,7 @@ exports[`season plan schema > records the plan schema shape so model changes req
     },
     "matches": {
       "additionalProperties": {
+        "additionalProperties": false,
         "properties": {
           "awayTeamName": {
             "type": "string",
@@ -291,6 +299,7 @@ exports[`season plan schema > records the plan schema shape so model changes req
           },
           "slots": {
             "items": {
+              "additionalProperties": false,
               "properties": {
                 "assignedMemberId": {
                   "anyOf": [
@@ -393,6 +402,7 @@ exports[`season plan schema > records the plan schema shape so model changes req
     },
     "members": {
       "additionalProperties": {
+        "additionalProperties": false,
         "properties": {
           "id": {
             "type": "string",
@@ -458,6 +468,7 @@ exports[`season plan schema > records the plan schema shape so model changes req
     },
     "skills": {
       "additionalProperties": {
+        "additionalProperties": false,
         "properties": {
           "id": {
             "type": "string",
@@ -494,6 +505,7 @@ exports[`season plan schema > records the plan schema shape so model changes req
     },
     "teams": {
       "additionalProperties": {
+        "additionalProperties": false,
         "properties": {
           "id": {
             "type": "string",
