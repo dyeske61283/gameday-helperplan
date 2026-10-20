@@ -2,7 +2,7 @@ import type { SeasonPlan } from "../../app/utils/plan-types";
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { SeasonPlanSchema } from "../../app/utils/plan-types";
+import { parseSeasonPlan } from "../../app/utils/plan-types";
 
 const FIXTURES_DIR = path.join(import.meta.dirname, "../fixtures");
 
@@ -23,7 +23,7 @@ describe("example plans validation", () => {
     expect(fs.existsSync(planPath)).toBe(true);
 
     const rawPlan = JSON.parse(fs.readFileSync(planPath, "utf8"));
-    const plan = SeasonPlanSchema.parse(rawPlan);
+    const plan = parseSeasonPlan(rawPlan);
     expectSeededDutyDefaults(plan);
 
     // Specific structural checks
@@ -48,7 +48,7 @@ describe("example plans validation", () => {
     expect(fs.existsSync(planPath)).toBe(true);
 
     const rawPlan = JSON.parse(fs.readFileSync(planPath, "utf8"));
-    const plan = SeasonPlanSchema.parse(rawPlan);
+    const plan = parseSeasonPlan(rawPlan);
     expectSeededDutyDefaults(plan);
 
     // Specific structural checks
