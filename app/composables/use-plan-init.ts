@@ -25,16 +25,18 @@ export function usePlanInit() {
     const queryId = (route.params.planId as string | undefined) || (route.query.planId as string | undefined);
     const keyFromStore = planStore.key;
     let storedResume = planStore.resumeState;
-    if (!storedResume && typeof globalThis.localStorage?.getItem === "function") {
+    if ((!storedResume?.key || (queryId && storedResume.id !== queryId)) && typeof window !== "undefined" && typeof window.localStorage?.getItem === "function") {
       try {
-        const serialized = globalThis.localStorage.getItem(PLAN_RESUME_KEY);
-        storedResume = serialized ? JSON.parse(serialized) as { id: string; key: string } : null;
+        const serialized = window.localStorage.getItem(PLAN_RESUME_KEY);
+        const localResume = serialized ? JSON.parse(serialized) as { id: string; key: string } : null;
+        if (localResume?.id && localResume.key && (!queryId || localResume.id === queryId))
+          storedResume = localResume;
       }
       catch {
-        storedResume = null;
+        if (!storedResume?.key)
+          storedResume = null;
       }
     }
-
     if (queryId && keyFromStore) {
       // Coming from a fresh shared link – load from server
       if (!planStore.plan || planStore.plan.id !== queryId) {

@@ -7,7 +7,7 @@ import type {
   Team,
 } from "../utils/plan-types";
 import { useLocalStorage } from "@vueuse/core";
-import { defineStore } from "pinia";
+import { defineStore, skipHydrate } from "pinia";
 import { computed, ref, toRaw } from "vue";
 import examplePlan from "../../test/fixtures/plan-2025-2026.json";
 import { useDecryption, useEncryption } from "../composables/use-crypto";
@@ -31,7 +31,7 @@ export const usePlanStore = defineStore("plan", () => {
   const eventSource = ref<EventSource | null>(null);
   let completionTimer: ReturnType<typeof setInterval> | undefined;
 
-  const resumeState = useLocalStorage<{ id: string; key: string } | null>(PLAN_RESUME_KEY, null, {
+  const resumeState = skipHydrate(useLocalStorage<{ id: string; key: string } | null>(PLAN_RESUME_KEY, null, {
     serializer: {
       read: (value) => {
         try {
@@ -43,7 +43,7 @@ export const usePlanStore = defineStore("plan", () => {
       },
       write: value => JSON.stringify(value),
     },
-  });
+  }));
   const selectedMembers = useLocalStorage<Record<string, string>>(MEMBER_KEY, {});
   const selectedMemberId = computed<string | null>({
     get: () => plan.value ? selectedMembers.value[plan.value.id] ?? null : null,

@@ -326,6 +326,7 @@ describe("plan-scoped routing", async () => {
     await picker.getByRole("button", { name: "Continue claim" }).click();
     await page.getByText("Duty claimed", { exact: true }).waitFor({ timeout: 10000 });
 
+    await page.evaluate(() => history.replaceState(null, "", location.pathname + location.search));
     await page.reload({ waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "Migration Team vs Visitors" }).waitFor();
     expect(await page.getByText("Eligible Helper", { exact: true }).count()).toBeGreaterThan(0);
@@ -336,6 +337,10 @@ describe("plan-scoped routing", async () => {
     await page.reload({ waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "My duties" }).waitFor();
     await page.getByText("Migration Team vs Visitors").first().waitFor();
+
+    await page.goto(testUrl("/"), { waitUntil: "domcontentloaded" });
+    await page.getByRole("link", { name: "Resume plan" }).click();
+    await page.getByRole("heading", { name: "Migration Club" }).waitFor();
     await page.close();
   }, 90000);
 

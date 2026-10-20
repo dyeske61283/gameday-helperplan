@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`SeasonPlan schema > records the plan schema shape so model changes require an explicit snapshot update 1`] = `
+exports[`season plan schema > records the plan schema shape so model changes require an explicit snapshot update 1`] = `
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "properties": {
