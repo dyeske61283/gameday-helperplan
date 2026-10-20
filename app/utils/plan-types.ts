@@ -138,10 +138,10 @@ const PlanVersionSchema = z.object({ schemaVersion: z.number().int() }).passthro
 type PlanRecord = Record<string, unknown>;
 
 /**
- * v1 -> v2: add explicit duty status from legacy occupancy and default missing
- * match/gameday slot arrays to empty arrays.
+ * v0/v1 -> v2: add explicit duty status from legacy occupancy and default
+ * missing match/gameday slot arrays to empty arrays.
  */
-function migrateV1ToV2(input: PlanRecord): PlanRecord {
+function migratePreV2ToV2(input: PlanRecord): PlanRecord {
   const plan = structuredClone(input);
 
   for (const collection of [plan.matches, plan.gamedays]) {
@@ -176,8 +176,8 @@ export function parseSeasonPlan(input: unknown): SeasonPlan {
   const { schemaVersion } = PlanVersionSchema.parse(input);
   let candidate = input;
 
-  if (schemaVersion === 1)
-    candidate = migrateV1ToV2(input as PlanRecord);
+  if (schemaVersion === 0 || schemaVersion === 1)
+    candidate = migratePreV2ToV2(input as PlanRecord);
   else if (schemaVersion !== CURRENT_SCHEMA_VERSION)
     throw new Error(`Unsupported plan schema version: ${schemaVersion}`);
 

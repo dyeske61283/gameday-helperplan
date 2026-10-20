@@ -14,11 +14,12 @@ Claiming an open eligible duty is immediately binding and requires no approval. 
 **Implementation decision:**
 
 - Slots persist `assignmentStatus` as `OPEN`, `ASSIGNED`, `COMPLETED`, or `CANCELLED`; legacy occupancy is migrated to `OPEN` or `ASSIGNED` when plans are loaded.
-- Current `SeasonPlan` schema version is 2. The v1 → v2 migration adds `assignmentStatus` based on occupancy and defaults missing match/gameday `slots` to `[]`; decrypted plans are migrated and validated on the client before becoming active.
+- Current `SeasonPlan` schema version is 2. The v0/v1 → v2 migration adds `assignmentStatus` based on occupancy and defaults missing match/gameday `slots` to `[]`; decrypted plans are migrated and validated on the client before becoming active.
+- Timestamp fields accept stored epoch milliseconds and ISO date-time strings (the latter are produced when serialized `Date` values are saved). Empty club email/homepage values are valid during initial setup.
 - Current-schema validation is strict: unexpected fields are rejected rather than silently dropped on a later save.
 - Changes to the plan Zod schema must review/update its schema snapshot, supported migration(s), and legacy fixture. Run `pnpm test:plan-schema` locally; the same test runs in CI.
 - Capability eligibility is evaluated from `Role.requiredSkillId` and `Member.skillIds` by the shared domain predicate used by both manual and automatic assignment.
 - Completion is a deterministic domain transition after a gameday's closing time. Check-in remains legacy data and is not used to determine completion.
 
-**Implementation State:** implemented for schema v1 → v2; swap and replacement
+**Implementation State:** implemented for schema v0/v1 → v2; swap and replacement
 workflows remain deferred.

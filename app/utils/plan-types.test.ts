@@ -18,6 +18,16 @@ describe("season plan schema", () => {
     expect(legacyPlan).toEqual(source);
   });
 
+  it("migrates version-zero plans using the same pre-v2 normalization", () => {
+    const legacyV0 = JSON.parse(JSON.stringify(legacyPlan));
+    legacyV0.schemaVersion = 0;
+
+    const plan = parseSeasonPlan(legacyV0);
+
+    expect(plan.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
+    expect(plan.matches["match-1"]?.slots.map(slot => slot.assignmentStatus)).toEqual(["OPEN", "ASSIGNED"]);
+  });
+
   it("restores omitted legacy match and gameday duty slots", () => {
     const source = JSON.parse(JSON.stringify(legacyPlan));
     delete source.matches["match-1"]!.slots;
