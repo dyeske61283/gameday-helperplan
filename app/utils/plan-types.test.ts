@@ -31,6 +31,13 @@ describe("season plan schema", () => {
     expect(source.gamedays["gameday-1"]!.slots).toBeUndefined();
   });
 
+  it("rejects malformed legacy slot collections instead of dropping their data", () => {
+    const invalidLegacy = JSON.parse(JSON.stringify(legacyPlan));
+    invalidLegacy.matches["match-1"].slots = "not-an-array";
+
+    expect(() => parseSeasonPlan(invalidLegacy)).toThrow();
+  });
+
   it("keeps current plans unchanged while validating them", () => {
     const current = JSON.parse(JSON.stringify(legacyPlan));
     current.schemaVersion = CURRENT_SCHEMA_VERSION;

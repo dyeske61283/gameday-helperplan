@@ -303,6 +303,11 @@ describe("plan-scoped routing", async () => {
     await page.getByRole("heading", { name: "Migration Club" }).waitFor();
     await page.locator("a[href*='/matches/match-1']").waitFor();
 
+    await page.goto(testUrl("/"), { waitUntil: "domcontentloaded" });
+    await page.getByRole("link", { name: "Resume plan" }).click();
+    await page.getByRole("heading", { name: "Migration Club" }).waitFor();
+    await page.locator("a[href*='/matches/match-1']").waitFor();
+
     await page.goto(testUrl(`/plans/${id}/matches/match-1#key=${keyString}`), { waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "Migration Team vs Visitors" }).waitFor();
     await page.getByRole("button", { name: "Select member" }).click();
@@ -337,10 +342,6 @@ describe("plan-scoped routing", async () => {
     await page.reload({ waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "My duties" }).waitFor();
     await page.getByText("Migration Team vs Visitors").first().waitFor();
-
-    await page.goto(testUrl("/"), { waitUntil: "domcontentloaded" });
-    await page.getByRole("link", { name: "Resume plan" }).click();
-    await page.getByRole("heading", { name: "Migration Club" }).waitFor();
     await page.close();
   }, 90000);
 

@@ -153,9 +153,11 @@ function migrateV1ToV2(input: PlanRecord): PlanRecord {
         continue;
 
       const record = entity as PlanRecord;
-      const slots: unknown[] = Array.isArray(record.slots) ? record.slots : [];
-      record.slots = slots;
-      for (const slot of slots) {
+      if (!Object.hasOwn(record, "slots"))
+        record.slots = [];
+      if (!Array.isArray(record.slots))
+        continue;
+      for (const slot of record.slots) {
         if (!slot || typeof slot !== "object" || Array.isArray(slot))
           continue;
         const duty = slot as PlanRecord;
