@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { useDecryption, useEncryption } from "../../app/composables/use-crypto";
 import { PLAN_BLOB_CHUNK_SIZE } from "../../server/types/stored-plan";
 import env from "../../utils/env";
+import { mergePlans } from "./plan-merge.prototype";
 
 await setup({
   host: env.TEST_HOST,
@@ -145,5 +146,51 @@ describe("create-save-edit-save workflow", async () => {
     const decryptedEditedPlan = JSON.parse(await decryptBlob(editedPlanData.blob, key));
 
     expect(decryptedEditedPlan).toEqual(editedPlan);
+  });
+
+  it("rebases an opaque client merge after the server rejects a stale expected revision", async () => {
+    const planId = globalThis.crypto.randomUUID();
+    const base = { members: { m1: { id: "m1", name: "Ari", teamIds: ["t1"] } } };
+    const local = { members: { m1: { id: "m1", name: "Aria", teamIds: ["t1"] } } };
+    const remote = { members: { m1: { id: "m1", name: "Ari", teamIds: ["t2"] } } };
+    const plaintextByBlob = new Map<string, typeof base>();
+    const seal = (label: string, plan: typeof base) => {
+      const blob = `opaque-ciphertext-${label}`;
+      plaintextByBlob.set(blob, structuredClone(plan));
+      return blob;
+    };
+    const open = (blob: string) => structuredClone(plaintextByBlob.get(blob)!);
+
+    await $fetch(`/api/${planId}`, {
+      method: "POST",
+      body: { blob: seal("base", base), expectedRevision: 0 },
+    });
+    await $fetch(`/api/${planId}`, {
+      method: "POST",
+      body: { blob: seal("remote", remote), expectedRevision: 1 },
+    });
+
+    const staleResponse = await fetch(`/api/${planId}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ blob: seal("local", local), expectedRevision: 1 }),
+    });
+    expect(staleResponse.status).toBe(409);
+
+    const latest = await $fetch<{ blob: string; revision: number }>(`/api/${planId}`);
+    const merged = mergePlans(base, local, open(latest.blob));
+    expect(merged.canSave).toBe(true);
+
+    const retry = await $fetch<{ revision: number }>(`/api/${planId}`, {
+      method: "POST",
+      body: { blob: seal("merged", merged.merged), expectedRevision: latest.revision },
+    });
+    const stored = await $fetch<{ blob: string; revision: number }>(`/api/${planId}`);
+
+    expect(retry.revision).toBe(3);
+    expect(stored.revision).toBe(3);
+    expect(stored.blob).toBe("opaque-ciphertext-merged");
+    expect(JSON.stringify(stored)).not.toContain("Aria");
+    expect(open(stored.blob).members.m1).toEqual({ id: "m1", name: "Aria", teamIds: ["t2"] });
   });
 });
