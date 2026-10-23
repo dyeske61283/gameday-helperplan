@@ -61,6 +61,7 @@ const accordionItems = computed(() => {
       label: t.name,
       value: t.id,
       content: t.id,
+      memberCount: planStore.membersList.filter(m => m.teamIds.includes(t.id)).length,
     };
   });
 
@@ -69,6 +70,7 @@ const accordionItems = computed(() => {
     label: "Teamless Members",
     value: "teamless",
     content: "teamless",
+    memberCount: planStore.membersList.filter(m => m.teamIds.length === 0).length,
   });
 
   return list;
@@ -225,38 +227,49 @@ async function deleteTeam(teamId: string) {
         />
       </div>
 
-      <!-- Teams Accordion List -->
-      <div class="bg-surface-container-lowest rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden p-2">
-        <UAccordion v-model="activeAccordions" :items="accordionItems" type="multiple">
+      <!-- Teams Accordion Cards -->
+      <div>
+        <UAccordion
+          v-model="activeAccordions"
+          :items="accordionItems"
+          type="multiple"
+          :ui="{
+            root: 'space-y-3',
+            item: 'rounded-xl border border-neutral-200 dark:border-neutral-800 bg-surface-container-low px-1',
+            trigger: 'items-start px-4 py-4',
+            label: 'w-full min-w-0 whitespace-normal',
+          }"
+        >
+          <template #default="{ item }">
+            <span class="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <span class="min-w-0 break-words">{{ item.label }}</span>
+              <UBadge color="neutral" variant="soft" size="sm" class="shrink-0 self-start sm:self-auto">
+                {{ item.memberCount }} {{ $t("ui.members") }}
+              </UBadge>
+            </span>
+          </template>
           <template #body="{ item }">
             <div class="p-4 space-y-4">
               <!-- Team Actions (CRUD) / Header Details inside Accordion -->
-              <div v-if="item.value !== 'teamless'" class="flex justify-between items-center pb-2 border-b border-neutral-100 dark:border-neutral-800">
-                <div class="flex items-center gap-2">
-                  <UBadge color="neutral" variant="soft" size="sm">
-                    {{ getMembersForTeam(item.value).length }} members
-                  </UBadge>
-                </div>
-                <div class="flex gap-2">
-                  <UButton
-                    size="xs"
-                    variant="ghost"
-                    icon="i-lucide-pencil"
-                    color="neutral"
-                    @click.stop="openEditTeam(item.value)"
-                  >
-                    {{ $t("ui.teams.editName") }}
-                  </UButton>
-                  <UButton
-                    size="xs"
-                    variant="ghost"
-                    icon="i-lucide-trash-2"
-                    color="error"
-                    @click.stop="deleteTeam(item.value)"
-                  >
-                    {{ $t("ui.teams.deleteTeam") }}
-                  </UButton>
-                </div>
+              <div v-if="item.value !== 'teamless'" class="flex justify-end gap-2 pb-2 border-b border-neutral-100 dark:border-neutral-800">
+                <UButton
+                  size="xs"
+                  variant="ghost"
+                  icon="i-lucide-pencil"
+                  color="neutral"
+                  @click.stop="openEditTeam(item.value)"
+                >
+                  {{ $t("ui.teams.editName") }}
+                </UButton>
+                <UButton
+                  size="xs"
+                  variant="ghost"
+                  icon="i-lucide-trash-2"
+                  color="error"
+                  @click.stop="deleteTeam(item.value)"
+                >
+                  {{ $t("ui.teams.deleteTeam") }}
+                </UButton>
               </div>
 
               <!-- Inside Members List -->
@@ -264,23 +277,25 @@ async function deleteTeam(teamId: string) {
                 {{ $t("ui.teams.noMembersFound") }}
               </div>
               <div v-else v-auto-animate class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div
+                <button
                   v-for="member in getMembersForTeam(item.value)"
                   :key="member.id"
                   :data-search-hit="searchQuery && member.name.toLowerCase().includes(searchQuery.toLowerCase())"
-                  class="flex items-center justify-between p-3 rounded-lg border border-neutral-100 dark:border-neutral-800 bg-surface hover:bg-neutral-50 dark:hover:bg-neutral-900 transition-all cursor-pointer"
+                  type="button"
+                  :aria-label="`${$t('ui.memberDetails')}: ${member.name}`"
+                  class="flex w-full items-center justify-between gap-3 rounded-lg border border-neutral-100 dark:border-neutral-800 bg-surface p-3 text-left transition-colors hover:bg-neutral-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary dark:hover:bg-neutral-900"
                   @click="openMemberDetails(member)"
                 >
-                  <div class="flex items-center gap-3">
+                  <span class="flex items-center gap-3">
                     <UAvatar :alt="member.name" size="sm" class="font-bold">
                       {{ getInitials(member.name) }}
                     </UAvatar>
-                    <div>
-                      <h3 class="text-sm font-semibold text-on-surface">
+                    <span>
+                      <span class="block text-sm font-semibold text-on-surface">
                         {{ member.name }}
-                      </h3>
+                      </span>
                       <!-- Tags for Team Assignments -->
-                      <div class="flex flex-wrap gap-1 mt-1">
+                      <span class="mt-1 flex flex-wrap gap-1">
                         <UBadge
                           v-for="tId in member.teamIds"
                           :key="tId"
@@ -289,30 +304,30 @@ async function deleteTeam(teamId: string) {
                         >
                           {{ planStore.teams[tId]?.name || tId }}
                         </UBadge>
-                      </div>
-                    </div>
-                  </div>
+                      </span>
+                    </span>
+                  </span>
 
                   <!-- Licenses (Referee, Timekeeper) with Strikethrough if Lacking -->
-                  <div class="flex gap-2 items-center">
+                  <span class="flex items-center gap-2">
                     <!-- Referee License -->
-                    <div
+                    <span
                       class="flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-semibold"
                       :class="member.skillIds.includes('referee') ? 'text-success bg-success/10' : 'line-through text-neutral-400 opacity-40 bg-neutral-100 dark:bg-neutral-800'"
                     >
                       <UIcon name="i-lucide-award" class="w-3.5 h-3.5 mr-0.5" />
                       Ref
-                    </div>
+                    </span>
                     <!-- Timekeeper License -->
-                    <div
+                    <span
                       class="flex items-center gap-0.5 px-1.5 py-0.5 rounded text-xs font-semibold"
                       :class="member.skillIds.includes('esb') ? 'text-info bg-info/10' : 'line-through text-neutral-400 opacity-40 bg-neutral-100 dark:bg-neutral-800'"
                     >
                       <UIcon name="i-lucide-clock" class="w-3.5 h-3.5 mr-0.5" />
                       Time
-                    </div>
-                  </div>
-                </div>
+                    </span>
+                  </span>
+                </button>
               </div>
             </div>
           </template>
