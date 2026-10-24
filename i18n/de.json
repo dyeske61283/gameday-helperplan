@@ -238,6 +238,31 @@
     "memberUpdated": "{name} wurde aktualisiert.",
     "teamSaved": "Team gespeichert",
     "teamDeleted": "Team gelöscht",
+    "locationLinkPrototype": {
+      "loadingPlan": "Plan wird geladen…",
+      "title": "Prototyp für Standortlinks",
+      "openValidSharedPlan": "Öffnen Sie diese Seite über einen gültigen geteilten Plan-Link.",
+      "prototypeLabel": "Wegwerf-UI-Prototyp",
+      "heading": "Standortlink-Aktionen",
+      "description": "Vergleichen Sie einen kompakten Dialog mit nicht-modalen Aktionen. Diese Steuerelemente werden nicht im aktiven Spielplan verwendet.",
+      "noLinkConfigured": "Kein Link konfiguriert; wird als einfacher Text angezeigt.",
+      "compactDialog": "Kompakter Dialog",
+      "nonModalActionMenu": "Nicht-modales Aktionsmenü"
+    },
+    "locationLinkActions": {
+      "linkCopied": "Link kopiert.",
+      "linkCopyFailed": "Link konnte nicht kopiert werden.",
+      "openDialogActionsFor": "Dialogaktionen für {name} öffnen",
+      "dialogActions": "Dialogaktionen",
+      "chooseHowToUseLink": "Wählen Sie, wie Sie diesen Standortlink verwenden möchten.",
+      "copyLink": "Link kopieren",
+      "openLink": "Link öffnen",
+      "opensInNewTab": "(wird in einem neuen Tab geöffnet)",
+      "close": "Schließen",
+      "showActions": "Aktionen anzeigen",
+      "showActionsFor": "Aktionen für {name} anzeigen",
+      "actionsFor": "Aktionen für {name}"
+    },
     "common": {
       "versus": "gegen",
       "assigned": "Zugewiesen",
