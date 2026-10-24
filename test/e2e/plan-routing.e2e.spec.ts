@@ -355,14 +355,18 @@ describe("plan-scoped routing", async () => {
     await createTeamSave;
     await page.getByRole("button", { name: "E2E Team" }).click();
 
-    await page.getByRole("button", { name: "Add Member" }).click();
+    await page.getByRole("group", { name: "Roster actions" }).getByRole("button", { name: "Add Member" }).click();
     await page.getByLabel("Full Name").fill("E2E Volunteer");
     await page.getByRole("switch", { name: "Referee License" }).click();
     await page.getByRole("checkbox", { name: "E2E Team" }).check();
     const createMemberSave = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === `/api/${seededPlanId}`);
     await page.getByRole("button", { name: "Save Changes" }).click();
     await createMemberSave;
-    await page.getByText("E2E Volunteer", { exact: true }).waitFor();
+    const e2eTeamHeader = page.getByRole("button", { name: "E2E Team" });
+    const volunteerCard = page.getByText("E2E Volunteer", { exact: true });
+    if (!await volunteerCard.isVisible())
+      await e2eTeamHeader.click();
+    await volunteerCard.waitFor();
 
     await page.getByRole("button", { name: "Edit Name" }).click();
     await page.getByLabel("Team Name").fill("E2E Renamed Team");
@@ -379,6 +383,20 @@ describe("plan-scoped routing", async () => {
     await page.reload({ waitUntil: "domcontentloaded" });
     await page.getByRole("button", { name: "E2E Renamed Team" }).click();
     await page.getByText("E2E Helper", { exact: true }).waitFor();
+
+    await page.getByText("E2E Helper", { exact: true }).click();
+    const memberDialog = page.getByRole("dialog", { name: "Member Details" });
+    await memberDialog.getByRole("button", { name: "Delete Member" }).click();
+    const confirmation = page.getByRole("dialog", { name: "Delete member?" });
+    await confirmation.getByText("Remove E2E Helper from this plan?").waitFor();
+    await confirmation.getByRole("button", { name: "Cancel" }).click();
+    await page.getByText("E2E Helper", { exact: true }).waitFor();
+
+    const deleteSave = page.waitForResponse(response => response.request().method() === "POST" && new URL(response.url()).pathname === `/api/${seededPlanId}`);
+    await memberDialog.getByRole("button", { name: "Delete Member" }).click();
+    await confirmation.getByRole("button", { name: "Delete Member" }).click();
+    await deleteSave;
+    await page.getByText("E2E Helper", { exact: true }).waitFor({ state: "detached" });
     await page.close();
   }, 90000);
 

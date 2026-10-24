@@ -348,10 +348,15 @@
     },
     "teams": {
       "manageYourClubTeamsLicensesAndMemberRoles": "Verwalten Sie Ihre Vereinsteams, Lizenzen und Mitgliederrollen.",
+      "rosterActions": "Kaderaktionen",
       "addMember": "Mitglied hinzufügen",
       "createTeam": "Team erstellen",
       "editName": "Namen bearbeiten",
       "deleteTeam": "Team löschen",
+      "deleteMember": "Mitglied löschen",
+      "deleteMemberTitle": "Mitglied löschen?",
+      "confirmDeleteMember": "{name} aus diesem Plan entfernen?",
+      "memberDeleted": "Mitglied gelöscht",
       "noMembersFound": "Keine Mitglieder gefunden"
     },
     "cockpit": {
