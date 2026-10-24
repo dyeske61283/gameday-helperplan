@@ -283,11 +283,11 @@ describe("plan-scoped routing", async () => {
     expect(cockpitUrl.hash).toBe(seededPlanHash);
     await cockpitLink.click();
     await page.getByRole("heading", { name: "My duties" }).waitFor();
-    await page.getByRole("link", { name: /\bvs\b/i }).waitFor();
+    await page.locator(`a[href*="/matches/${matchId}"]`).waitFor();
     expect(await page.getByLabel("Member profile", { exact: true }).inputValue()).toBe("member-aaron-zipp");
     await page.reload({ waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "My duties" }).waitFor();
-    await page.getByRole("link", { name: /\bvs\b/i }).waitFor();
+    await page.locator(`a[href*="/matches/${matchId}"]`).waitFor();
     await browser.close();
   }, 90000);
 
