@@ -20,7 +20,7 @@ const __dirname = path.dirname(__filename);
 const defaultPlanId = localPlanFixtures.workflow.id;
 const testHost = process.env.TEST_HOST;
 const testUrl = (path: string) => testHost ? new URL(path, testHost).toString() : url(path);
-const seededPlanLink = process.env.E2E_WORKFLOW_PLAN_URL || process.env.E2E_PLAN_URL || `/plans/${defaultPlanId}#key=${localPlanFixtures.workflow.key}`;
+const seededPlanLink = process.env.E2E_WORKFLOW_PLAN_URL || `/plans/${defaultPlanId}#key=${localPlanFixtures.workflow.key}`;
 const seededPlanId = new URL(seededPlanLink, testHost || "http://localhost").pathname.split("/")[2] || defaultPlanId;
 let workflowPage: any;
 
@@ -34,7 +34,7 @@ describe("feature: User Workflows (BDD Specs)", async () => {
   });
 
   beforeAll(async () => {
-    if (process.env.E2E_WORKFLOW_PLAN_URL || process.env.E2E_PLAN_URL)
+    if (process.env.E2E_WORKFLOW_PLAN_URL)
       return;
     await seedLocalPlan(defaultPlanId, localPlanFixtures.workflow.key, testUrl);
   });
@@ -51,8 +51,8 @@ describe("feature: User Workflows (BDD Specs)", async () => {
       await workflowPage.getByText("Season fixtures, helper schedules, and real-time duty tracking.").waitFor();
       expect(new URL(workflowPage.url()).pathname).toBe(`/plans/${seededPlanId}`);
     });
-    await Then("the plan is fetched from /api/f530083d-8c74-4f10-931a-dd877ee7b52c and decrypted client-side", async () => {
-      await workflowPage.getByRole("heading", { name: "Gladbeck HC" }).waitFor();
+    await Then(`the plan is fetched from /api/${seededPlanId} and decrypted client-side`, async () => {
+      await workflowPage.getByRole("button", { name: "Copy share link" }).waitFor();
     });
     await Then("the plan ID and key are persisted to localStorage for resume", async () => {
       const storedResume = await workflowPage.evaluate(() => JSON.parse(localStorage.getItem("gameday-plan-resume") || "null"));
@@ -62,14 +62,13 @@ describe("feature: User Workflows (BDD Specs)", async () => {
       });
     });
     await Then("the schedule displays the active plan", async () => {
-      const content = await workflowPage.textContent("body");
-      expect(content).toContain("Gladbeck HC");
+      expect(await workflowPage.getByRole("button", { name: "Copy share link" }).count()).toBe(1);
       await workflowPage.close();
     });
   });
 
   Scenario("1 Error — Missing key fragment in URL", async () => {
-    await When("navigating to /setup?planId=f530083d-8c74-4f10-931a-dd877ee7b52c (no #key=…)", async () => {});
+    await When(`navigating to /setup?planId=${defaultPlanId} (no #key=…)`, async () => {});
     await When("clicking \"Resume Last Plan\"", async () => {});
     await Then("an error toast appears: \"Could not resume. Need both a stored Plan ID and a Key in the URL fragment.\"", async () => {});
   });

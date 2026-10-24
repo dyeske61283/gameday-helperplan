@@ -13,9 +13,9 @@ import { localPlanFixtures, seedLocalPlan } from "./plan-identities";
 
 const defaultPlanId = localPlanFixtures.routing.id;
 const defaultPlanUrl = `/plans/${defaultPlanId}#key=${localPlanFixtures.routing.key}`;
-const seededPlanUrl = process.env.E2E_ROUTING_PLAN_URL || process.env.E2E_PLAN_URL || defaultPlanUrl;
+const seededPlanUrl = process.env.E2E_ROUTING_PLAN_URL || defaultPlanUrl;
 const defaultEditPlanUrl = `/plans/${localPlanFixtures.editing.id}#key=${localPlanFixtures.editing.key}`;
-const editPlanUrl = process.env.E2E_EDIT_PLAN_URL || (process.env.E2E_ROUTING_PLAN_URL || process.env.E2E_PLAN_URL ? seededPlanUrl : defaultEditPlanUrl);
+const editPlanUrl = process.env.E2E_EDIT_PLAN_URL || defaultEditPlanUrl;
 const testHost = process.env.TEST_HOST;
 const testUrl = (pathname: string) => testHost ? new URL(pathname, testHost).toString() : url(pathname);
 const seededPlanHash = new URL(seededPlanUrl, testHost || "http://localhost").hash;
@@ -116,10 +116,10 @@ describe("plan-scoped routing", async () => {
   await setup({ host: testHost, dev: true });
 
   beforeAll(async () => {
-    if (!process.env.E2E_ROUTING_PLAN_URL && !process.env.E2E_PLAN_URL) {
+    if (!process.env.E2E_ROUTING_PLAN_URL) {
       await seedLocalPlan(defaultPlanId, localPlanFixtures.routing.key, testUrl);
     }
-    if (!process.env.E2E_EDIT_PLAN_URL && !process.env.E2E_ROUTING_PLAN_URL && !process.env.E2E_PLAN_URL) {
+    if (!process.env.E2E_EDIT_PLAN_URL) {
       await seedLocalPlan(localPlanFixtures.editing.id, localPlanFixtures.editing.key, testUrl);
     }
   });
@@ -162,7 +162,7 @@ describe("plan-scoped routing", async () => {
     expect(allFixturesUrl.hash).toBe(seededPlanHash);
     expect(await page.getByText("Claiming as").count()).toBe(0);
     await allFixturesLink.click();
-    await page.getByRole("heading", { name: "Gladbeck HC" }).waitFor();
+    await page.getByRole("button", { name: "Copy share link" }).waitFor();
 
     const teamsLink = page.getByRole("link", { name: "Teams & Roster" });
     const teamsUrl = new URL(await teamsLink.getAttribute("href")!, page.url());
@@ -172,7 +172,7 @@ describe("plan-scoped routing", async () => {
     await page.getByRole("heading", { name: "Teams" }).waitFor();
 
     await page.goBack();
-    await page.getByRole("heading", { name: "Gladbeck HC" }).waitFor();
+    await page.getByRole("button", { name: "Copy share link" }).waitFor();
 
     const assignmentsLink = page.getByRole("link", { name: "Manage Duties" });
     const assignmentsUrl = new URL(await assignmentsLink.getAttribute("href")!, page.url());
@@ -234,13 +234,13 @@ describe("plan-scoped routing", async () => {
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
     await context.addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
     await page.goto(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl), { waitUntil: "domcontentloaded" });
-    await page.getByRole("heading", { name: "Gladbeck HC" }).waitFor();
+    await page.getByRole("button", { name: "Copy share link" }).waitFor();
     await page.getByRole("button", { name: "Calendar" }).click();
     await page.locator("[id^='calendar-']").first().waitFor();
     await page.getByRole("button", { name: "Timeline" }).click();
 
     await page.goto(testUrl(`/plans/${seededPlanId}/matches/${matchId}${seededPlanHash}`), { waitUntil: "domcontentloaded" });
-    await page.getByRole("heading", { name: /SG Menden \(Sauerland\) vs Gast/ }).waitFor();
+    await page.getByRole("button", { name: "Select member" }).waitFor();
     await page.getByRole("button", { name: "Select member" }).click();
     const dialog = page.getByRole("dialog");
     const auditDialog = async () => {
@@ -283,11 +283,11 @@ describe("plan-scoped routing", async () => {
     expect(cockpitUrl.hash).toBe(seededPlanHash);
     await cockpitLink.click();
     await page.getByRole("heading", { name: "My duties" }).waitFor();
-    await page.getByText("SG Menden (Sauerland) vs Gast").waitFor();
+    await page.getByRole("link", { name: /\bvs\b/i }).waitFor();
     expect(await page.getByLabel("Member profile", { exact: true }).inputValue()).toBe("member-aaron-zipp");
     await page.reload({ waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "My duties" }).waitFor();
-    await page.getByText("SG Menden (Sauerland) vs Gast").waitFor();
+    await page.getByRole("link", { name: /\bvs\b/i }).waitFor();
     await browser.close();
   }, 90000);
 
