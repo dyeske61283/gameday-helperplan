@@ -47,10 +47,13 @@ jobs:
             SEED_PLAN_ID="$(node -e 'console.log(require("node:crypto").randomUUID())')" \
             pnpm seed:plan | sed -n 's/^SEED_PLAN_URL=//p')
           test -n "$PLAN_URL"
+          echo "::add-mask::$PLAN_URL"
           echo "E2E_WORKFLOW_PLAN_URL=$PLAN_URL" >> "$GITHUB_ENV"
           {
             echo "## Deployment preview smoke data"
             echo "Seeded an isolated plan for the shared-link smoke test."
+            echo "- [Open the seeded preview plan]($PLAN_URL)"
+            echo "> This is a public, editable test plan. Do not add personal data."
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Run deployment preview smoke test
         run: pnpm test:preview
