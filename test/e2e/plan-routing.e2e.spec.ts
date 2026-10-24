@@ -8,12 +8,14 @@ import { AxeBuilder } from "@axe-core/playwright";
 import { createPage, setup, url } from "@nuxt/test-utils/e2e";
 import { chromium } from "playwright";
 import { beforeAll, describe, expect, it } from "vitest";
+import { localPlanFixtures, seedLocalPlan } from "./plan-identities";
 /* eslint-disable node/no-process-env */
 
-const defaultPlanId = "f530083d-8c74-4f10-931a-dd877ee7b52c";
-const defaultPlanUrl = `/plans/${defaultPlanId}#key=tWVZ4hmOA7LFsrNViX1X6w`;
+const defaultPlanId = localPlanFixtures.routing.id;
+const defaultPlanUrl = `/plans/${defaultPlanId}#key=${localPlanFixtures.routing.key}`;
 const seededPlanUrl = process.env.E2E_ROUTING_PLAN_URL || process.env.E2E_PLAN_URL || defaultPlanUrl;
-const editPlanUrl = process.env.E2E_EDIT_PLAN_URL || seededPlanUrl;
+const defaultEditPlanUrl = `/plans/${localPlanFixtures.editing.id}#key=${localPlanFixtures.editing.key}`;
+const editPlanUrl = process.env.E2E_EDIT_PLAN_URL || (process.env.E2E_ROUTING_PLAN_URL || process.env.E2E_PLAN_URL ? seededPlanUrl : defaultEditPlanUrl);
 const testHost = process.env.TEST_HOST;
 const testUrl = (pathname: string) => testHost ? new URL(pathname, testHost).toString() : url(pathname);
 const seededPlanHash = new URL(seededPlanUrl, testHost || "http://localhost").hash;
@@ -115,16 +117,10 @@ describe("plan-scoped routing", async () => {
 
   beforeAll(async () => {
     if (!process.env.E2E_ROUTING_PLAN_URL && !process.env.E2E_PLAN_URL) {
-      const fixture = JSON.parse(fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../fixtures/encrypted-plan-2025-2026.json"), "utf8"));
-      const currentResponse = await fetch(testUrl(`/api/${seededPlanId}`));
-      if (!currentResponse.ok && currentResponse.status !== 404)
-        throw new Error(`Could not read seeded plan: ${currentResponse.status}`);
-      const expectedRevision = currentResponse.ok ? (await currentResponse.json()).revision ?? 0 : 0;
-      await fetch(testUrl(`/api/${seededPlanId}`), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ blob: fixture.blob, expectedRevision }),
-      });
+      await seedLocalPlan(defaultPlanId, localPlanFixtures.routing.key, testUrl);
+    }
+    if (!process.env.E2E_EDIT_PLAN_URL && !process.env.E2E_ROUTING_PLAN_URL && !process.env.E2E_PLAN_URL) {
+      await seedLocalPlan(localPlanFixtures.editing.id, localPlanFixtures.editing.key, testUrl);
     }
   });
 
