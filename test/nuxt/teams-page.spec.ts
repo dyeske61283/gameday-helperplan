@@ -45,13 +45,12 @@ describe("teams page", () => {
     const emptyTeam = planStore.addTeam("Empty team")!;
     const occupiedTeam = planStore.addTeam("Occupied team")!;
     planStore.addMember({ name: "Existing member", teamIds: [occupiedTeam.id], skillIds: [] });
+    const planBeforeAdd = JSON.stringify(planStore.plan);
 
     const page = await mountSuspended(TeamsPage, {
       route: "/plans/test-plan/teams",
       global: { plugins: [pinia] },
     });
-    await page.get("input[placeholder='Search members by name...']").setValue("no matching member");
-
     const [emptyCard, occupiedCard, teamlessCard] = page.findAll("[data-slot='item']");
     await emptyCard!.get("[data-slot='trigger']").trigger("click");
     await occupiedCard!.get("[data-slot='trigger']").trigger("click");
@@ -68,5 +67,88 @@ describe("teams page", () => {
 
     expect(document.body.textContent).toContain("Team Assignments");
     expect(document.body.querySelector(`#team-${emptyTeam.id}`)?.getAttribute("aria-checked")).toBe("true");
+    expect(planStore.membersList).toHaveLength(1);
+    expect(JSON.stringify(planStore.plan)).toBe(planBeforeAdd);
+
+    [...document.querySelectorAll("button")].find(button => button.textContent?.trim() === "Save Changes")?.click();
+    await flushPromises();
+    expect(planStore.membersList).toHaveLength(2);
+    expect(planStore.membersList.find(member => member.name === "New Member")?.teamIds).toEqual([emptyTeam.id]);
+  });
+
+  it("discards a staged member when the editor is cancelled", async () => {
+    const planStore = usePlanStore();
+    planStore.createNewPlan("test-plan", "", { clubName: "Club", season: "2026/2027" });
+    const team = planStore.addTeam("Empty team")!;
+    const planBeforeCancel = JSON.stringify(planStore.plan);
+    const page = await mountSuspended(TeamsPage, {
+      route: "/plans/test-plan/teams",
+      global: { plugins: [pinia] },
+    });
+    const [teamCard] = page.findAll("[data-slot='item']");
+
+    await teamCard!.get("[data-slot='trigger']").trigger("click");
+    await flushPromises();
+    await teamCard!.findAll("button").find(button => button.text() === "Add Member")!.trigger("click");
+    await flushPromises();
+    expect(planStore.membersList).toHaveLength(0);
+
+    [...document.querySelectorAll("button")].find(button => button.textContent?.trim() === "Cancel")?.click();
+    expect(planStore.membersList).toHaveLength(0);
+    expect(planStore.teams[team.id]).toBeDefined();
+    expect(JSON.stringify(planStore.plan)).toBe(planBeforeCancel);
+  });
+
+  it("asks before deleting a member and leaves it intact when deletion is cancelled", async () => {
+    const planStore = usePlanStore();
+    planStore.createNewPlan("test-plan", "", { clubName: "Club", season: "2026/2027" });
+    planStore.addMember({ name: "Member to remove", teamIds: [], skillIds: [] });
+    const page = await mountSuspended(TeamsPage, {
+      route: "/plans/test-plan/teams",
+      global: { plugins: [pinia] },
+    });
+    const teamlessCard = page.findAll("[data-slot='item']").at(-1)!;
+    await teamlessCard.get("[data-slot='trigger']").trigger("click");
+    await flushPromises();
+    await teamlessCard.find("button[aria-label='Member Details: Member to remove']").trigger("click");
+    await flushPromises();
+
+    const dialogs = () => [...document.querySelectorAll("[role='dialog']")];
+    const editorDialog = dialogs().find(dialog => dialog.textContent?.includes("Team Assignments"))!;
+    [...editorDialog.querySelectorAll("button")].find(button => button.textContent?.trim() === "Delete Member")?.click();
+    await flushPromises();
+    const confirmationDialog = dialogs().find(dialog => dialog.textContent?.includes("Remove Member to remove from this plan?"))!;
+    expect(confirmationDialog.textContent).toContain("Remove Member to remove from this plan?");
+    expect(planStore.membersList.map(member => member.name)).toEqual(["Member to remove"]);
+
+    [...confirmationDialog.querySelectorAll("button")].find(button => button.textContent?.trim() === "Cancel")?.click();
+    await flushPromises();
+    expect(planStore.membersList.map(member => member.name)).toEqual(["Member to remove"]);
+
+    [...editorDialog.querySelectorAll("button")].find(button => button.textContent?.trim() === "Delete Member")?.click();
+    await flushPromises();
+    [...confirmationDialog.querySelectorAll("button")].find(button => button.textContent?.trim() === "Delete Member")?.click();
+    await flushPromises();
+    expect(planStore.membersList).toHaveLength(0);
+  });
+
+  it("does not offer the empty-team action while teams are search-filtered", async () => {
+    const planStore = usePlanStore();
+    planStore.createNewPlan("test-plan", "", { clubName: "Club", season: "2026/2027" });
+    planStore.addTeam("Empty team");
+    const occupiedTeam = planStore.addTeam("Occupied team")!;
+    planStore.addMember({ name: "Existing member", teamIds: [occupiedTeam.id], skillIds: [] });
+    const page = await mountSuspended(TeamsPage, {
+      route: "/plans/test-plan/teams",
+      global: { plugins: [pinia] },
+    });
+
+    await page.get("input[placeholder='Search members by name...']").setValue("no matching member");
+    await flushPromises();
+    for (const card of page.findAll("[data-slot='item']")) {
+      await card.get("[data-slot='trigger']").trigger("click");
+    }
+    await flushPromises();
+    expect(page.findAll("[data-slot='item']").some(card => card.findAll("button").some(button => button.text() === "Add Member"))).toBe(false);
   });
 });

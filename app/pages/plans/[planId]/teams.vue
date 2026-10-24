@@ -12,7 +12,8 @@ const activeAccordions = ref<string[]>([]);
 
 // Modals state
 const isMemberModalOpen = ref(false);
-const selectedMember = ref<{ id: string; name: string; teamIds: string[]; skillIds: string[] } | null>(null);
+const isDeleteConfirmationOpen = ref(false);
+const selectedMember = ref<{ id: string | null; name: string; teamIds: string[]; skillIds: string[] } | null>(null);
 
 const isTeamModalOpen = ref(false);
 const selectedTeam = ref<{ id: string; name: string } | null>(null);
@@ -127,24 +128,44 @@ function openMemberDetails(member: any) {
 async function saveMember() {
   if (!selectedMember.value)
     return;
-  planStore.updateMember(selectedMember.value.id, {
-    name: selectedMember.value.name,
-    teamIds: selectedMember.value.teamIds,
-    skillIds: selectedMember.value.skillIds,
-  });
+  const member = selectedMember.value;
+  if (member.id) {
+    planStore.updateMember(member.id, {
+      name: member.name,
+      teamIds: member.teamIds,
+      skillIds: member.skillIds,
+    });
+  }
+  else if (!planStore.addMember({ name: member.name, teamIds: member.teamIds, skillIds: member.skillIds })) {
+    return;
+  }
   isMemberModalOpen.value = false;
-  await autoSave(t("ui.memberSaved"), t("ui.memberUpdated", { name: selectedMember.value.name }));
+  await autoSave(t("ui.memberSaved"), t("ui.memberUpdated", { name: member.name }));
 }
 
-async function addMember(teamId?: string) {
-  const newM = planStore.addMember({
+function addMember(teamId?: string) {
+  selectedMember.value = {
+    id: null,
     name: "New Member",
     teamIds: teamId ? [teamId] : [],
     skillIds: [],
-  });
-  if (!newM)
+  };
+  isMemberModalOpen.value = true;
+}
+
+function requestMemberDeletion() {
+  if (selectedMember.value?.id)
+    isDeleteConfirmationOpen.value = true;
+}
+
+async function deleteMember() {
+  const member = selectedMember.value;
+  if (!member?.id)
     return;
-  openMemberDetails(newM);
+  planStore.deleteMember(member.id);
+  isDeleteConfirmationOpen.value = false;
+  isMemberModalOpen.value = false;
+  await autoSave(t("ui.teams.memberDeleted"));
 }
 
 // Team CRUD
@@ -196,7 +217,7 @@ async function deleteTeam(teamId: string) {
             {{ $t("ui.teams.manageYourClubTeamsLicensesAndMemberRoles") }}
           </p>
         </div>
-        <div class="flex gap-3">
+        <div role="group" :aria-label="$t('ui.teams.rosterActions')" class="flex gap-3">
           <UButton
             icon="i-lucide-users-round"
             variant="outline"
@@ -275,7 +296,7 @@ async function deleteTeam(teamId: string) {
               <!-- Inside Members List -->
               <div v-if="getMembersForTeam(item.value).length === 0" class="text-sm text-neutral-400 py-2 text-center">
                 <UButton
-                  v-if="item.value !== 'teamless' && item.memberCount === 0"
+                  v-if="!searchQuery.trim() && item.value !== 'teamless' && item.memberCount === 0"
                   icon="i-lucide-user-round-plus"
                   variant="outline"
                   @click.stop="addMember(item.value)"
@@ -418,12 +439,33 @@ async function deleteTeam(teamId: string) {
       </template>
 
       <template #footer>
+        <div class="flex justify-between gap-2 w-full">
+          <UButton v-if="selectedMember?.id" variant="outline" color="error" @click="requestMemberDeletion">
+            {{ $t("ui.teams.deleteMember") }}
+          </UButton>
+          <div class="flex gap-2">
+            <UButton variant="outline" color="neutral" @click="isMemberModalOpen = false">
+              {{ $t("ui.common.cancel") }}
+            </UButton>
+            <UButton @click="saveMember">
+              {{ $t("ui.common.saveChanges") }}
+            </UButton>
+          </div>
+        </div>
+      </template>
+    </UModal>
+
+    <UModal v-model:open="isDeleteConfirmationOpen" :title="$t('ui.teams.deleteMemberTitle')">
+      <template #body>
+        <p>{{ $t("ui.teams.confirmDeleteMember", { name: selectedMember?.name }) }}</p>
+      </template>
+      <template #footer>
         <div class="flex gap-2 justify-end w-full">
-          <UButton variant="outline" color="neutral" @click="isMemberModalOpen = false">
+          <UButton variant="outline" color="neutral" @click="isDeleteConfirmationOpen = false">
             {{ $t("ui.common.cancel") }}
           </UButton>
-          <UButton @click="saveMember">
-            {{ $t("ui.common.saveChanges") }}
+          <UButton color="error" @click="deleteMember">
+            {{ $t("ui.teams.deleteMember") }}
           </UButton>
         </div>
       </template>

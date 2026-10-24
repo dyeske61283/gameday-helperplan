@@ -348,10 +348,15 @@
     },
     "teams": {
       "manageYourClubTeamsLicensesAndMemberRoles": "Manage your club teams, licenses, and member roles.",
+      "rosterActions": "Roster actions",
       "addMember": "Add Member",
       "createTeam": "Create Team",
       "editName": "Edit Name",
       "deleteTeam": "Delete Team",
+      "deleteMember": "Delete Member",
+      "deleteMemberTitle": "Delete member?",
+      "confirmDeleteMember": "Remove {name} from this plan?",
+      "memberDeleted": "Member deleted",
       "noMembersFound": "No members found"
     },
     "cockpit": {
