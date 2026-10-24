@@ -244,7 +244,7 @@
       "openValidSharedPlan": "Open this page from a valid shared plan link.",
       "prototypeLabel": "Throwaway UI prototype",
       "heading": "Location link actions",
-      "description": "Compare a compact dialog with non-modal actions. These controls are not used by the live schedule.",
+      "description": "Compare the schedule dialog with a non-modal alternative. The dialog is used for live schedule location links.",
       "noLinkConfigured": "No link configured; shown as plain text.",
       "compactDialog": "Compact dialog",
       "nonModalActionMenu": "Non-modal action menu"
@@ -256,6 +256,7 @@
       "dialogActions": "Dialog actions",
       "chooseHowToUseLink": "Choose how to use this location link.",
       "copyLink": "Copy link",
+      "copied": "Copied",
       "openLink": "Open link",
       "opensInNewTab": "(opens in a new tab)",
       "close": "Close",

@@ -82,19 +82,15 @@ function matchLink(matchId: string) {
           </h2>
         </div>
         <div class="flex items-center gap-2 text-xs text-on-surface-variant mt-1">
-          <span v-if="location" class="flex items-center gap-1">
+          <div v-if="location" class="flex items-center gap-1">
             <UIcon name="i-lucide-map-pin" class="w-3.5 h-3.5 text-secondary" />
-            <a
-              v-if="location.link"
-              :href="location.link"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="underline hover:text-primary"
-            >
-              {{ location.name }}
-            </a>
+            <LocationLinkActions v-if="location.link" :location="location" :instance-id="gameday.id" variant="dialog">
+              <template #trigger>
+                {{ location.name }}
+              </template>
+            </LocationLinkActions>
             <span v-else>{{ location.name }}</span>
-          </span>
+          </div>
           <span v-if="gameday.openingTime" class="ml-2">
             {{ t("dashboard.opens") }}: {{ gameday.openingTime }}
           </span>

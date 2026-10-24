@@ -244,7 +244,7 @@
       "openValidSharedPlan": "Öffnen Sie diese Seite über einen gültigen geteilten Plan-Link.",
       "prototypeLabel": "Wegwerf-UI-Prototyp",
       "heading": "Standortlink-Aktionen",
-      "description": "Vergleichen Sie einen kompakten Dialog mit nicht-modalen Aktionen. Diese Steuerelemente werden nicht im aktiven Spielplan verwendet.",
+      "description": "Vergleichen Sie den Dialog des Spielplans mit einer nicht-modalen Alternative. Der Dialog wird für Standortlinks im Spielplan verwendet.",
       "noLinkConfigured": "Kein Link konfiguriert; wird als einfacher Text angezeigt.",
       "compactDialog": "Kompakter Dialog",
       "nonModalActionMenu": "Nicht-modales Aktionsmenü"
@@ -256,6 +256,7 @@
       "dialogActions": "Dialogaktionen",
       "chooseHowToUseLink": "Wählen Sie, wie Sie diesen Standortlink verwenden möchten.",
       "copyLink": "Link kopieren",
+      "copied": "Kopiert",
       "openLink": "Link öffnen",
       "opensInNewTab": "(wird in einem neuen Tab geöffnet)",
       "close": "Schließen",

@@ -17,7 +17,12 @@ describe("location link options prototype", async () => {
   beforeAll(async () => {
     const plan = JSON.parse(await readFile("test/fixtures/plan-2025-2026.json", "utf8"));
     plan.config.locations[0].link = "https://venue.example/location?x=1";
-    plan.config.locations.push({ id: "no-link-hall", name: "Plain-text Hall" });
+    const linkedLocation = plan.config.locations[0];
+    plan.config.locations = [linkedLocation, { id: "no-link-hall", name: "Plain-text Hall" }];
+    const gamedays = Object.values(plan.gamedays).filter(item => item.locationId === linkedLocation.id).slice(0, 2);
+    plan.gamedays = Object.fromEntries(gamedays.map(gameday => [gameday.id, gameday]));
+    const matchIds = new Set(gamedays.flatMap(gameday => gameday.matchIds));
+    plan.matches = Object.fromEntries([...matchIds].map(matchId => [matchId, plan.matches[matchId]]));
     const key = await webcrypto.subtle.importKey("jwk", {
       k: planKey,
       alg: "A128GCM",
@@ -96,6 +101,48 @@ describe("location link options prototype", async () => {
         expect(await menuLink.getAttribute("rel")).toBe("noopener noreferrer");
         await location.getByRole("button", { name: "Show actions for Aalen, Seebach-Arena" }).click();
       }
+
+      await page.setViewportSize({ width: 1280, height: 800 });
+      await page.evaluate((path) => {
+        window.history.pushState({}, "", path);
+        window.dispatchEvent(new PopStateEvent("popstate"));
+      }, `/plans/${planId}#key=${planKey}`);
+      const card = page.locator("#gameday-gameday-2025-09-21-seebachgrundhalle");
+      await card.waitFor();
+      const dialogIds = await page.locator("dialog[id^='location-dialog-']").evaluateAll(dialogs => dialogs.map(dialog => dialog.id));
+      expect(dialogIds.length).toBeGreaterThan(0);
+      expect(new Set(dialogIds).size).toBe(dialogIds.length);
+      const trigger = card.getByRole("button", { name: "Open dialog actions for Aalen, Seebach-Arena" });
+      await trigger.waitFor();
+      await trigger.click();
+
+      const dialog = page.getByRole("dialog", { name: "Aalen, Seebach-Arena" });
+      await dialog.waitFor();
+      expect(new URL(page.url()).pathname).toBe(`/plans/${planId}`);
+      const box = await dialog.boundingBox();
+      expect(box).not.toBeNull();
+      expect(Math.abs(box!.x + box!.width / 2 - 640)).toBeLessThan(2);
+      expect(Math.abs(box!.y + box!.height / 2 - 400)).toBeLessThan(2);
+      expect((await new AxeBuilder({ page }).include("dialog").analyze()).violations).toEqual([]);
+
+      const openLink = dialog.getByRole("link", { name: "Open link (opens in a new tab)" });
+      expect(await openLink.getAttribute("href")).toBe("https://venue.example/location?x=1");
+      expect(await openLink.getAttribute("target")).toBe("_blank");
+      expect(await openLink.getAttribute("rel")).toBe("noopener noreferrer");
+      expect(await openLink.getAttribute("class")).toContain("bg-primary");
+      expect(await openLink.locator("[class~=\"i-lucide:external-link\"]").count()).toBe(1);
+
+      await page.evaluate(() => {
+        Object.defineProperty(navigator, "clipboard", {
+          configurable: true,
+          value: { writeText: (text: string) => (window as any).recordClipboardText(text) },
+        });
+      });
+      const copyButton = dialog.getByRole("button", { name: "Copy link" });
+      await copyButton.click();
+      expect(copiedLink).toBe("https://venue.example/location?x=1");
+      expect(await dialog.getByRole("button", { name: "Copied" }).textContent()).toContain("Copied");
+      expect(await dialog.getByRole("status").textContent()).toBe("Link copied.");
     }
     finally {
       await context.close();
