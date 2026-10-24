@@ -238,6 +238,31 @@
     "memberUpdated": "{name} has been updated.",
     "teamSaved": "Team saved",
     "teamDeleted": "Team deleted",
+    "locationLinkPrototype": {
+      "loadingPlan": "Loading plan…",
+      "title": "Location link prototype",
+      "openValidSharedPlan": "Open this page from a valid shared plan link.",
+      "prototypeLabel": "Throwaway UI prototype",
+      "heading": "Location link actions",
+      "description": "Compare a compact dialog with non-modal actions. These controls are not used by the live schedule.",
+      "noLinkConfigured": "No link configured; shown as plain text.",
+      "compactDialog": "Compact dialog",
+      "nonModalActionMenu": "Non-modal action menu"
+    },
+    "locationLinkActions": {
+      "linkCopied": "Link copied.",
+      "linkCopyFailed": "Could not copy link.",
+      "openDialogActionsFor": "Open dialog actions for {name}",
+      "dialogActions": "Dialog actions",
+      "chooseHowToUseLink": "Choose how to use this location link.",
+      "copyLink": "Copy link",
+      "openLink": "Open link",
+      "opensInNewTab": "(opens in a new tab)",
+      "close": "Close",
+      "showActions": "Show actions",
+      "showActionsFor": "Show actions for {name}",
+      "actionsFor": "Actions for {name}"
+    },
     "common": {
       "versus": "vs",
       "assigned": "Assigned",

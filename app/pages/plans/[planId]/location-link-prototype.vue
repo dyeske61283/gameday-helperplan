@@ -1,33 +1,35 @@
 <script setup lang="ts">
 import { usePlanStore } from "~/stores/plan";
 
+const { t } = useI18n();
 const planStore = usePlanStore();
+useHead({ title: t("ui.locationLinkPrototype.heading") });
 usePlanInit();
 </script>
 
 <template>
   <UContainer class="max-w-4xl space-y-6 py-8 md:py-12">
     <div v-if="planStore.isLoading" class="py-16 text-center">
-      Loading plan…
+      {{ $t("ui.locationLinkPrototype.loadingPlan") }}
     </div>
     <div v-else-if="!planStore.plan" class="py-16 text-center">
       <h1 class="text-2xl font-bold">
-        Location link prototype
+        {{ $t("ui.locationLinkPrototype.title") }}
       </h1>
       <p class="mt-2 text-on-surface-variant">
-        Open this page from a valid shared plan link.
+        {{ $t("ui.locationLinkPrototype.openValidSharedPlan") }}
       </p>
     </div>
     <template v-else>
       <header class="space-y-2">
         <p class="text-sm font-semibold uppercase tracking-wide text-primary">
-          Throwaway UI prototype
+          {{ $t("ui.locationLinkPrototype.prototypeLabel") }}
         </p>
         <h1 class="text-3xl font-bold">
-          Location link actions
+          {{ $t("ui.locationLinkPrototype.heading") }}
         </h1>
         <p class="text-on-surface-variant">
-          Compare a compact dialog with non-modal actions. These controls are not used by the live schedule.
+          {{ $t("ui.locationLinkPrototype.description") }}
         </p>
       </header>
 
@@ -40,20 +42,20 @@ usePlanInit();
             {{ location.link }}
           </p>
           <p v-else class="mt-1 text-sm text-on-surface-variant">
-            No link configured; shown as plain text.
+            {{ $t("ui.locationLinkPrototype.noLinkConfigured") }}
           </p>
         </div>
 
         <div class="grid gap-4 sm:grid-cols-2">
           <section class="space-y-2 rounded-xl bg-surface-container p-4">
             <h3 class="font-semibold">
-              Compact dialog
+              {{ $t("ui.locationLinkPrototype.compactDialog") }}
             </h3>
             <LocationLinkActions :location="location" variant="dialog" />
           </section>
           <section class="space-y-2 rounded-xl bg-surface-container p-4">
             <h3 class="font-semibold">
-              Non-modal action menu
+              {{ $t("ui.locationLinkPrototype.nonModalActionMenu") }}
             </h3>
             <LocationLinkActions :location="location" variant="menu" />
           </section>

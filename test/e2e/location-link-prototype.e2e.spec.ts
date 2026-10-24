@@ -38,7 +38,7 @@ describe("location link options prototype", async () => {
 
   it("keeps both patterns accessible and functional on mobile and desktop", async () => {
     const browser = await chromium.launch();
-    const context = await browser.newContext({ viewport: { width: 1280, height: 800 } });
+    const context = await browser.newContext({ locale: "en-US", viewport: { width: 1280, height: 800 } });
     const page = await context.newPage();
     try {
       let copiedLink = "";
