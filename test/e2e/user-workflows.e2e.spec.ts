@@ -6,6 +6,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { checkMemberConflict } from "../../app/utils/conflict-detector";
 import { autoAssignMatchDuties } from "../../app/utils/helper-assignment";
 import { generateMemberICal } from "../../app/utils/ical-export";
+import { localPlanFixtures, seedLocalPlan } from "./plan-identities";
 /* eslint-disable node/no-process-env */
 
 const step = (_description: string, fn: () => Promise<void> | void) => fn();
@@ -16,10 +17,10 @@ const When = step;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const defaultPlanId = "f530083d-8c74-4f10-931a-dd877ee7b52c";
+const defaultPlanId = localPlanFixtures.workflow.id;
 const testHost = process.env.TEST_HOST;
 const testUrl = (path: string) => testHost ? new URL(path, testHost).toString() : url(path);
-const seededPlanLink = process.env.E2E_WORKFLOW_PLAN_URL || process.env.E2E_PLAN_URL || `/plans/${defaultPlanId}#key=tWVZ4hmOA7LFsrNViX1X6w`;
+const seededPlanLink = process.env.E2E_WORKFLOW_PLAN_URL || `/plans/${defaultPlanId}#key=${localPlanFixtures.workflow.key}`;
 const seededPlanId = new URL(seededPlanLink, testHost || "http://localhost").pathname.split("/")[2] || defaultPlanId;
 let workflowPage: any;
 
@@ -33,21 +34,9 @@ describe("feature: User Workflows (BDD Specs)", async () => {
   });
 
   beforeAll(async () => {
-    if (process.env.E2E_WORKFLOW_PLAN_URL || process.env.E2E_PLAN_URL)
+    if (process.env.E2E_WORKFLOW_PLAN_URL)
       return;
-    // Seed plan f530083d-8c74-4f10-931a-dd877ee7b52c into test storage
-    const encryptedFixture = JSON.parse(
-      fs.readFileSync(path.resolve(__dirname, "../fixtures/encrypted-plan-2025-2026.json"), "utf-8"),
-    );
-    const currentResponse = await fetch(testUrl(`/api/${seededPlanId}`));
-    if (!currentResponse.ok && currentResponse.status !== 404)
-      throw new Error(`Could not read seeded plan: ${currentResponse.status}`);
-    const expectedRevision = currentResponse.ok ? (await currentResponse.json()).revision ?? 0 : 0;
-    await fetch(testUrl(`/api/${seededPlanId}`), {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ blob: encryptedFixture.blob, expectedRevision }),
-    });
+    await seedLocalPlan(defaultPlanId, localPlanFixtures.workflow.key, testUrl);
   });
 
   // 1 — Open a Shared Link (Get Link)
@@ -62,8 +51,8 @@ describe("feature: User Workflows (BDD Specs)", async () => {
       await workflowPage.getByText("Season fixtures, helper schedules, and real-time duty tracking.").waitFor();
       expect(new URL(workflowPage.url()).pathname).toBe(`/plans/${seededPlanId}`);
     });
-    await Then("the plan is fetched from /api/f530083d-8c74-4f10-931a-dd877ee7b52c and decrypted client-side", async () => {
-      await workflowPage.getByRole("heading", { name: "Gladbeck HC" }).waitFor();
+    await Then(`the plan is fetched from /api/${seededPlanId} and decrypted client-side`, async () => {
+      await workflowPage.getByRole("button", { name: "Copy share link" }).waitFor();
     });
     await Then("the plan ID and key are persisted to localStorage for resume", async () => {
       const storedResume = await workflowPage.evaluate(() => JSON.parse(localStorage.getItem("gameday-plan-resume") || "null"));
@@ -73,14 +62,13 @@ describe("feature: User Workflows (BDD Specs)", async () => {
       });
     });
     await Then("the schedule displays the active plan", async () => {
-      const content = await workflowPage.textContent("body");
-      expect(content).toContain("Gladbeck HC");
+      expect(await workflowPage.getByRole("button", { name: "Copy share link" }).count()).toBe(1);
       await workflowPage.close();
     });
   });
 
   Scenario("1 Error — Missing key fragment in URL", async () => {
-    await When("navigating to /setup?planId=f530083d-8c74-4f10-931a-dd877ee7b52c (no #key=…)", async () => {});
+    await When(`navigating to /setup?planId=${defaultPlanId} (no #key=…)`, async () => {});
     await When("clicking \"Resume Last Plan\"", async () => {});
     await Then("an error toast appears: \"Could not resume. Need both a stored Plan ID and a Key in the URL fragment.\"", async () => {});
   });

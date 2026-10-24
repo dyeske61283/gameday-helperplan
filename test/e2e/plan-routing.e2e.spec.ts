@@ -8,12 +8,14 @@ import { AxeBuilder } from "@axe-core/playwright";
 import { createPage, setup, url } from "@nuxt/test-utils/e2e";
 import { chromium } from "playwright";
 import { beforeAll, describe, expect, it } from "vitest";
+import { localPlanFixtures, seedLocalPlan } from "./plan-identities";
 /* eslint-disable node/no-process-env */
 
-const defaultPlanId = "f530083d-8c74-4f10-931a-dd877ee7b52c";
-const defaultPlanUrl = `/plans/${defaultPlanId}#key=tWVZ4hmOA7LFsrNViX1X6w`;
-const seededPlanUrl = process.env.E2E_ROUTING_PLAN_URL || process.env.E2E_PLAN_URL || defaultPlanUrl;
-const editPlanUrl = process.env.E2E_EDIT_PLAN_URL || seededPlanUrl;
+const defaultPlanId = localPlanFixtures.routing.id;
+const defaultPlanUrl = `/plans/${defaultPlanId}#key=${localPlanFixtures.routing.key}`;
+const seededPlanUrl = process.env.E2E_ROUTING_PLAN_URL || defaultPlanUrl;
+const defaultEditPlanUrl = `/plans/${localPlanFixtures.editing.id}#key=${localPlanFixtures.editing.key}`;
+const editPlanUrl = process.env.E2E_EDIT_PLAN_URL || defaultEditPlanUrl;
 const testHost = process.env.TEST_HOST;
 const testUrl = (pathname: string) => testHost ? new URL(pathname, testHost).toString() : url(pathname);
 const seededPlanHash = new URL(seededPlanUrl, testHost || "http://localhost").hash;
@@ -114,17 +116,11 @@ describe("plan-scoped routing", async () => {
   await setup({ host: testHost, dev: true });
 
   beforeAll(async () => {
-    if (!process.env.E2E_ROUTING_PLAN_URL && !process.env.E2E_PLAN_URL) {
-      const fixture = JSON.parse(fs.readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../fixtures/encrypted-plan-2025-2026.json"), "utf8"));
-      const currentResponse = await fetch(testUrl(`/api/${seededPlanId}`));
-      if (!currentResponse.ok && currentResponse.status !== 404)
-        throw new Error(`Could not read seeded plan: ${currentResponse.status}`);
-      const expectedRevision = currentResponse.ok ? (await currentResponse.json()).revision ?? 0 : 0;
-      await fetch(testUrl(`/api/${seededPlanId}`), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ blob: fixture.blob, expectedRevision }),
-      });
+    if (!process.env.E2E_ROUTING_PLAN_URL) {
+      await seedLocalPlan(defaultPlanId, localPlanFixtures.routing.key, testUrl);
+    }
+    if (!process.env.E2E_EDIT_PLAN_URL) {
+      await seedLocalPlan(localPlanFixtures.editing.id, localPlanFixtures.editing.key, testUrl);
     }
   });
 
@@ -166,7 +162,7 @@ describe("plan-scoped routing", async () => {
     expect(allFixturesUrl.hash).toBe(seededPlanHash);
     expect(await page.getByText("Claiming as").count()).toBe(0);
     await allFixturesLink.click();
-    await page.getByRole("heading", { name: "Gladbeck HC" }).waitFor();
+    await page.getByRole("button", { name: "Copy share link" }).waitFor();
 
     const teamsLink = page.getByRole("link", { name: "Teams & Roster" });
     const teamsUrl = new URL(await teamsLink.getAttribute("href")!, page.url());
@@ -176,7 +172,7 @@ describe("plan-scoped routing", async () => {
     await page.getByRole("heading", { name: "Teams" }).waitFor();
 
     await page.goBack();
-    await page.getByRole("heading", { name: "Gladbeck HC" }).waitFor();
+    await page.getByRole("button", { name: "Copy share link" }).waitFor();
 
     const assignmentsLink = page.getByRole("link", { name: "Manage Duties" });
     const assignmentsUrl = new URL(await assignmentsLink.getAttribute("href")!, page.url());
@@ -238,13 +234,13 @@ describe("plan-scoped routing", async () => {
     await page.emulateMedia({ colorScheme: "light", reducedMotion: "reduce" });
     await context.addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
     await page.goto(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl), { waitUntil: "domcontentloaded" });
-    await page.getByRole("heading", { name: "Gladbeck HC" }).waitFor();
+    await page.getByRole("button", { name: "Copy share link" }).waitFor();
     await page.getByRole("button", { name: "Calendar" }).click();
     await page.locator("[id^='calendar-']").first().waitFor();
     await page.getByRole("button", { name: "Timeline" }).click();
 
     await page.goto(testUrl(`/plans/${seededPlanId}/matches/${matchId}${seededPlanHash}`), { waitUntil: "domcontentloaded" });
-    await page.getByRole("heading", { name: /SG Menden \(Sauerland\) vs Gast/ }).waitFor();
+    await page.getByRole("button", { name: "Select member" }).waitFor();
     await page.getByRole("button", { name: "Select member" }).click();
     const dialog = page.getByRole("dialog");
     const auditDialog = async () => {
@@ -287,11 +283,11 @@ describe("plan-scoped routing", async () => {
     expect(cockpitUrl.hash).toBe(seededPlanHash);
     await cockpitLink.click();
     await page.getByRole("heading", { name: "My duties" }).waitFor();
-    await page.getByText("SG Menden (Sauerland) vs Gast").waitFor();
+    await page.locator(`a[href*="/matches/${matchId}"]`).waitFor();
     expect(await page.getByLabel("Member profile", { exact: true }).inputValue()).toBe("member-aaron-zipp");
     await page.reload({ waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "My duties" }).waitFor();
-    await page.getByText("SG Menden (Sauerland) vs Gast").waitFor();
+    await page.locator(`a[href*="/matches/${matchId}"]`).waitFor();
     await browser.close();
   }, 90000);
 

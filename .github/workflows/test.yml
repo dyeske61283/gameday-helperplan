@@ -18,10 +18,10 @@ jobs:
         with:
           node-version: lts/*
       - run: pnpm install
-      - name: Validate plan schema and migrations
-        run: pnpm test:plan-schema
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps chromium
+      - name: Verify
+        run: pnpm verify
 
       - name: Get Deno Deploy URL
         id: get-url
@@ -41,22 +41,22 @@ jobs:
           echo "DENO_DEPLOY_REVISION_ID=$REVISION_ID" >> $GITHUB_ENV
           echo "deployment_url=$URL" >> $GITHUB_OUTPUT
 
-      - name: Seed isolated E2E plans
+      - name: Seed isolated preview smoke plan
         run: |
-          seed_plan() {
-            SEED_BASE_URL="$TEST_HOST" \
+          PLAN_URL=$(SEED_BASE_URL="$TEST_HOST" \
             SEED_PLAN_ID="$(node -e 'console.log(require("node:crypto").randomUUID())')" \
-            pnpm seed:plan | sed -n 's/^SEED_PLAN_URL=//p'
-          }
-          echo "E2E_WORKFLOW_PLAN_URL=$(seed_plan)" >> "$GITHUB_ENV"
-          echo "E2E_ROUTING_PLAN_URL=$(seed_plan)" >> "$GITHUB_ENV"
-          echo "E2E_EDIT_PLAN_URL=$(seed_plan)" >> "$GITHUB_ENV"
+            pnpm seed:plan | sed -n 's/^SEED_PLAN_URL=//p')
+          test -n "$PLAN_URL"
+          echo "::add-mask::$PLAN_URL"
+          echo "E2E_WORKFLOW_PLAN_URL=$PLAN_URL" >> "$GITHUB_ENV"
           {
-            echo "## E2E test data"
-            echo "Seeded independent workflow, routing/sharing, and editing plans."
+            echo "## Deployment preview smoke data"
+            echo "Seeded an isolated plan for the shared-link smoke test."
+            echo "- [Open the seeded preview plan]($PLAN_URL)"
+            echo "> This is a public, editable test plan. Do not add personal data."
           } >> "$GITHUB_STEP_SUMMARY"
-      - name: Run Vitest tests
-        run: pnpm test
+      - name: Run deployment preview smoke test
+        run: pnpm test:preview
 
       - name: Show Deno runtime errors on test failure
         if: failure()
