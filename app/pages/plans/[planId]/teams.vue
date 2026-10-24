@@ -136,10 +136,10 @@ async function saveMember() {
   await autoSave(t("ui.memberSaved"), t("ui.memberUpdated", { name: selectedMember.value.name }));
 }
 
-async function addMember() {
+async function addMember(teamId?: string) {
   const newM = planStore.addMember({
     name: "New Member",
-    teamIds: [],
+    teamIds: teamId ? [teamId] : [],
     skillIds: [],
   });
   if (!newM)
@@ -201,7 +201,7 @@ async function deleteTeam(teamId: string) {
             icon="i-lucide-users-round"
             variant="outline"
             :disabled="!planStore.plan"
-            @click="addMember"
+            @click="addMember()"
           >
             {{ $t("ui.teams.addMember") }}
           </UButton>
@@ -274,7 +274,15 @@ async function deleteTeam(teamId: string) {
 
               <!-- Inside Members List -->
               <div v-if="getMembersForTeam(item.value).length === 0" class="text-sm text-neutral-400 py-2 text-center">
-                {{ $t("ui.teams.noMembersFound") }}
+                <UButton
+                  v-if="item.value !== 'teamless' && item.memberCount === 0"
+                  icon="i-lucide-user-round-plus"
+                  variant="outline"
+                  @click.stop="addMember(item.value)"
+                >
+                  {{ $t("ui.teams.addMember") }}
+                </UButton>
+                <span v-else>{{ $t("ui.teams.noMembersFound") }}</span>
               </div>
               <div v-else v-auto-animate class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button

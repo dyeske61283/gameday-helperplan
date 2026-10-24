@@ -38,4 +38,35 @@ describe("teams page", () => {
     expect(memberCard.element.tagName).toBe("BUTTON");
     expect(memberCard.find("div, h1, h2, h3, h4, h5, h6").exists()).toBe(false);
   });
+
+  it("offers to add a member to a genuinely empty team and preselects that team", async () => {
+    const planStore = usePlanStore();
+    planStore.createNewPlan("test-plan", "", { clubName: "Club", season: "2026/2027" });
+    const emptyTeam = planStore.addTeam("Empty team")!;
+    const occupiedTeam = planStore.addTeam("Occupied team")!;
+    planStore.addMember({ name: "Existing member", teamIds: [occupiedTeam.id], skillIds: [] });
+
+    const page = await mountSuspended(TeamsPage, {
+      route: "/plans/test-plan/teams",
+      global: { plugins: [pinia] },
+    });
+    await page.get("input[placeholder='Search members by name...']").setValue("no matching member");
+
+    const [emptyCard, occupiedCard, teamlessCard] = page.findAll("[data-slot='item']");
+    await emptyCard!.get("[data-slot='trigger']").trigger("click");
+    await occupiedCard!.get("[data-slot='trigger']").trigger("click");
+    await teamlessCard!.get("[data-slot='trigger']").trigger("click");
+    await flushPromises();
+
+    const addToEmptyTeam = emptyCard!.findAll("button").find(button => button.text() === "Add Member");
+    expect(addToEmptyTeam).toBeDefined();
+    expect(occupiedCard!.findAll("button").some(button => button.text() === "Add Member")).toBe(false);
+    expect(teamlessCard!.text()).toContain("No members found");
+    expect(teamlessCard!.findAll("button").some(button => button.text() === "Add Member")).toBe(false);
+    await addToEmptyTeam!.trigger("click");
+    await flushPromises();
+
+    expect(document.body.textContent).toContain("Team Assignments");
+    expect(document.body.querySelector(`#team-${emptyTeam.id}`)?.getAttribute("aria-checked")).toBe("true");
+  });
 });
