@@ -1,6 +1,6 @@
 # Concurrent Plan Edits and Conflict Resolution
 
-**Status:** proposed
+**Status:** accepted
 
 ## Context
 
@@ -16,7 +16,13 @@ The user-facing contract for concurrent edits is:
 - Notify users when a conflict requires resolution; do not show a notification for a clean merge.
 - Never silently overwrite local edits or a newer remote revision.
 
-The merge mechanism is not yet decided. A design/prototype will compare a CRDT approach with schema-aware three-way merge. Reconciliation remains client-side so the server can continue treating plan payloads as opaque encrypted data.
+Use a client-side, schema-aware three-way merge rather than a CRDT for the first implementation. Retain the common base snapshot, local draft, and latest remote snapshot; merge independent changes automatically, and preserve all alternatives for same-field and delete-versus-edit conflicts until the user resolves them. Reconciliation remains client-side so the server can continue treating plan payloads as opaque encrypted data.
+
+Merge keyed collections by stable entity IDs, never array position. Production rules must distinguish entity collections, ordered entities, and relationship arrays; the JSON-tree prototype is evidence for the approach, not production merge coverage.
+
+## Alternatives Considered
+
+CRDTs better support offline edits and richer multi-writer collaboration, but require operation metadata and merge semantics for each plan field and collection. The current connected-client flow already has a common base snapshot and revision/CAS boundary, so schema-aware three-way merge is the smaller first step. Last-writer-wins is rejected because it would silently discard one side of a same-field conflict.
 
 ## Consequences
 
@@ -24,8 +30,9 @@ The merge mechanism is not yet decided. A design/prototype will compare a CRDT a
 - Merge semantics must account for stable entity IDs, collections, additions, and deletions.
 - Tests must cover independent edits, same-field edits, delete-versus-edit, stale CAS writes, and explicit resolution.
 - Offline reconciliation, editor identity, and a full collaborative presence/locking protocol are out of scope.
-- The merge strategy and its tradeoffs should be recorded after the prototype before production implementation.
+- Production auto-merge retries re-encrypt the plan. Do not implement that path until the fixed-IV AES-GCM format is replaced with the nonce-safe format tracked in #70.
+- The prototype is retained as reference on its `prototype/issue-63-plan-merge` branch; only this decision record is merged to `main`.
 
 ## Implementation State
 
-The client currently defers newer SSE plans while an editor is active, but does not merge concurrent edits or provide user-facing conflict resolution. The design/prototype is tracked in #63; implementation is blocked on that result in #28.
+The client currently defers newer SSE plans while an editor is active, but does not merge concurrent edits or provide user-facing conflict resolution. The schema-aware strategy was evaluated in prototype PR #66 and is implemented by #28 after the nonce-safety prerequisite in #70.
