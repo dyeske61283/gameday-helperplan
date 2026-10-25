@@ -365,6 +365,14 @@
       "selectAMemberFromAMatchToSeePersonalDuties": "Select a member from a match to see personal duties.",
       "youHaveNoPersonalDuties": "You have no personal duties."
     },
+    "calendarFeeds": {
+      "downloadMatches": "Download matches (.ics)",
+      "downloadMyDuties": "Download my duties (.ics)",
+      "createSubscription": "Create calendar subscription",
+      "openInCalendarApp": "Open in a calendar app",
+      "feedUrl": "HTTPS calendar feed URL",
+      "subscriptionFailed": "Could not create the calendar subscription."
+    },
     "match": {
       "loadingMatch": "Loading match...",
       "matchNotFound": "Match not found",

@@ -142,7 +142,7 @@ describe("plan-scoped routing", async () => {
     await page.goto(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl), { waitUntil: "domcontentloaded" });
     await page.getByText("Season fixtures, helper schedules, and real-time duty tracking.").waitFor();
 
-    await page.getByRole("button", { name: "Calendar" }).click();
+    await page.getByRole("button", { name: "Calendar", exact: true }).click();
     await page.locator("[id^='calendar-']").first().waitFor();
     await page.getByRole("button", { name: "Timeline" }).click();
     expect(await page.locator("[id^='calendar-']").count()).toBe(0);
@@ -235,7 +235,7 @@ describe("plan-scoped routing", async () => {
     await context.addCookies([{ name: "i18n_redirected", value: "en", url: testUrl("/") }]);
     await page.goto(seededPlanUrl.startsWith("http") ? seededPlanUrl : testUrl(seededPlanUrl), { waitUntil: "domcontentloaded" });
     await page.getByRole("button", { name: "Copy share link" }).waitFor();
-    await page.getByRole("button", { name: "Calendar" }).click();
+    await page.getByRole("button", { name: "Calendar", exact: true }).click();
     await page.locator("[id^='calendar-']").first().waitFor();
     await page.getByRole("button", { name: "Timeline" }).click();
 

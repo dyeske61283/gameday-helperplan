@@ -1,8 +1,10 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  runtimeConfig: {
+    calendarFeedSecret: "",
+  },
   modules: [
     "@nuxt/ui",
-    "@formkit/auto-animate/nuxt",
     "@nuxt/eslint",
     "@nuxtjs/i18n",
     "@pinia/nuxt",

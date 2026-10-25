@@ -119,5 +119,7 @@ or attendee workflow.
 
 ## Implementation State
 
-Accepted design; implementation pending. The related implementation tasks are
+Implemented in the plan-scoped schedule and cockpit. Configure the private
+`NUXT_CALENDAR_FEED_SECRET` runtime variable with a random value of at least 32
+characters; feed tokens expire after 90 days. The related implementation is
 tracked in GitHub issue #40.

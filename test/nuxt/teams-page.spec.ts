@@ -1,6 +1,6 @@
 import { mountSuspended } from "@nuxt/test-utils/runtime";
 import { flushPromises } from "@vue/test-utils";
-import { createPinia, setActivePinia } from "pinia";
+import { createPinia, piniaSymbol, setActivePinia } from "pinia";
 import { beforeEach, describe, expect, it } from "vitest";
 import TeamsPage from "../../app/pages/plans/[planId]/teams.vue";
 import { usePlanStore } from "../../app/stores/plan";
@@ -21,7 +21,7 @@ describe("teams page", () => {
 
     const page = await mountSuspended(TeamsPage, {
       route: "/plans/test-plan/teams",
-      global: { plugins: [pinia] },
+      global: { provide: { [piniaSymbol]: pinia } },
     });
     const header = page.get("[data-slot='trigger']");
     const title = header.get("[data-slot='label']");
@@ -49,7 +49,7 @@ describe("teams page", () => {
 
     const page = await mountSuspended(TeamsPage, {
       route: "/plans/test-plan/teams",
-      global: { plugins: [pinia] },
+      global: { provide: { [piniaSymbol]: pinia } },
     });
     const [emptyCard, occupiedCard, teamlessCard] = page.findAll("[data-slot='item']");
     await emptyCard!.get("[data-slot='trigger']").trigger("click");
@@ -83,7 +83,7 @@ describe("teams page", () => {
     const planBeforeCancel = JSON.stringify(planStore.plan);
     const page = await mountSuspended(TeamsPage, {
       route: "/plans/test-plan/teams",
-      global: { plugins: [pinia] },
+      global: { provide: { [piniaSymbol]: pinia } },
     });
     const [teamCard] = page.findAll("[data-slot='item']");
 
@@ -105,7 +105,7 @@ describe("teams page", () => {
     planStore.addMember({ name: "Member to remove", teamIds: [], skillIds: [] });
     const page = await mountSuspended(TeamsPage, {
       route: "/plans/test-plan/teams",
-      global: { plugins: [pinia] },
+      global: { provide: { [piniaSymbol]: pinia } },
     });
     const teamlessCard = page.findAll("[data-slot='item']").at(-1)!;
     await teamlessCard.get("[data-slot='trigger']").trigger("click");
@@ -140,7 +140,7 @@ describe("teams page", () => {
     planStore.addMember({ name: "Existing member", teamIds: [occupiedTeam.id], skillIds: [] });
     const page = await mountSuspended(TeamsPage, {
       route: "/plans/test-plan/teams",
-      global: { plugins: [pinia] },
+      global: { provide: { [piniaSymbol]: pinia } },
     });
 
     await page.get("input[placeholder='Search members by name...']").setValue("no matching member");

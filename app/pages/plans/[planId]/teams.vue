@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { vAutoAnimate } from "@formkit/auto-animate/vue";
 import { usePlanStore } from "~/stores/plan";
 
 const planStore = usePlanStore();
