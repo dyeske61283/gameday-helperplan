@@ -411,6 +411,7 @@ describe("plan-scoped routing", async () => {
     await page.getByRole("button", { name: "Confirm Assignment" }).click();
     await saveAssignment;
     await page.getByText("Browser Guest", { exact: true }).waitFor();
+    await page.getByText("You have unsaved local plan edits.", { exact: true }).waitFor({ state: "hidden" });
 
     await page.getByText("Wischer 1", { exact: true }).first().click();
     const assignmentDialog = page.getByRole("dialog", { name: "Assign Helper to Slot" });
