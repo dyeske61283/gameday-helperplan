@@ -47,7 +47,6 @@ jobs:
             SEED_PLAN_ID="$(node -e 'console.log(require("node:crypto").randomUUID())')" \
             pnpm seed:plan | sed -n 's/^SEED_PLAN_URL=//p')
           test -n "$PLAN_URL"
-          echo "::add-mask::$PLAN_URL"
           echo "E2E_WORKFLOW_PLAN_URL=$PLAN_URL" >> "$GITHUB_ENV"
           {
             echo "## Deployment preview smoke data"
