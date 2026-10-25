@@ -44,6 +44,7 @@ jobs:
           echo "deployment_url=$URL" >> $GITHUB_OUTPUT
 
       - name: Seed isolated preview smoke plan
+        if: ${{ !cancelled() && steps.get-url.outcome == 'success' }}
         run: |
           PLAN_URL=$(SEED_BASE_URL="$TEST_HOST" \
             SEED_PLAN_ID="$(node -e 'console.log(require("node:crypto").randomUUID())')" \
