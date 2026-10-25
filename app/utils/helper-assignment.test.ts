@@ -1,6 +1,6 @@
 import type { SeasonPlan } from "./plan-types";
 import { describe, expect, it } from "vitest";
-import { autoAssignMatchDuties, completeClosedAssignments, getMemberDutyCounts, isMemberEligibleForSlot } from "./helper-assignment";
+import { autoAssignMatchDuties, claimDuty, completeClosedAssignments, getMemberDutyCounts, isMemberEligibleForSlot } from "./helper-assignment";
 import { CURRENT_SCHEMA_VERSION } from "./plan-types";
 
 describe("assign helpers to slots with restrictions and reducing assignment count average", () => {
@@ -187,6 +187,20 @@ describe("assign helpers to slots with restrictions and reducing assignment coun
 
     expect(isMemberEligibleForSlot(plan, slot, "m_alice")).toBe(true);
     expect(isMemberEligibleForSlot(plan, slot, "m_bob")).toBe(false);
+  });
+
+  it("claims an open duty through the domain operation using the supplied time", () => {
+    const plan = createTestPlan();
+    const now = new Date("2026-10-25T12:00:00.000Z");
+
+    claimDuty(plan, "m_target", "slot_ref", "m_alice", now);
+
+    const slot = plan.matches.m_target!.slots[0]!;
+    expect(slot.assignedMemberId).toBe("m_alice");
+    expect(slot.assignmentStatus).toBe("ASSIGNED");
+    expect(slot.updatedAt).toBe(now);
+    expect(plan.matches.m_target!.updatedAt).toBe(now);
+    expect(plan.lastUpdated).toBe(now);
   });
 
   it("completes assigned duties after the gameday closes", () => {

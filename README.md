@@ -76,6 +76,36 @@ The encryption key is generated locally and only appears in the printed link.
 Treat that link as a bearer secret. GitHub Actions runs the same command for
 E2E deployments and publishes the link in the workflow summary.
 
+### Run a Decrypted Plan Command
+
+The internal runner reads one JSON request from stdin or a file. Its `plan`
+must be decrypted `SeasonPlan` JSON; mutation requests require an explicit ISO
+`now` so results are deterministic. For example:
+
+```json
+{
+  "command": "claim-duty",
+  "plan": { "...": "decrypted SeasonPlan" },
+  "matchId": "match-1",
+  "slotId": "slot-1",
+  "memberId": "member-1",
+  "now": "2026-10-25T12:00:00.000Z"
+}
+```
+
+Run a request from a file or pipe it on stdin:
+
+```bash
+deno run --unstable-sloppy-imports --allow-read scripts/plan-runner.ts request.json
+cat request.json | deno run --unstable-sloppy-imports --allow-read scripts/plan-runner.ts
+```
+
+Supported commands are `validate`, `claim-duty`, `auto-assign`, and
+`complete-assignments`. Auto-assignment takes `matchId`, `now`, and optional
+`balanceDutyCounts` / `excludeConflicts` booleans. Successful output is one
+compact JSON object containing a mutation summary and the resulting plan;
+errors go to stderr and exit nonzero.
+
 ## Toolchain
 
 This project uses ESLint for linting and formatting.
