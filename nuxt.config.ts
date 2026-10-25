@@ -5,7 +5,6 @@ export default defineNuxtConfig({
   },
   modules: [
     "@nuxt/ui",
-    "@formkit/auto-animate/nuxt",
     "@nuxt/eslint",
     "@nuxtjs/i18n",
     "@pinia/nuxt",

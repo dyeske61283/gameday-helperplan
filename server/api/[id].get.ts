@@ -49,80 +49,63 @@ export default eventHandler(async (event) => {
   plan.revision ??= 0;
 
   if (getHeader(event, "accept") === "text/event-stream") {
-    let unwatch: Awaited<ReturnType<typeof storage.watch>> | undefined;
     let isClosed = false;
+    let isPolling = false;
+    let latestRevision = plan.revision ?? 0;
+    let pollTimer: ReturnType<typeof setInterval>;
     const eventStream = createEventStream(event);
     const denoEvent = event as typeof event & {
       runtime?: { deno?: { info?: { completed?: Promise<unknown> } } };
     };
     denoEvent.runtime?.deno?.info?.completed?.catch(error => console.warn("Deno plan stream request closed", error));
 
-    async function stopWatching() {
-      const stop = unwatch;
-      unwatch = undefined;
-      if (!stop)
-        return;
-      try {
-        await stop();
-      }
-      catch (error) {
-        console.warn("Failed to stop closed plan watcher", error);
-      }
-    }
-
     async function closeEventStream() {
       isClosed = true;
+      clearInterval(pollTimer);
       try {
         await eventStream.close();
       }
       catch (error) {
         console.warn("Failed to close plan event stream", error);
       }
-      await stopWatching();
     }
+
+    // ponytail: one storage read per second per stream; use plan-scoped pub/sub if connection volume makes this costly.
+    pollTimer = setInterval(() => {
+      if (isClosed || isPolling)
+        return;
+      isPolling = true;
+      void (async () => {
+        try {
+          const latestPlan = await storage.getItem(id);
+          if (!latestPlan) {
+            await closeEventStream();
+            return;
+          }
+          const revision = latestPlan.revision ?? 0;
+          if (revision <= latestRevision)
+            return;
+
+          const hydratedPlan = await hydrateChunks(latestPlan, id);
+          await eventStream.push(JSON.stringify({ blob: hydratedPlan.blob, revision }));
+          latestRevision = revision;
+        }
+        catch (error) {
+          console.error("Failed to poll plan updates", error);
+          await closeEventStream();
+        }
+        finally {
+          isPolling = false;
+        }
+      })();
+    }, 1000);
 
     eventStream.onClosed(() => {
       isClosed = true;
-      void stopWatching();
+      clearInterval(pollTimer);
     });
 
-    if (plan) {
-      eventStream.push(JSON.stringify({ blob: plan.blob, revision: plan.revision }));
-    }
-
-    try {
-      unwatch = await storage.watch(async (planUpdateEvent, planIdIncludingPrefix) => {
-        if (isClosed)
-          return;
-        if (planIdIncludingPrefix !== `${storageName}:${id}`)
-          return;
-        if (planUpdateEvent === "remove") {
-          await closeEventStream();
-          return;
-        }
-
-        if (planUpdateEvent === "update") {
-          try {
-            const latestPlan = await storage.getItem(id);
-            if (!latestPlan || isClosed) {
-              await closeEventStream();
-              return;
-            }
-            const hydratedPlan = await hydrateChunks(latestPlan, id);
-            await eventStream.push(JSON.stringify({ blob: hydratedPlan.blob, revision: hydratedPlan.revision ?? 0 }));
-          }
-          catch (error) {
-            console.error("Failed to push update to event stream", error);
-            await closeEventStream();
-          }
-        }
-      });
-      if (isClosed)
-        await stopWatching();
-    }
-    catch (error) {
-      console.error("Storage watch failed", error);
-    }
+    void eventStream.push(JSON.stringify({ blob: plan.blob, revision: latestRevision }));
 
     return eventStream.send();
   }

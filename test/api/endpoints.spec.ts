@@ -27,6 +27,44 @@ describe("api endpoints", async () => {
     expect(res).toMatchObject({ blob: "test-plan-content", meta: {}, revision: 1 });
   });
 
+  it("streams a saved plan revision to connected clients", async () => {
+    const planId = globalThis.crypto.randomUUID();
+    await $fetch(`/api/${planId}`, {
+      method: "POST",
+      body: { blob: "initial", expectedRevision: 0 },
+    });
+    const controller = new AbortController();
+    const response = await fetch(`/api/${planId}`, {
+      headers: { Accept: "text/event-stream" },
+      signal: controller.signal,
+    });
+    const reader = response.body!.getReader();
+    const decoder = new TextDecoder();
+
+    try {
+      expect(decoder.decode((await reader.read()).value)).toContain("\"revision\":1");
+      await $fetch(`/api/${planId}`, {
+        method: "POST",
+        body: { blob: "updated", expectedRevision: 1 },
+      });
+
+      let timeout: ReturnType<typeof setTimeout>;
+      const nextEvent = await Promise.race([
+        reader.read(),
+        new Promise<never>((_, reject) => {
+          timeout = setTimeout(() => reject(new Error("Timed out waiting for SSE revision")), 3000);
+        }),
+      ]).finally(() => clearTimeout(timeout));
+
+      expect(decoder.decode(nextEvent.value)).toContain("\"revision\":2");
+      expect(decoder.decode(nextEvent.value)).toContain("\"blob\":\"updated\"");
+    }
+    finally {
+      controller.abort();
+      await reader.cancel().catch(() => {});
+    }
+  }, 10000);
+
   it.each([
     ["exactly one chunk", PLAN_BLOB_CHUNK_SIZE],
     ["one byte over one chunk", PLAN_BLOB_CHUNK_SIZE + 1],
