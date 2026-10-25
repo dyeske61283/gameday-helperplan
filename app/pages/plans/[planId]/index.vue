@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { Match } from "~/utils/plan-types";
+import { downloadICS } from "~/composables/use-calendar-feed";
 import { usePlanStore } from "~/stores/plan";
 import { buildCalendarLayout } from "~/utils/calendar-layout";
 import { copyToClipboard } from "~/utils/clipboard";
-import { generateMemberICal } from "~/utils/ical-export";
+import { generateMatchICal } from "~/utils/ical-export";
 import { createPlanLink } from "~/utils/plan-links";
 
 const route = useRoute();
@@ -16,6 +17,11 @@ usePlanInit();
 const planId = computed(() => String(route.params.planId));
 const shareUrl = computed(() => planStore.key ? createPlanLink(planId.value, planStore.key) : "");
 const shareState = ref<"idle" | "copied" | "failed">("idle");
+const calendarFeed = useCalendarFeed();
+const matchedMember = computed(() => {
+  const query = searchQuery.value.trim().toLowerCase();
+  return query ? planStore.membersList.find(member => member.name.toLowerCase().includes(query)) ?? null : null;
+});
 
 function planLink(path = "") {
   const pathname = `/plans/${planId.value}${path}`;
@@ -30,14 +36,6 @@ async function copyShareUrl() {
   }
   catch { shareState.value = "failed"; }
 }
-
-// Computed active member match if search matches a member
-const matchedMember = computed(() => {
-  const query = searchQuery.value.trim().toLowerCase();
-  if (!query)
-    return null;
-  return planStore.membersList.find(m => m.name.toLowerCase().includes(query));
-});
 
 // Filtered Gamedays
 const filteredGamedays = computed(() => {
@@ -87,23 +85,10 @@ function showTimeline(gamedayId?: string) {
     window.location.hash = `gameday-${gamedayId}`;
 }
 
-// Export iCal handler
 function handleExportICal() {
-  if (!matchedMember.value || !planStore.plan)
+  if (!planStore.plan)
     return;
-
-  const shareUrl = typeof window !== "undefined" ? window.location.href : "";
-  const icsContent = generateMemberICal(planStore.plan, matchedMember.value.id, shareUrl);
-
-  const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `duties-${matchedMember.value.name.replace(/\s+/g, "-")}.ics`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  downloadICS(generateMatchICal(planStore.plan), `matches-${planStore.plan.season.replace(/[^\w-]+/g, "-")}.ics`);
 }
 
 // Stats computed
@@ -161,6 +146,18 @@ const totalAssignedSlots = computed(() => {
       </div>
 
       <div class="flex flex-wrap gap-3">
+        <UButton icon="i-lucide-calendar-arrow-down" variant="outline" class="rounded-full" @click="handleExportICal">
+          {{ $t("ui.calendarFeeds.downloadMatches") }}
+        </UButton>
+        <UButton
+          v-if="planStore.key"
+          icon="i-lucide-calendar-plus"
+          variant="outline"
+          class="rounded-full"
+          @click="calendarFeed.create(planId, planStore.key, 'matches')"
+        >
+          {{ $t("ui.calendarFeeds.createSubscription") }}
+        </UButton>
         <UButton
           :to="planLink('/assignments')"
           icon="i-lucide-id-card-lanyard"
@@ -186,6 +183,13 @@ const totalAssignedSlots = computed(() => {
           {{ $t("ui.editPlan") }}
         </UButton>
       </div>
+      <div v-if="calendarFeed.feedUrl.value" class="mt-4 space-y-2">
+        <a :href="calendarFeed.webcalUrl.value ?? undefined" class="text-primary underline">{{ $t("ui.calendarFeeds.openInCalendarApp") }}</a>
+        <UInput :model-value="calendarFeed.feedUrl.value" readonly :aria-label="$t('ui.calendarFeeds.feedUrl')" />
+      </div>
+      <p v-if="calendarFeed.failed.value" role="alert" class="mt-2 text-sm text-error">
+        {{ $t("ui.calendarFeeds.subscriptionFailed") }}
+      </p>
     </div>
 
     <section v-if="shareUrl" aria-labelledby="share-heading" class="space-y-3 rounded-xl border border-primary/30 p-5">
@@ -235,7 +239,7 @@ const totalAssignedSlots = computed(() => {
       </div>
     </div>
 
-    <!-- Filter & Personal "My Duties" Bar -->
+    <!-- Schedule search -->
     <div class="p-4 rounded-2xl bg-surface-container-low border border-neutral-200 dark:border-neutral-800 space-y-4">
       <div class="flex flex-col sm:flex-row gap-4">
         <UInput
@@ -246,23 +250,6 @@ const totalAssignedSlots = computed(() => {
           class="grow"
           clearable
         />
-
-        <UButton
-          v-if="matchedMember"
-          icon="i-lucide-calendar-arrow-down"
-          color="secondary"
-          variant="solid"
-          class="shrink-0 rounded-xl"
-          @click="handleExportICal"
-        >
-          Export {{ matchedMember.name }}'s Duties (.ics)
-        </UButton>
-      </div>
-
-      <!-- Active Filter Helper Message -->
-      <div v-if="matchedMember" class="text-xs text-secondary font-medium flex items-center gap-1.5">
-        <UIcon name="i-lucide-sparkles" class="w-4 h-4" />
-        Filtering duties for <strong>{{ matchedMember.name }}</strong>. Use the button above to sync to Apple Calendar or Google Calendar.
       </div>
     </div>
 

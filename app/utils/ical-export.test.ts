@@ -1,10 +1,33 @@
 import type { SeasonPlan } from "./plan-types";
 import { describe, expect, it } from "vitest";
 import examplePlan from "../../test/fixtures/plan-2025-2026.json";
-import { generateICS, generateMemberICal } from "./ical-export";
-import { CURRENT_SCHEMA_VERSION } from "./plan-types";
+import { generateICS, generateMatchICal, generateMemberICal } from "./ical-export";
+import { CURRENT_SCHEMA_VERSION, parseSeasonPlan } from "./plan-types";
 
 describe("iCal Calendar Export", () => {
+  it("exports every plan match with stable IDs and no assignments", () => {
+    const plan = structuredClone(parseSeasonPlan(examplePlan));
+    const firstMatch = Object.values(plan.matches)[0]!;
+    firstMatch.slots[0]!.assignedMemberId = Object.keys(plan.members)[0]!;
+    const ics = generateMatchICal(plan);
+
+    expect((ics.match(/BEGIN:VEVENT/g) ?? []).length).toBe(Object.keys(plan.matches).length);
+    expect(ics).toContain(`UID:match-${firstMatch.id}@gameday-helperplan`);
+    expect(ics).toContain(`DTSTART:${firstMatch.time.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "")}`);
+    expect(ics).not.toContain("Duty:");
+    expect(ics).not.toContain("member-");
+  });
+
+  it("keeps cancelled matches in the calendar with a cancelled status", () => {
+    const plan = structuredClone(parseSeasonPlan(examplePlan));
+    const match = Object.values(plan.matches)[0]!;
+    (match as SeasonPlan["matches"][string] & { status?: string }).status = "CANCELLED";
+    const ics = generateMatchICal(plan);
+
+    expect(ics).toContain(`UID:match-${match.id}@gameday-helperplan`);
+    expect(ics).toContain("STATUS:CANCELLED");
+  });
+
   it("should generate a valid empty VCALENDAR", () => {
     const ics = generateICS([]);
     expect(ics).toContain("BEGIN:VCALENDAR");
@@ -24,7 +47,7 @@ describe("iCal Calendar Export", () => {
     expect(memberWithDuty).toBeDefined();
 
     if (memberWithDuty) {
-      const shareUrl = "https://example.com/setup?planId=f530083d-8c74-4f10-931a-dd877ee7b52c#key=tWVZ4hmOA7LFsrNViX1X6w";
+      const shareUrl = "https://example.com/setup#key=abcdefghijklmnopqrstuv";
       const ics = generateMemberICal(plan, memberWithDuty.id, shareUrl);
 
       expect(ics).toContain("BEGIN:VCALENDAR");
@@ -72,7 +95,7 @@ describe("iCal Calendar Export", () => {
       },
     };
 
-    const ics = generateMemberICal(plan, "m1", "https://example.com/plan");
+    const ics = generateMemberICal(plan, "m1");
     expect(ics).toContain("SUMMARY:Duty: Hall Opening & Setup (Gameday 2026-11-15)");
     expect(ics).toContain("LOCATION:Sportarena Süd");
     expect(ics).toContain("UID:duty-m1-gd-gd1-slot_gd1@gameday-helperplan");
@@ -94,6 +117,31 @@ describe("iCal Calendar Export", () => {
     expect(ics).toContain("SUMMARY:Duty\\, with comma\\; and semicolon");
     expect(ics).toContain("LOCATION:Hall\\, Room 1\\; Gym");
     expect(ics).toContain("DESCRIPTION:Line 1\\nLine 2 with \\\\backslash");
+  });
+
+  it("omits invalid event dates rather than returning malformed ICS", () => {
+    const ics = generateICS([{
+      uid: "bad-date@gameday-helperplan",
+      title: "Invalid date",
+      startDate: new Date(Number.NaN),
+      endDate: new Date("2026-10-15T15:30:00Z"),
+    }]);
+
+    expect(ics).toContain("BEGIN:VCALENDAR");
+    expect(ics).not.toContain("BEGIN:VEVENT");
+    expect(ics).toContain("END:VCALENDAR");
+  });
+
+  it("does not allow event IDs to inject calendar lines", () => {
+    const ics = generateICS([{
+      uid: "safe\r\nBEGIN:VEVENT",
+      title: "Test",
+      startDate: new Date("2026-10-15T14:00:00Z"),
+      endDate: new Date("2026-10-15T15:00:00Z"),
+    }]);
+
+    expect(ics).toContain("UID:safe\\nBEGIN:VEVENT");
+    expect((ics.match(/^BEGIN:VEVENT$/gm) ?? []).length).toBe(1);
   });
 
   it("returns empty calendar when member is not found", () => {

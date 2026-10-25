@@ -365,6 +365,14 @@
       "selectAMemberFromAMatchToSeePersonalDuties": "Wählen Sie in einem Spiel ein Mitglied aus, um persönliche Aufgaben zu sehen.",
       "youHaveNoPersonalDuties": "Sie haben keine persönlichen Aufgaben."
     },
+    "calendarFeeds": {
+      "downloadMatches": "Spiele herunterladen (.ics)",
+      "downloadMyDuties": "Meine Aufgaben herunterladen (.ics)",
+      "createSubscription": "Kalenderabonnement erstellen",
+      "openInCalendarApp": "In einer Kalender-App öffnen",
+      "feedUrl": "HTTPS-Kalender-Feed-URL",
+      "subscriptionFailed": "Das Kalenderabonnement konnte nicht erstellt werden."
+    },
     "match": {
       "loadingMatch": "Spiel wird geladen...",
       "matchNotFound": "Spiel nicht gefunden",

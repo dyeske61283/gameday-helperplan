@@ -19,8 +19,9 @@ export default defineConfig({
       {
         test: {
           name: "api",
-          include: ["test/api/*.{test,spec}.ts"],
+          include: ["test/api/*.{test,spec}.ts", "server/utils/*.{test,spec}.ts"],
           environment: "node",
+          fileParallelism: false,
         },
       },
       {

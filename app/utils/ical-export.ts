@@ -2,6 +2,7 @@ import type { SeasonPlan } from "./plan-types";
 
 export type ICalEvent = {
   uid?: string;
+  status?: "CANCELLED";
   title: string;
   description?: string;
   location?: string;
@@ -34,6 +35,8 @@ export function generateICS(events: ICalEvent[]): string {
   ];
 
   for (const event of events) {
+    if (!Number.isFinite(event.startDate.getTime()) || !Number.isFinite(event.endDate.getTime()))
+      continue;
     const now = formatDateToICS(new Date());
     const start = formatDateToICS(new Date(event.startDate));
     const end = formatDateToICS(new Date(event.endDate));
@@ -41,12 +44,15 @@ export function generateICS(events: ICalEvent[]): string {
 
     lines.push(
       "BEGIN:VEVENT",
-      `UID:${uid}`,
+      `UID:${escapeICSText(uid)}`,
       `DTSTAMP:${now}`,
       `DTSTART:${start}`,
       `DTEND:${end}`,
       `SUMMARY:${escapeICSText(event.title)}`,
     );
+
+    if (event.status)
+      lines.push(`STATUS:${event.status}`);
 
     if (event.location) {
       lines.push(`LOCATION:${escapeICSText(event.location)}`);
@@ -61,6 +67,23 @@ export function generateICS(events: ICalEvent[]): string {
 
   lines.push("END:VCALENDAR");
   return lines.join("\r\n");
+}
+
+export function generateMatchICal(plan: SeasonPlan): string {
+  return generateICS(Object.values(plan.matches).map((match) => {
+    const homeTeam = plan.teams[match.homeTeamId]?.name || match.homeTeamId;
+    const gameday = Object.values(plan.gamedays).find(day => day.matchIds.includes(match.id));
+    const location = plan.config.locations.find(loc => loc.id === gameday?.locationId);
+
+    return {
+      uid: `match-${match.id}@gameday-helperplan`,
+      title: `${homeTeam} vs ${match.awayTeamName}`,
+      location: location?.name,
+      startDate: match.time,
+      endDate: new Date(match.time.getTime() + 90 * 60 * 1000),
+      ...(match.status === "CANCELLED" ? { status: "CANCELLED" as const } : {}),
+    };
+  }));
 }
 
 export function generateMemberICal(plan: SeasonPlan, memberId: string, shareUrl?: string): string {
@@ -94,6 +117,7 @@ export function generateMemberICal(plan: SeasonPlan, memberId: string, shareUrl?
         description: `Helper Duty for ${roleName}\nMatch: ${homeTeam} vs ${match.awayTeamName}${shareUrl ? `\nPlan Link: ${shareUrl}` : ""}`,
         startDate: matchTime,
         endDate: endTime,
+        ...(slot.assignmentStatus === "CANCELLED" ? { status: "CANCELLED" as const } : {}),
       });
     }
   }
@@ -118,13 +142,17 @@ export function generateMemberICal(plan: SeasonPlan, memberId: string, shareUrl?
       const role = plan.config.roles.find(r => r.id === slot.roleId);
       const roleName = role?.name || slot.roleId;
 
+      if (!Number.isFinite(startTime.getTime()) || !Number.isFinite(endTime.getTime()))
+        continue;
+
       events.push({
         uid: `duty-${memberId}-gd-${gameday.id}-${slot.id}@gameday-helperplan`,
         title: `Duty: ${roleName} (Gameday ${dateStr})`,
         location: location?.name || "Home Turf",
         description: `Gameday Duty for ${roleName}\nDate: ${dateStr}${shareUrl ? `\nPlan Link: ${shareUrl}` : ""}`,
-        startDate: Number.isNaN(startTime.getTime()) ? new Date() : startTime,
-        endDate: Number.isNaN(endTime.getTime()) ? new Date() : endTime,
+        startDate: startTime,
+        endDate: endTime,
+        ...(slot.assignmentStatus === "CANCELLED" ? { status: "CANCELLED" as const } : {}),
       });
     }
   }

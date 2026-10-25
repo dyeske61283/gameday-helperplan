@@ -78,6 +78,7 @@ export type Gameday = z.infer<typeof GamedaySchema>;
 export const MatchSchema = z.strictObject({
   id: z.string(),
   time: isoDateTimeStringToDateSchema,
+  status: z.enum(["SCHEDULED", "CANCELLED"]).optional(),
   homeTeamId: z.string(),
   awayTeamName: z.string(),
   helperTeamId: z.string().optional(),

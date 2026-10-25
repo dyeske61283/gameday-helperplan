@@ -1,16 +1,25 @@
 <script setup lang="ts">
+import { downloadICS } from "~/composables/use-calendar-feed";
 import { usePlanStore } from "~/stores/plan";
+import { generateMemberICal } from "~/utils/ical-export";
 import { createPlanLink } from "~/utils/plan-links";
 
 const route = useRoute();
 const planStore = usePlanStore();
 const { t } = useI18n();
 const planError = computed(() => planStore.error?.startsWith("ui.") ? t(planStore.error) : planStore.error);
+const calendarFeed = useCalendarFeed();
 usePlanInit();
 function planLink(path = "") {
   const planId = String(route.params.planId);
   const pathname = `/plans/${planId}${path}`;
   return createPlanLink(planId, planStore.key!, pathname);
+}
+function downloadDuties() {
+  if (!planStore.plan || !planStore.selectedMemberId)
+    return;
+  const member = planStore.members[planStore.selectedMemberId];
+  downloadICS(generateMemberICal(planStore.plan, planStore.selectedMemberId, window.location.href), `duties-${member?.name.replace(/\s+/g, "-") || "member"}.ics`);
 }
 const duties = computed(() => {
   if (!planStore.selectedMemberId)
@@ -45,6 +54,23 @@ const duties = computed(() => {
         </option>
       </select>
     </label>
+    <section v-if="planStore.selectedMemberId && planStore.key" class="space-y-3">
+      <div class="flex flex-wrap gap-2">
+        <UButton icon="i-lucide-calendar-arrow-down" variant="outline" @click="downloadDuties">
+          {{ $t("ui.calendarFeeds.downloadMyDuties") }}
+        </UButton>
+        <UButton icon="i-lucide-calendar-plus" variant="outline" @click="calendarFeed.create(String(route.params.planId), planStore.key, 'member-duties', planStore.selectedMemberId)">
+          {{ $t("ui.calendarFeeds.createSubscription") }}
+        </UButton>
+      </div>
+      <div v-if="calendarFeed.feedUrl.value" class="space-y-2">
+        <a :href="calendarFeed.webcalUrl.value ?? undefined" class="text-primary underline">{{ $t("ui.calendarFeeds.openInCalendarApp") }}</a>
+        <UInput :model-value="calendarFeed.feedUrl.value" readonly :aria-label="$t('ui.calendarFeeds.feedUrl')" />
+      </div>
+      <p v-if="calendarFeed.failed.value" role="alert" class="text-sm text-error">
+        {{ $t("ui.calendarFeeds.subscriptionFailed") }}
+      </p>
+    </section>
     <div v-if="planStore.error" class="rounded-xl border border-dashed p-8 text-center space-y-3">
       <p>{{ $t('ui.loadPlanFailed') }}</p>
       <p class="text-sm text-neutral-500">

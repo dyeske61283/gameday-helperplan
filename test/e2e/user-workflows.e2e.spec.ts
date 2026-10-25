@@ -466,7 +466,7 @@ describe("feature: User Workflows (BDD Specs)", async () => {
       expect(icsContent).toContain("BEGIN:VEVENT");
       expect(icsContent).toContain("END:VEVENT");
     });
-    await Then("each calendar event includes title, start/end times, hall location, and the direct encrypted plan URL (/setup?planId={id}#key={key}) in the event description", async () => {
+    await Then("each calendar event includes title, start/end times, hall location, and the direct encrypted plan URL", async () => {
       expect(icsContent).toContain("SUMMARY:Duty:");
       expect(icsContent).toContain("DTSTART:");
       expect(icsContent).toContain("DTEND:");
