@@ -99,7 +99,13 @@ function matchLink(matchId: string) {
           <span v-if="gameday.openingTime" class="ml-2">
             {{ t("dashboard.opens") }}: {{ gameday.openingTime }}
           </span>
+          <span v-if="gameday.closingTime" class="ml-2">
+            {{ t("dashboard.closes") }}: {{ gameday.closingTime }}
+          </span>
         </div>
+        <p v-if="gameday.notes" class="mt-2 text-sm text-on-surface-variant">
+          <span class="font-semibold">{{ t("ui.schedule.notes") }}:</span> {{ gameday.notes }}
+        </p>
       </div>
       <div class="flex items-center gap-2">
         <UBadge variant="soft" color="primary" size="sm">

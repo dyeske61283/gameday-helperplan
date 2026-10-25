@@ -206,10 +206,12 @@ describe("usePlanStore", () => {
     const draft = structuredClone(toRaw(store.plan!));
 
     expect(() => store.createGameday({ date: "2026-10-25", locationId: "missing" }, draft)).toThrow("location");
+    expect(() => store.createGameday({ date: "2026-10-25", locationId: "hall", openingTime: "invalid" }, draft)).toThrow("time");
+    expect(() => store.createGameday({ date: "2026-10-25", locationId: "hall", roleIds: ["missing"] }, draft)).toThrow("dutyRole");
     expect(draft.gamedays).toEqual({});
-    const gameday = store.createGameday({ date: "2026-10-25", locationId: "hall" }, draft);
+    const gameday = store.createGameday({ date: "2026-10-25", locationId: "hall", openingTime: "12:00", closingTime: "18:00", notes: "Bring the key" }, draft);
 
-    expect(gameday).toMatchObject({ date: "2026-10-25", locationId: "hall", matchIds: [] });
+    expect(gameday).toMatchObject({ date: "2026-10-25", locationId: "hall", openingTime: "12:00", closingTime: "18:00", notes: "Bring the key", matchIds: [] });
     expect(gameday.slots).toHaveLength(1);
     expect(gameday.slots[0]).toMatchObject({ roleId: "opening", assignmentStatus: "OPEN", assignedMemberId: null });
     expect(store.plan!.gamedays).toEqual({});
@@ -224,6 +226,7 @@ describe("usePlanStore", () => {
       { id: "referee", name: "Referee", scope: "match", requiredSkillId: "license" },
     ];
     const team = store.addTeam("Home team")!;
+    const helperTeam = store.addTeam("Helper team")!;
     const draft = structuredClone(toRaw(store.plan!));
     const gameday = store.createGameday({ date: "2026-10-25", locationId: "hall" }, draft);
 
@@ -231,11 +234,13 @@ describe("usePlanStore", () => {
     expect(draft.matches).toEqual({});
     expect(gameday.matchIds).toEqual([]);
     expect(() => store.createMatch({ gamedayId: gameday.id, time: "2026-10-25T13:00", homeTeamId: "missing", awayTeamName: "Away" }, draft)).toThrow("homeTeam");
+    expect(() => store.createMatch({ gamedayId: gameday.id, time: "2026-10-25T13:00", homeTeamId: team.id, awayTeamName: "Away", helperTeamId: "missing" }, draft)).toThrow("helperTeam");
+    expect(() => store.createMatch({ gamedayId: gameday.id, time: "2026-10-25T13:00", homeTeamId: team.id, awayTeamName: "Away", roleIds: ["missing"] }, draft)).toThrow("dutyRole");
     expect(draft.matches).toEqual({});
     expect(gameday.matchIds).toEqual([]);
-    const match = store.createMatch({ gamedayId: gameday.id, time: "2026-10-25T13:00", homeTeamId: team.id, awayTeamName: "Away" }, draft);
+    const match = store.createMatch({ gamedayId: gameday.id, time: "2026-10-25T13:00", homeTeamId: team.id, awayTeamName: "Away", helperTeamId: helperTeam.id }, draft);
 
-    expect(match).toMatchObject({ homeTeamId: team.id, awayTeamName: "Away" });
+    expect(match).toMatchObject({ homeTeamId: team.id, awayTeamName: "Away", helperTeamId: helperTeam.id });
     expect(match.time).toBeInstanceOf(Date);
     expect(match.slots).toHaveLength(1);
     expect(match.slots[0]).toMatchObject({ roleId: "referee", assignmentStatus: "OPEN", assignedMemberId: null });
