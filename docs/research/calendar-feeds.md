@@ -10,9 +10,9 @@ uses the AES key from the URL fragment, and decrypts it locally. No server-side
 iCalendar route exists today. The current member export is generated in the
 browser.
 
-The current encryption implementation uses AES-GCM with a fixed zero IV. ADR
-0007 records that unique IVs are future work. This is an existing security
-issue, not a recommendation for new feed cryptography.
+New plan saves use nonce-safe AES-GCM payloads; legacy fixed-IV plans remain
+readable and migrate on save. See ADR 0007. This remains separate from feed
+cryptography.
 
 ## Access Options
 

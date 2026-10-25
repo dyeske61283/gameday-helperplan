@@ -4,6 +4,8 @@
  * @see https://plus.excalidraw.com/blog/end-to-end-encryption
  */
 export function useEncryption() {
+  const formatPrefix = "v1.";
+
   /**
    * Generates a 128-bit AES-GCM key and returns its JWK 'k' parameter.
    * This 'k' value is base64url encoded and safe to use in URL fragments.
@@ -24,8 +26,7 @@ export function useEncryption() {
 
   /**
    * Encrypts a string using a JWK key string.
-   * Returns an ArrayBuffer containing the encrypted data.
-   * Uses a zero IV as suggested in the Excalidraw article for single-use keys.
+   * Returns a versioned base64 payload containing the IV and encrypted data.
    */
   const encryptData = async (data: string, k: string): Promise<string> => {
     if (import.meta.server) {
@@ -46,7 +47,7 @@ export function useEncryption() {
       ["encrypt"],
     );
 
-    const iv = new Uint8Array(12);
+    const iv = globalThis.crypto.getRandomValues(new Uint8Array(12));
     const encoded = new TextEncoder().encode(data);
 
     const encrypted = await globalThis.crypto.subtle.encrypt(
@@ -55,9 +56,11 @@ export function useEncryption() {
       encoded,
     );
 
-    const encryptedAsString = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+    const payload = new Uint8Array(iv.length + encrypted.byteLength);
+    payload.set(iv);
+    payload.set(new Uint8Array(encrypted), iv.length);
 
-    return encryptedAsString;
+    return `${formatPrefix}${btoa(String.fromCharCode(...payload))}`;
   };
 
   return {
@@ -70,6 +73,8 @@ export function useEncryption() {
  * Composable for client-side decryption using the Web Crypto API.
  */
 export function useDecryption() {
+  const formatPrefix = "v1.";
+
   /**
    * Decrypts a Blob using a JWK key string.
    * Returns the decrypted data as a string.
@@ -79,7 +84,8 @@ export function useDecryption() {
       throw new Error("Decryption is only available on the client side");
     }
 
-    const binaryString = atob(blob);
+    const isVersioned = blob.startsWith(formatPrefix);
+    const binaryString = atob(isVersioned ? blob.slice(formatPrefix.length) : blob);
     const bytes = new Uint8Array(binaryString.length);
     for (let i = 0; i < binaryString.length; i++) {
       bytes[i] = binaryString.charCodeAt(i);
@@ -99,13 +105,13 @@ export function useDecryption() {
       ["decrypt"],
     );
 
-    const iv = new Uint8Array(12);
+    const iv = isVersioned ? bytes.slice(0, 12) : new Uint8Array(12);
+    const ciphertext = isVersioned ? bytes.slice(12) : bytes;
 
-    // Decrypt using the ArrayBuffer blob (preferred method)
     const decrypted = await globalThis.crypto.subtle.decrypt(
       { name: "AES-GCM", iv },
       key,
-      bytes,
+      ciphertext,
     );
 
     return new TextDecoder().decode(new Uint8Array(decrypted));

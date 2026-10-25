@@ -101,9 +101,8 @@ or attendee workflow.
 - Token issuance and feed generation need focused tests for scope isolation,
   malformed or expired tokens, logging/cache behavior, stable UIDs, updates,
   cancellations, and empty plans.
-- The existing encryption implementation's fixed-IV risk remains separate
-  security work and must not be treated as a reason to persist plaintext feed
-  projections.
+- Nonce-safe plan encryption is implemented separately under ADR 0007; it does
+  not justify persisting plaintext feed projections.
 
 ## Rejected Alternatives
 
