@@ -28,6 +28,23 @@ describe("iCal Calendar Export", () => {
     expect(ics).toContain("STATUS:CANCELLED");
   });
 
+  it("cancels assigned match duties when their match is cancelled without changing UIDs or gameday duties", () => {
+    const plan = parseSeasonPlan(examplePlan);
+    const memberId = "member-nelly-walton";
+    const match = Object.values(plan.matches).find(match => match.slots.some(slot => slot.assignedMemberId === memberId))!;
+    const slot = match.slots.find(slot => slot.assignedMemberId === memberId)!;
+    match.status = "CANCELLED";
+    const ics = generateMemberICal(plan, memberId);
+    const events = ics.split("BEGIN:VEVENT\r\n").slice(1);
+    const matchEvent = events.find(event => event.includes(`UID:duty-${memberId}-${match.id}-`));
+    const gamedayEvent = events.find(event => event.includes(`UID:duty-${memberId}-gd-`));
+
+    expect(matchEvent).toContain(`UID:duty-${memberId}-${match.id}-${slot.id}@gameday-helperplan`);
+    expect(matchEvent).toContain("STATUS:CANCELLED");
+    expect(gamedayEvent).toBeDefined();
+    expect(gamedayEvent).not.toContain("STATUS:CANCELLED");
+  });
+
   it("should generate a valid empty VCALENDAR", () => {
     const ics = generateICS([]);
     expect(ics).toContain("BEGIN:VCALENDAR");

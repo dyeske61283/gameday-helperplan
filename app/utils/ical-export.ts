@@ -119,7 +119,7 @@ export function generateMemberICal(plan: SeasonPlan, memberId: string, shareUrl?
         description: `Helper Duty for ${roleName}\nMatch: ${homeTeam} vs ${match.awayTeamName}${shareUrl ? `\nPlan Link: ${shareUrl}` : ""}`,
         startDate: matchTime,
         endDate: endTime,
-        ...(slot.assignmentStatus === "CANCELLED" ? { status: "CANCELLED" as const } : {}),
+        ...(slot.assignmentStatus === "CANCELLED" || match.status === "CANCELLED" ? { status: "CANCELLED" as const } : {}),
       });
     }
   }
