@@ -21,9 +21,11 @@ jobs:
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps chromium
       - name: Verify
+        id: verify
         run: pnpm verify
 
       - name: Get Deno Deploy URL
+        if: ${{ !cancelled() && steps.verify.outcome != 'skipped' }}
         id: get-url
         env:
           DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
