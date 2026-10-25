@@ -8,10 +8,12 @@ export type ICalEvent = {
   location?: string;
   startDate: Date;
   endDate: Date;
+  floating?: boolean;
 };
 
-function formatDateToICS(date: Date): string {
-  return date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+function formatDateToICS(date: Date, floating = false): string {
+  const value = date.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+  return floating ? value.replace(/Z$/, "") : value;
 }
 
 /**
@@ -38,8 +40,8 @@ export function generateICS(events: ICalEvent[]): string {
     if (!Number.isFinite(event.startDate.getTime()) || !Number.isFinite(event.endDate.getTime()))
       continue;
     const now = formatDateToICS(new Date());
-    const start = formatDateToICS(new Date(event.startDate));
-    const end = formatDateToICS(new Date(event.endDate));
+    const start = formatDateToICS(new Date(event.startDate), event.floating);
+    const end = formatDateToICS(new Date(event.endDate), event.floating);
     const uid = event.uid || `duty-${start}-${Math.random().toString(36).substring(2, 9)}@gameday-helperplan`;
 
     lines.push(
@@ -152,6 +154,7 @@ export function generateMemberICal(plan: SeasonPlan, memberId: string, shareUrl?
         description: `Gameday Duty for ${roleName}\nDate: ${dateStr}${shareUrl ? `\nPlan Link: ${shareUrl}` : ""}`,
         startDate: startTime,
         endDate: endTime,
+        floating: true,
         ...(slot.assignmentStatus === "CANCELLED" ? { status: "CANCELLED" as const } : {}),
       });
     }

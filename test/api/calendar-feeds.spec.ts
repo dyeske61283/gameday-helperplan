@@ -95,6 +95,24 @@ describe("calendar feeds", () => {
     expect(ics).not.toContain("BEGIN:VEVENT");
   });
 
+  it.each(["invalid schema", "decryption failure"]) ("hides invalid stored plan data after %s", async (failure) => {
+    const { plan, key } = await savePlan();
+    const { feedUrl } = await issueFeed(plan.id, key, "matches");
+    const marker = "private-invalid-plan-marker";
+    const invalidPlaintext = JSON.stringify({ marker, title: plan.club.name });
+    const invalidKey = failure === "decryption failure" ? await useEncryption().generateKey() : key;
+    const invalidBlob = await useEncryption().encryptData(invalidPlaintext, invalidKey);
+    await $fetch(`/api/${plan.id}`, { method: "POST", body: { blob: invalidBlob, expectedRevision: 1 } });
+
+    const response = await fetch(feedUrl);
+    const body = await response.text();
+
+    expect(response.status).toBe(404);
+    expect(body).toContain("Calendar feed not found");
+    expect(body).not.toContain(marker);
+    expect(body).not.toContain(plan.club.name);
+  });
+
   it("rejects invalid scopes and malformed or expired tokens", async () => {
     const { plan, key } = await savePlan();
     await expect($fetch("/api/calendar-feeds", {

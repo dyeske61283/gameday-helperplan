@@ -99,7 +99,9 @@ describe("iCal Calendar Export", () => {
     expect(ics).toContain("SUMMARY:Duty: Hall Opening & Setup (Gameday 2026-11-15)");
     expect(ics).toContain("LOCATION:Sportarena Süd");
     expect(ics).toContain("UID:duty-m1-gd-gd1-slot_gd1@gameday-helperplan");
-    expect(ics).toContain("DTSTART:20261115T120000Z");
+    expect(ics).toContain("DTSTART:20261115T120000\r\n");
+    expect(ics).toContain("DTEND:20261115T190000\r\n");
+    expect(ics).not.toContain("TZID");
   });
 
   it("should properly escape special characters and newlines in description", () => {
