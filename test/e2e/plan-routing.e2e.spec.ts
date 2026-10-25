@@ -412,6 +412,9 @@ describe("plan-scoped routing", async () => {
     await saveAssignment;
     await page.getByText("Browser Guest", { exact: true }).waitFor();
     await page.getByText("You have unsaved local plan edits.", { exact: true }).waitFor({ state: "hidden" });
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await page.getByRole("heading", { name: "Duty Assignments" }).waitFor();
+    await page.getByText("Browser Guest", { exact: true }).waitFor();
 
     await page.getByText("Wischer 1", { exact: true }).first().click();
     const assignmentDialog = page.getByRole("dialog", { name: "Assign Helper to Slot" });
