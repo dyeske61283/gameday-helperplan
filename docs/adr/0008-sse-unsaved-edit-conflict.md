@@ -35,4 +35,4 @@ CRDTs better support offline edits and richer multi-writer collaboration, but re
 
 ## Implementation State
 
-Implemented by #28: the client tracks a saved baseline, merges independent edits by stable entity IDs, and requires an explicit local-or-remote choice for conflicting edits. Relationship arrays merge as membership sets; ordered entity arrays preserve one-sided reorders and surface conflicting reorders. CAS failures refresh the opaque remote blob and use the same merge flow.
+Implemented by #28: the client tracks a saved baseline, merges independent edits by stable entity IDs, and exposes base/local/remote alternatives with per-field resolution for conflicts. Relationship arrays merge as membership sets; ordered entity arrays preserve one-sided reorders and surface conflicting reorders. Dirty reload/navigation flows offer save, discard, or stay. CAS failures refresh the opaque remote blob and use the same merge flow.

@@ -33,6 +33,25 @@ describe("mergePlans", () => {
     expect(remoteChoice.plan.club.name).toBe("Remote name");
   });
 
+  it("resolves different conflicting fields independently", () => {
+    const base = parseSeasonPlan(legacyPlan);
+    const local = structuredClone(base);
+    const remote = structuredClone(base);
+    local.club.name = "Local name";
+    remote.club.name = "Remote name";
+    local.season = "2027/2028";
+    remote.season = "2028/2029";
+
+    const result = mergePlans(base, local, remote, {
+      "club.name": "remote",
+      "season": "local",
+    });
+
+    expect(result.plan.club.name).toBe("Remote name");
+    expect(result.plan.season).toBe("2027/2028");
+    expect(result.conflicts.map(conflict => conflict.path)).toEqual(["club.name", "season"]);
+  });
+
   it("merges relationship membership by ID without using array position", () => {
     const base = parseSeasonPlan(legacyPlan);
     const local = structuredClone(base);

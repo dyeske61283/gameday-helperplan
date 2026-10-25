@@ -1,6 +1,7 @@
 import type { AutoAssignOptions } from "../utils/helper-assignment";
-import type { PlanMergeConflict } from "../utils/plan-merge";
+import type { PlanMergeChoices, PlanMergeConflict } from "../utils/plan-merge";
 import type {
+  Location,
   Member,
   NewPlanMetadata,
   Role,
@@ -31,6 +32,8 @@ export const usePlanStore = defineStore("plan", () => {
   const pendingUpdate = ref<SeasonPlan | null>(null);
   const pendingStorageRevision = ref<number | null>(null);
   const mergeConflicts = ref<PlanMergeConflict[]>([]);
+  const conflictBasePlan = ref<SeasonPlan | null>(null);
+  const conflictLocalPlan = ref<SeasonPlan | null>(null);
   const eventSource = ref<EventSource | null>(null);
   let completionTimer: ReturnType<typeof setInterval> | undefined;
 
@@ -64,7 +67,9 @@ export const usePlanStore = defineStore("plan", () => {
 
   const { encryptData, generateKey } = useEncryption();
   const { decryptBlob } = useDecryption();
-  const isDirty = computed(() => !!plan.value && !!baselinePlan.value && JSON.stringify(plan.value) !== JSON.stringify(baselinePlan.value));
+  // Generated timestamps alone are not unsaved user edits, so reverting a field restores clean state.
+  const serializePlanContent = (value: SeasonPlan) => JSON.stringify(value, (key, property) => ["updatedAt", "lastUpdated"].includes(key) ? undefined : property);
+  const isDirty = computed(() => !!plan.value && !!baselinePlan.value && serializePlanContent(plan.value) !== serializePlanContent(baselinePlan.value));
 
   // Computed Getters & Domain Views
   const isModifiable = computed(() => !readOnly.value && !!plan.value);
@@ -111,9 +116,7 @@ export const usePlanStore = defineStore("plan", () => {
       plan.value = loadedPlan;
       baselinePlan.value = structuredClone(loadedPlan);
       storageRevision.value = response.revision ?? 0;
-      pendingStorageRevision.value = null;
-      pendingUpdate.value = null;
-      mergeConflicts.value = [];
+      clearPendingUpdate();
       resumeState.value = { id, key: decryptionKey };
     }
     catch (err: unknown) {
@@ -189,6 +192,8 @@ export const usePlanStore = defineStore("plan", () => {
     pendingUpdate.value = null;
     pendingStorageRevision.value = null;
     mergeConflicts.value = [];
+    conflictBasePlan.value = null;
+    conflictLocalPlan.value = null;
   }
 
   async function applyRemotePlan(remote: SeasonPlan, revision: number, saveMerge = true): Promise<boolean> {
@@ -202,12 +207,14 @@ export const usePlanStore = defineStore("plan", () => {
       return true;
     }
 
-    const result = mergePlans(base, structuredClone(toRaw(local)), remote);
+    const result = mergePlans(toRaw(base), structuredClone(toRaw(local)), remote);
     plan.value = result.plan;
     baselinePlan.value = structuredClone(remote);
     storageRevision.value = Math.max(storageRevision.value, revision);
     mergeConflicts.value = result.conflicts;
     if (result.conflicts.length) {
+      conflictBasePlan.value = structuredClone(toRaw(base));
+      conflictLocalPlan.value = structuredClone(toRaw(local));
       pendingUpdate.value = structuredClone(remote);
       pendingStorageRevision.value = storageRevision.value;
       return false;
@@ -230,11 +237,37 @@ export const usePlanStore = defineStore("plan", () => {
     error.value = null;
   }
 
+  function discardLocalEdits() {
+    if (pendingUpdate.value) {
+      reloadRemote();
+      return;
+    }
+    if (!baselinePlan.value)
+      return;
+    plan.value = structuredClone(toRaw(baselinePlan.value));
+    clearPendingUpdate();
+    error.value = null;
+  }
+
   async function retryLocal(): Promise<boolean> {
     if (!pendingUpdate.value)
       return false;
     storageRevision.value = pendingStorageRevision.value ?? storageRevision.value;
     baselinePlan.value = structuredClone(toRaw(pendingUpdate.value));
+    clearPendingUpdate();
+    return savePlan();
+  }
+
+  async function retryWithChoices(choices: PlanMergeChoices): Promise<boolean> {
+    const remote = pendingUpdate.value;
+    const base = conflictBasePlan.value;
+    const local = conflictLocalPlan.value;
+    if (!remote || !base || !local || typeof choices === "string" || !mergeConflicts.value.every(conflict => choices[conflict.path]))
+      return false;
+    const result = mergePlans(toRaw(base), toRaw(local), toRaw(remote), choices);
+    plan.value = result.plan;
+    baselinePlan.value = structuredClone(toRaw(remote));
+    storageRevision.value = pendingStorageRevision.value ?? storageRevision.value;
     clearPendingUpdate();
     return savePlan();
   }
@@ -384,8 +417,43 @@ export const usePlanStore = defineStore("plan", () => {
       },
     };
     baselinePlan.value = structuredClone(toRaw(plan.value));
-    pendingUpdate.value = null;
-    mergeConflicts.value = [];
+    clearPendingUpdate();
+  }
+
+  function updatePlanSetup(fields: {
+    clubName: string;
+    season: string;
+    contactEmail: string;
+    homepage: string;
+    roles: Role[];
+    locations: Location[];
+  }) {
+    if (!plan.value)
+      return;
+    const current = plan.value;
+    const clubChanged = current.club.name !== fields.clubName
+      || current.club.contactEmail !== fields.contactEmail
+      || current.club.homepage !== fields.homepage;
+    const seasonChanged = current.season !== fields.season;
+    const rolesChanged = JSON.stringify(current.config.roles) !== JSON.stringify(fields.roles);
+    const locationsChanged = JSON.stringify(current.config.locations) !== JSON.stringify(fields.locations);
+    if (!clubChanged && !seasonChanged && !rolesChanged && !locationsChanged)
+      return;
+
+    const now = new Date();
+    if (clubChanged) {
+      current.club.name = fields.clubName;
+      current.club.contactEmail = fields.contactEmail;
+      current.club.homepage = fields.homepage;
+      current.club.lastUpdated = now;
+    }
+    if (seasonChanged)
+      current.season = fields.season;
+    if (rolesChanged)
+      current.config.roles = structuredClone(fields.roles);
+    if (locationsChanged)
+      current.config.locations = structuredClone(fields.locations);
+    current.lastUpdated = now;
   }
 
   function configureRoles(names: string[], scopes: Role["scope"][]) {
@@ -430,7 +498,7 @@ export const usePlanStore = defineStore("plan", () => {
   }
 
   function updateTeam(teamId: string, name: string) {
-    if (!plan.value || !plan.value.teams[teamId])
+    if (!plan.value || !plan.value.teams[teamId] || plan.value.teams[teamId].name === name)
       return;
     const now = new Date();
     plan.value.teams[teamId].name = name;
@@ -473,6 +541,12 @@ export const usePlanStore = defineStore("plan", () => {
     if (!plan.value || !plan.value.members[memberId])
       return;
     const member = plan.value.members[memberId];
+    if ((updates.name === undefined || updates.name === member.name)
+      && (updates.teamIds === undefined || JSON.stringify(updates.teamIds) === JSON.stringify(member.teamIds))
+      && (updates.skillIds === undefined || JSON.stringify(updates.skillIds) === JSON.stringify(member.skillIds))
+      && (updates.isManual === undefined || updates.isManual === member.isManual)) {
+      return;
+    }
     if (updates.name !== undefined)
       member.name = updates.name;
     if (updates.teamIds !== undefined)
@@ -638,9 +712,12 @@ export const usePlanStore = defineStore("plan", () => {
     watchPlan,
     stopWatching,
     reloadRemote,
+    discardLocalEdits,
     retryLocal,
+    retryWithChoices,
     savePlan,
     createNewPlan,
+    updatePlanSetup,
     addTeam,
     updateTeam,
     deleteTeam,

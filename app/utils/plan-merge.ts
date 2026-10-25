@@ -10,6 +10,8 @@ export type PlanMergeConflict = {
   remote: unknown;
 };
 
+export type PlanMergeChoices = "local" | "remote" | Record<string, "local" | "remote">;
+
 function equal(a: unknown, b: unknown): boolean {
   if (a === missing || b === missing)
     return a === b;
@@ -55,9 +57,10 @@ export function mergePlans(
   base: SeasonPlan,
   local: SeasonPlan,
   remote: SeasonPlan,
-  preference: "local" | "remote" = "local",
+  preference: PlanMergeChoices = "local",
 ): { plan: SeasonPlan; conflicts: PlanMergeConflict[] } {
   const conflicts: PlanMergeConflict[] = [];
+  const preferenceFor = (path: string) => typeof preference === "string" ? preference : preference[path] ?? "local";
 
   function conflict(path: string, b: unknown | Missing, l: unknown | Missing, r: unknown | Missing) {
     conflicts.push({
@@ -66,7 +69,7 @@ export function mergePlans(
       local: l === missing ? undefined : clone(l),
       remote: r === missing ? undefined : clone(r),
     });
-    return clone(preference === "local" ? l : r);
+    return clone(preferenceFor(path) === "local" ? l : r);
   }
 
   function mergeValue(b: unknown | Missing, l: unknown | Missing, r: unknown | Missing, path: string): unknown | Missing {
@@ -138,7 +141,7 @@ export function mergePlans(
     let chosenOrder = localOrder;
     if (localReordered && remoteReordered && localCommonOrder.join("\0") !== remoteCommonOrder.join("\0")) {
       conflict(`${path}.$order`, baseOrder, localOrder, remoteOrder);
-      chosenOrder = preference === "local" ? localOrder : remoteOrder;
+      chosenOrder = preferenceFor(`${path}.$order`) === "local" ? localOrder : remoteOrder;
     }
     else if (!localReordered && remoteReordered) {
       chosenOrder = remoteOrder;
