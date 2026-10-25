@@ -105,8 +105,7 @@ async function autoSave(title = "Saved", description = "Changes synced to server
     toast.add({ title, description, color: "success" });
     return;
   }
-  await planStore.savePlan();
-  if (planStore.error) {
+  if (!await planStore.savePlan()) {
     toast.add({ title: t("ui.saveFailed"), description: planError.value || undefined, color: "error" });
   }
   else {

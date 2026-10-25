@@ -220,9 +220,8 @@ async function autoSave(
     toast.add({ title, description, color });
     return;
   }
-  await planStore.savePlan();
-  if (planStore.error) {
-    toast.add({ title: t("ui.saveFailed"), description: planStore.error?.startsWith("ui.") ? t(planStore.error) : planStore.error, color: "error" });
+  if (!await planStore.savePlan()) {
+    toast.add({ title: t("ui.saveFailed"), description: planStore.error?.startsWith("ui.") ? t(planStore.error) : planStore.error ?? t("ui.couldNotSavePlan"), color: "error" });
   }
   else {
     toast.add({ title, description, color });
@@ -268,11 +267,10 @@ async function handleClearMatch(matchId: string) {
 }
 
 async function handleSavePlan() {
-  await planStore.savePlan();
-  if (planStore.error) {
+  if (!await planStore.savePlan()) {
     toast.add({
       title: t("ui.saveFailed"),
-      description: planStore.error?.startsWith("ui.") ? t(planStore.error) : planStore.error,
+      description: planStore.error?.startsWith("ui.") ? t(planStore.error) : planStore.error ?? t("ui.couldNotSavePlan"),
       color: "error",
     });
   }

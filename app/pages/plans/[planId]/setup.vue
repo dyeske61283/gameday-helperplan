@@ -1,8 +1,6 @@
 <!-- Nuxt requires camelCase dynamic parameter names here. -->
 <!-- eslint-disable unicorn/filename-case -->
 <script setup lang="ts">
-import type { SeasonPlan } from "../../../utils/plan-types";
-import { toRaw } from "vue";
 import { usePlanStore } from "../../../stores/plan";
 import { copyToClipboard } from "../../../utils/clipboard";
 import { createPlanLink } from "../../../utils/plan-links";
@@ -13,13 +11,10 @@ const toast = useToast();
 const { t } = useI18n();
 usePlanInit();
 
-onMounted(() => planStore.setEditing(true));
-onUnmounted(() => planStore.setEditing(false));
-
 const planLink = computed(() => planStore.key ? `/plans/${route.params.planId}#key=${planStore.key}` : `/plans/${route.params.planId}${route.hash}`);
 const scheduleLink = computed(() => planLink.value);
 const shareUrl = computed(() => planStore.key ? createPlanLink(String(route.params.planId), planStore.key, `/plans/${route.params.planId}/setup`) : "");
-const draft = ref<SeasonPlan | null>(null);
+const draft = computed(() => planStore.plan);
 const clubName = ref("");
 const season = ref("");
 const contactEmail = ref("");
@@ -28,28 +23,42 @@ const rolesText = ref("");
 const locationsText = ref("");
 const newTeamName = ref("");
 const newMemberName = ref("");
-const isDirty = ref(false);
-const syncingDrafts = ref(false);
 const shareState = ref<"idle" | "copied" | "failed">("idle");
 
 function syncDrafts() {
-  if (!planStore.plan || isDirty.value)
+  if (!planStore.plan)
     return;
-  syncingDrafts.value = true;
-  draft.value = structuredClone(toRaw(planStore.plan));
   clubName.value = planStore.plan.club.name;
   season.value = planStore.plan.season;
   contactEmail.value = planStore.plan.club.contactEmail;
   homepage.value = planStore.plan.club.homepage;
   rolesText.value = planStore.roles.map(role => `${role.name} | ${role.scope}`).join("\n");
   locationsText.value = planStore.locations.map(location => `${location.name}${location.link ? ` | ${location.link}` : ""}`).join("\n");
-  nextTick(() => syncingDrafts.value = false);
 }
 
 watch(() => planStore.plan, syncDrafts, { immediate: true });
+
+function syncFormToPlan() {
+  const plan = planStore.plan;
+  if (!plan)
+    return;
+  plan.club.name = clubName.value;
+  plan.season = season.value;
+  plan.club.contactEmail = contactEmail.value;
+  plan.club.homepage = homepage.value;
+  plan.config.roles = rolesText.value.split("\n").map((line, index) => {
+    const [name, scope = plan.config.roles[index]?.scope ?? "match"] = line.split("|").map(value => value.trim());
+    const previous = plan.config.roles[index];
+    return { id: previous?.id ?? `role-${index + 1}`, name: name ?? "", scope: scope === "gameday" ? "gameday" as const : "match" as const, requiredSkillId: previous?.requiredSkillId ?? "" };
+  }).filter(role => Boolean(role.name));
+  plan.config.locations = locationsText.value.split("\n").map((line, index) => {
+    const [name, link] = line.split("|").map(value => value.trim());
+    return { id: plan.config.locations[index]?.id ?? `location-${index + 1}`, name: name ?? "", ...(link ? { link } : {}) };
+  }).filter(location => Boolean(location.name));
+}
+
 function markDirty() {
-  isDirty.value = true;
-  planStore.setEditing(true);
+  syncFormToPlan();
 }
 
 const teams = computed(() => Object.values(draft.value?.teams ?? {}));
@@ -102,6 +111,7 @@ function validate() {
 }
 
 async function save() {
+  syncFormToPlan();
   const validationError = validate();
   if (validationError || !planStore.plan || !draft.value) {
     toast.add({ title: "ui.checkChanges", description: validationError || "ui.planUnavailable", color: "error" });
@@ -109,15 +119,6 @@ async function save() {
   }
   draft.value.club = { ...draft.value.club, name: clubName.value.trim(), contactEmail: contactEmail.value.trim(), homepage: homepage.value.trim(), lastUpdated: new Date() };
   draft.value.season = season.value.trim();
-  draft.value.config.roles = rolesText.value.split("\n").map((line, index) => {
-    const [name, scope = planStore.roles[index]?.scope ?? "match"] = line.split("|").map(value => value.trim());
-    const previous = planStore.roles[index];
-    return { id: previous?.id ?? `role-${index + 1}`, name: name ?? "", scope: scope === "gameday" ? "gameday" as const : "match" as const, requiredSkillId: previous?.requiredSkillId ?? "" };
-  }).filter(role => Boolean(role.name));
-  draft.value.config.locations = locationsText.value.split("\n").map((line, index) => {
-    const [name, link] = line.split("|").map(value => value.trim());
-    return { id: planStore.locations[index]?.id ?? `location-${index + 1}`, name: name ?? "", ...(link ? { link } : {}) };
-  }).filter(location => Boolean(location.name));
   Object.values(draft.value.teams).forEach((team) => {
     team.name = team.name.trim();
     team.updatedAt = new Date();
@@ -126,21 +127,16 @@ async function save() {
     member.name = member.name.trim();
     member.updatedAt = new Date();
   });
-  if (await planStore.savePlan(draft.value)) {
-    isDirty.value = false;
-    planStore.setEditing(false);
-  }
-  else {
-    toast.add({ title: "ui.saveFailed", description: planStore.error || "ui.couldNotSavePlan", color: "error" });
+  if (!await planStore.savePlan()) {
+    const description = planStore.error?.startsWith("ui.") ? t(planStore.error) : planStore.error ?? t("ui.couldNotSavePlan");
+    toast.add({ title: t("ui.saveFailed"), description, color: "error" });
   }
 }
 
 async function reload() {
   if (!planStore.plan || !planStore.key)
     return;
-  // Buffer SSE updates while the authoritative server reload replaces the draft.
-  planStore.setEditing(true);
-  isDirty.value = false;
+  // Load the authoritative server version to explicitly discard local edits.
   await planStore.loadPlan(planStore.plan.id, planStore.key);
 }
 
@@ -166,7 +162,7 @@ useHead({ title: t("ui.editPlan") });
         {{ $t("ui.planSetup.couldNotLoadPlan") }}
       </h1>
       <p class="text-error">
-        {{ planStore.error }}
+        {{ planStore.error.startsWith("ui.") ? $t(planStore.error) : planStore.error }}
       </p>
       <UButton :to="planLink">
         {{ $t("ui.planSetup.returnToPlan") }}
@@ -201,7 +197,7 @@ useHead({ title: t("ui.editPlan") });
         </div>
       </header>
       <div v-if="planStore.error" class="rounded-lg bg-error/10 p-4 text-error">
-        {{ planStore.error }}
+        {{ planStore.error.startsWith("ui.") ? $t(planStore.error) : planStore.error }}
       </div>
       <section class="space-y-4 rounded-xl border p-5">
         <h2 class="text-xl font-bold">
@@ -292,7 +288,7 @@ useHead({ title: t("ui.editPlan") });
         </p>
       </section>
       <footer class="flex items-center justify-between border-t pt-6">
-        <span class="text-sm text-on-surface-variant">{{ isDirty ? $t("ui.common.saveChanges") : $t("ui.saved") }}</span><UButton variant="outline" :loading="planStore.isLoading" @click="reload">
+        <span class="text-sm text-on-surface-variant">{{ planStore.isDirty ? $t("ui.common.saveChanges") : $t("ui.saved") }}</span><UButton variant="outline" :loading="planStore.isLoading" @click="reload">
           {{ $t("ui.planSetup.reloadFromServer") }}
         </UButton>
       </footer>

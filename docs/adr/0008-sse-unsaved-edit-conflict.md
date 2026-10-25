@@ -30,9 +30,9 @@ CRDTs better support offline edits and richer multi-writer collaboration, but re
 - Merge semantics must account for stable entity IDs, collections, additions, and deletions.
 - Tests must cover independent edits, same-field edits, delete-versus-edit, stale CAS writes, and explicit resolution.
 - Offline reconciliation, editor identity, and a full collaborative presence/locking protocol are out of scope.
-- Production auto-merge retries re-encrypt the plan. Do not implement that path until the fixed-IV AES-GCM format is replaced with the nonce-safe format tracked in #70.
+- Production auto-merge retries re-encrypt the plan; they rely on the nonce-safe AES-GCM format implemented by #70.
 - The prototype is retained as reference on its `prototype/issue-63-plan-merge` branch; only this decision record is merged to `main`.
 
 ## Implementation State
 
-The client currently defers newer SSE plans while an editor is active, but does not merge concurrent edits or provide user-facing conflict resolution. The schema-aware strategy was evaluated in prototype PR #66 and is implemented by #28 after the nonce-safety prerequisite in #70.
+Implemented by #28: the client tracks a saved baseline, merges independent edits by stable entity IDs, and requires an explicit local-or-remote choice for conflicting edits. Relationship arrays merge as membership sets; ordered entity arrays preserve one-sided reorders and surface conflicting reorders. CAS failures refresh the opaque remote blob and use the same merge flow.

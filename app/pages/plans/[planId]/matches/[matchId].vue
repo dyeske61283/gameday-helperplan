@@ -38,25 +38,15 @@ async function claim(slot: Slot) {
     isMemberPickerOpen.value = true;
     return;
   }
-  const previous = {
-    assignedMemberId: slot.assignedMemberId,
-    assignmentStatus: slot.assignmentStatus,
-    customHelperName: slot.customHelperName,
-    updatedAt: slot.updatedAt,
-  };
   try {
     planStore.claimSlot(match.value!.id, slot.id, planStore.selectedMemberId || undefined);
-    await planStore.savePlan();
-    if (planStore.error)
-      throw new Error(planStore.error);
+    if (!await planStore.savePlan())
+      throw new Error(planStore.error ?? t("ui.couldNotSavePlan"));
     toast.add({ title: t("ui.dutyClaimed"), color: "success" });
   }
   catch (error) {
-    slot.assignedMemberId = previous.assignedMemberId;
-    slot.assignmentStatus = previous.assignmentStatus;
-    slot.customHelperName = previous.customHelperName;
-    slot.updatedAt = previous.updatedAt;
-    toast.add({ title: t("ui.couldNotClaimDuty"), description: (error as Error).message, color: "error" });
+    const message = (error as Error).message;
+    toast.add({ title: t("ui.couldNotClaimDuty"), description: message.startsWith("ui.") ? t(message) : message, color: "error" });
   }
 }
 
