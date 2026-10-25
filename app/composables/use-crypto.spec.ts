@@ -17,16 +17,24 @@ describe("useCrypto", () => {
       expect(key).toMatch(/^[\w-]+$/);
     });
 
-    it("should encrypt data and return both ArrayBuffer and string", async () => {
+    it("uses a fresh IV for every save and decrypts both payloads", async () => {
       const { generateKey, encryptData } = useEncryption();
+      const { decryptBlob } = useDecryption();
       const key = await generateKey();
       const testData = "Hello World";
 
-      const result = await encryptData(testData, key);
+      const first = await encryptData(testData, key);
+      const second = await encryptData(testData, key);
 
-      expect(result.length).toBeGreaterThan(0);
+      expect(first.startsWith("v1.")).toBe(true);
+      expect(second.startsWith("v1.")).toBe(true);
+      const firstBytes = Uint8Array.from(atob(first.slice(3)), char => char.charCodeAt(0));
+      const secondBytes = Uint8Array.from(atob(second.slice(3)), char => char.charCodeAt(0));
+      expect(firstBytes.slice(0, 12)).not.toEqual(secondBytes.slice(0, 12));
+      await expect(decryptBlob(first, key)).resolves.toBe(testData);
+      await expect(decryptBlob(second, key)).resolves.toBe(testData);
     });
-  }); ;
+  });
 
   describe("useDecryption", () => {
     it("should decrypt encrypted data back to original string", async () => {
@@ -71,5 +79,19 @@ describe("useCrypto", () => {
 
     expect(decryptedString).toBe(originalString);
     expect(JSON.parse(decryptedString)).toEqual(originalObject);
+  });
+
+  it("decrypts a legacy payload and can save it in the new format", async () => {
+    const key = "AAAAAAAAAAAAAAAAAAAAAA";
+    const legacyBlob = "eKq2qwfXwOvRErbLBNeD/xZCi7ExAoTOPyHWjlxxkA==";
+    const { decryptBlob } = useDecryption();
+    const { encryptData } = useEncryption();
+
+    const plaintext = await decryptBlob(legacyBlob, key);
+    expect(plaintext).toBe("{\"legacy\":true}");
+
+    const migrated = await encryptData(plaintext, key);
+    expect(migrated.startsWith("v1.")).toBe(true);
+    await expect(decryptBlob(migrated, key)).resolves.toBe(plaintext);
   });
 });
