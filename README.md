@@ -102,9 +102,14 @@ cat request.json | deno run --unstable-sloppy-imports --allow-read scripts/plan-
 
 Supported commands are `validate`, `claim-duty`, `auto-assign`, and
 `complete-assignments`. Auto-assignment takes `matchId`, `now`, and optional
-`balanceDutyCounts` / `excludeConflicts` booleans. Successful output is one
-compact JSON object containing a mutation summary and the resulting plan;
-errors go to stderr and exit nonzero.
+`balanceDutyCounts` / `excludeConflicts` booleans. Success writes exactly one
+compact JSON object to stdout: `validate` returns `{ command, summary }` with
+`valid`, `planId`, and `schemaVersion`; mutations return `{ command, summary }`
+only, never the plan. Failures write
+`{"error":{"code":"...","message":"..."}}` to stderr, leave stdout empty,
+and exit nonzero. Error codes include `MALFORMED_JSON`, `UNKNOWN_COMMAND`,
+`INVALID_REQUEST`, `INVALID_PLAN`, `COMMAND_REJECTED`, and `RUNNER_ERROR`. Run
+the process-boundary checks with `pnpm test:plan-runner`.
 
 ## Toolchain
 

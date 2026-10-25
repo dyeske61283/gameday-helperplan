@@ -7,8 +7,10 @@ describe("plan runner", () => {
   it("validates and normalizes a decrypted legacy plan", () => {
     const result = runPlanCommand({ command: "validate", plan: legacyPlan });
 
-    expect(result.summary).toEqual({ valid: true });
-    expect(result.plan.schemaVersion).toBe(CURRENT_SCHEMA_VERSION);
+    expect(result).toEqual({
+      command: "validate",
+      summary: { valid: true, planId: legacyPlan.id, schemaVersion: CURRENT_SCHEMA_VERSION },
+    });
   });
 
   it("claims an eligible duty with a deterministic timestamp", () => {
@@ -22,7 +24,7 @@ describe("plan runner", () => {
     });
 
     expect(result.summary).toEqual({ matchId: "match-1", slotId: "match-slot-open", assignedMemberId: "eligible" });
-    expect(result.plan.matches["match-1"]!.slots[0]!.updatedAt.toISOString()).toBe("2026-10-25T12:00:00.000Z");
+    expect(Object.keys(result).sort()).toEqual(["command", "summary"]);
   });
 
   it("auto-assigns open duties and reports unfilled duties", () => {
@@ -38,7 +40,7 @@ describe("plan runner", () => {
     });
 
     expect(result.summary).toEqual({ assignedCount: 1, unassignedSlotIds: ["match-slot-assigned"] });
-    expect(result.plan.matches["match-1"]!.slots[0]!.updatedAt.toISOString()).toBe("2026-10-25T12:00:00.000Z");
+    expect(Object.keys(result).sort()).toEqual(["command", "summary"]);
   });
 
   it("completes assigned duties after their gameday closes", () => {
@@ -49,8 +51,7 @@ describe("plan runner", () => {
     });
 
     expect(result.summary).toEqual({ completedCount: 2 });
-    expect(result.plan.gamedays["gameday-1"]!.slots[0]!.assignmentStatus).toBe("COMPLETED");
-    expect(result.plan.matches["match-1"]!.slots[1]!.assignmentStatus).toBe("COMPLETED");
+    expect(Object.keys(result).sort()).toEqual(["command", "summary"]);
   });
 
   it("rejects unknown commands, missing deterministic time, and rejected duties", () => {

@@ -1,7 +1,7 @@
 import { Buffer } from "node:buffer";
 import { readFile } from "node:fs/promises";
 import process from "node:process";
-import { runPlanCommand } from "../app/utils/plan-runner.ts";
+import { PlanRunnerError, runPlanCommand } from "../app/utils/plan-runner.ts";
 
 async function readStdin(): Promise<string> {
   return await new Promise((resolve, reject) => {
@@ -21,6 +21,12 @@ try {
   process.stdout.write(`${JSON.stringify(result)}\n`);
 }
 catch (error) {
-  process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`);
+  const code = error instanceof PlanRunnerError
+    ? error.code
+    : error instanceof SyntaxError ? "MALFORMED_JSON" : "RUNNER_ERROR";
+  const message = error instanceof SyntaxError
+    ? "Invalid JSON input"
+    : error instanceof Error ? error.message : String(error);
+  process.stderr.write(`${JSON.stringify({ error: { code, message } })}\n`);
   process.exitCode = 1;
 }
