@@ -195,6 +195,55 @@ describe("usePlanStore", () => {
     expect(store.roles.map(role => role.scope)).toEqual(["gameday", "match", "match"]);
   });
 
+  it("creates a gameday with configured duty slots only after validating its location", () => {
+    const store = usePlanStore();
+    store.createNewPlan("plan-id", "plan-key");
+    store.plan!.config.locations = [{ id: "hall", name: "Main hall" }];
+    store.plan!.config.roles = [
+      { id: "opening", name: "Opening", scope: "gameday", requiredSkillId: "keyholder" },
+      { id: "scorekeeper", name: "Scorekeeper", scope: "match" },
+    ];
+    const draft = structuredClone(toRaw(store.plan!));
+
+    expect(() => store.createGameday({ date: "2026-10-25", locationId: "missing" }, draft)).toThrow("location");
+    expect(draft.gamedays).toEqual({});
+    const gameday = store.createGameday({ date: "2026-10-25", locationId: "hall" }, draft);
+
+    expect(gameday).toMatchObject({ date: "2026-10-25", locationId: "hall", matchIds: [] });
+    expect(gameday.slots).toHaveLength(1);
+    expect(gameday.slots[0]).toMatchObject({ roleId: "opening", assignmentStatus: "OPEN", assignedMemberId: null });
+    expect(store.plan!.gamedays).toEqual({});
+  });
+
+  it("creates one match on a valid gameday with configured match duties", () => {
+    const store = usePlanStore();
+    store.createNewPlan("plan-id", "plan-key");
+    store.plan!.config.locations = [{ id: "hall", name: "Main hall" }];
+    store.plan!.config.roles = [
+      { id: "opening", name: "Opening", scope: "gameday" },
+      { id: "referee", name: "Referee", scope: "match", requiredSkillId: "license" },
+    ];
+    const team = store.addTeam("Home team")!;
+    const draft = structuredClone(toRaw(store.plan!));
+    const gameday = store.createGameday({ date: "2026-10-25", locationId: "hall" }, draft);
+
+    expect(() => store.createMatch({ gamedayId: "missing", time: "2026-10-25T13:00", homeTeamId: team.id, awayTeamName: "Away" }, draft)).toThrow("gameday");
+    expect(draft.matches).toEqual({});
+    expect(gameday.matchIds).toEqual([]);
+    expect(() => store.createMatch({ gamedayId: gameday.id, time: "2026-10-25T13:00", homeTeamId: "missing", awayTeamName: "Away" }, draft)).toThrow("homeTeam");
+    expect(draft.matches).toEqual({});
+    expect(gameday.matchIds).toEqual([]);
+    const match = store.createMatch({ gamedayId: gameday.id, time: "2026-10-25T13:00", homeTeamId: team.id, awayTeamName: "Away" }, draft);
+
+    expect(match).toMatchObject({ homeTeamId: team.id, awayTeamName: "Away" });
+    expect(match.time).toBeInstanceOf(Date);
+    expect(match.slots).toHaveLength(1);
+    expect(match.slots[0]).toMatchObject({ roleId: "referee", assignmentStatus: "OPEN", assignedMemberId: null });
+    expect(draft.config.roles.find(role => role.id === "referee")?.requiredSkillId).toBe("license");
+    expect(gameday.matchIds).toEqual([match.id]);
+    expect(store.plan!.matches).toEqual({});
+  });
+
   describe("example plan loading", () => {
     it("should load the example plan into state", () => {
       const store = usePlanStore();
