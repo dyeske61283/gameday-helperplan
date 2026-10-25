@@ -18,3 +18,7 @@ Infer the repository from `git remote -v`.
 ## Pull Requests As A Triage Surface
 
 PRs as a request surface: no.
+
+## Prototype Work
+
+Prototype PRs and their `prototype/*` branches are evidence, not merge candidates. Keep prototype code out of `main`; retain the branch as a reference and link it from the follow-up implementation issue. Merge architectural decisions as ADRs. Record reversible product or UI choices in the implementation brief instead. Close the prototype PR and issue once the decision and follow-up are recorded.
