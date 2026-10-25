@@ -97,6 +97,9 @@ describe("plan setup", () => {
       route: "/source",
       global: { plugins: [pinia] },
     });
+    const dirtyUnload = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(dirtyUnload);
+    expect(dirtyUnload.defaultPrevented).toBe(true);
     const navigation = (layout.vm as typeof layout.vm & { $router: { push: (path: string) => Promise<void>; currentRoute: { value: { fullPath: string } } } }).$router.push("/destination");
     await flushPromises();
 
@@ -108,6 +111,22 @@ describe("plan setup", () => {
     await navigation;
 
     expect(store.isDirty).toBe(false);
+    await flushPromises();
+    const cleanUnload = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(cleanUnload);
+    expect(cleanUnload.defaultPrevented).toBe(false);
+    store.updatePlanSetup({
+      clubName: "Dirty again",
+      season: "2026/2027",
+      contactEmail: "",
+      homepage: "",
+      roles: store.roles,
+      locations: store.locations,
+    });
+    await flushPromises();
     layout.unmount();
+    const unmountedUnload = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(unmountedUnload);
+    expect(unmountedUnload.defaultPrevented).toBe(false);
   });
 });

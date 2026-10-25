@@ -10,6 +10,14 @@ const conflictChoices = ref<Record<string, "local" | "remote">>({});
 const hasAllConflictChoices = computed(() => planStore.mergeConflicts.every(conflict => conflictChoices.value[conflict.path]));
 let finishDecision: ((choice: UnsavedPlanChoice) => void) | undefined;
 let removeNavigationGuard: (() => void) | undefined;
+let stopDirtyWatch: (() => void) | undefined;
+
+function preventDirtyUnload(event: BeforeUnloadEvent) {
+  if (!planStore.isDirty)
+    return;
+  event.preventDefault();
+  event.returnValue = "";
+}
 
 function requestNavigationChoice(): Promise<UnsavedPlanChoice> {
   isNavigationPromptOpen.value = true;
@@ -33,6 +41,12 @@ function formatConflictValue(value: unknown) {
 watch(() => planStore.mergeConflicts, () => conflictChoices.value = {});
 
 onMounted(() => {
+  stopDirtyWatch = watch(() => planStore.isDirty, (dirty) => {
+    if (dirty)
+      window.addEventListener("beforeunload", preventDirtyUnload);
+    else
+      window.removeEventListener("beforeunload", preventDirtyUnload);
+  }, { immediate: true });
   removeNavigationGuard = router.beforeEach(async (to, from) => {
     if (!planStore.isDirty || to.fullPath === from.fullPath || /^\/plans\/[^/]+\/setup$/.test(from.path))
       return true;
@@ -41,7 +55,11 @@ onMounted(() => {
   });
 });
 
-onBeforeUnmount(() => removeNavigationGuard?.());
+onBeforeUnmount(() => {
+  stopDirtyWatch?.();
+  window.removeEventListener("beforeunload", preventDirtyUnload);
+  removeNavigationGuard?.();
+});
 </script>
 
 <template>
