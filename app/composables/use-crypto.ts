@@ -3,9 +3,9 @@
  * Inspired by Excalidraw's end-to-end encryption.
  * @see https://plus.excalidraw.com/blog/end-to-end-encryption
  */
-export function useEncryption() {
-  const formatPrefix = "v1.";
+const PLAN_BLOB_FORMAT_PREFIX = "v1.";
 
+export function useEncryption() {
   /**
    * Generates a 128-bit AES-GCM key and returns its JWK 'k' parameter.
    * This 'k' value is base64url encoded and safe to use in URL fragments.
@@ -60,7 +60,7 @@ export function useEncryption() {
     payload.set(iv);
     payload.set(new Uint8Array(encrypted), iv.length);
 
-    return `${formatPrefix}${btoa(String.fromCharCode(...payload))}`;
+    return `${PLAN_BLOB_FORMAT_PREFIX}${btoa(String.fromCharCode(...payload))}`;
   };
 
   return {
@@ -73,8 +73,6 @@ export function useEncryption() {
  * Composable for client-side decryption using the Web Crypto API.
  */
 export function useDecryption() {
-  const formatPrefix = "v1.";
-
   /**
    * Decrypts a Blob using a JWK key string.
    * Returns the decrypted data as a string.
@@ -84,8 +82,8 @@ export function useDecryption() {
       throw new Error("Decryption is only available on the client side");
     }
 
-    const isVersioned = blob.startsWith(formatPrefix);
-    const binaryString = atob(isVersioned ? blob.slice(formatPrefix.length) : blob);
+    const isVersioned = blob.startsWith(PLAN_BLOB_FORMAT_PREFIX);
+    const binaryString = atob(isVersioned ? blob.slice(PLAN_BLOB_FORMAT_PREFIX.length) : blob);
     const bytes = new Uint8Array(binaryString.length);
     for (let i = 0; i < binaryString.length; i++) {
       bytes[i] = binaryString.charCodeAt(i);
