@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from "pinia";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { toRaw } from "vue";
 import legacyPlan from "../../test/fixtures/legacy-plan-v1.json";
 import { CURRENT_SCHEMA_VERSION, NewPlanMetadataSchema } from "../utils/plan-types";
@@ -25,7 +25,10 @@ vi.mock("@vueuse/core", () => ({
 describe("usePlanStore", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    vi.useFakeTimers({ now: new Date("2026-10-25T00:00:00.000Z") });
   });
+
+  afterEach(() => vi.useRealTimers());
 
   it("validates the required new-plan metadata", () => {
     const invalidClub = NewPlanMetadataSchema.safeParse({ clubName: "", season: "2026/2027" });
