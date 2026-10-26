@@ -269,13 +269,10 @@ describe("plan-scoped routing", async () => {
       }
     });
     await page.getByRole("button", { name: "Continue claim" }).click();
-    await page.getByText("Could not claim duty", { exact: true }).waitFor({ timeout: 10000 });
-    expect(await page.getByText("Duty claimed", { exact: true }).count()).toBe(0);
-    await page.getByRole("button", { name: "Claim" }).waitFor();
+    // A stale revision is refreshed and retried when the merge has no conflicts.
+    await page.getByText("Duty claimed", { exact: true }).waitFor({ timeout: 10000 });
     expect(rejectedClaim).toBe(true);
     await page.unroute(`**/api/${seededPlanId}`);
-    await page.getByRole("button", { name: "Claim" }).click();
-    await page.getByText("Duty claimed", { exact: true }).waitFor({ timeout: 10000 });
 
     const cockpitLink = page.getByRole("link", { name: "Open personal cockpit" });
     const cockpitUrl = new URL(await cockpitLink.getAttribute("href")!, page.url());
@@ -380,6 +377,7 @@ describe("plan-scoped routing", async () => {
     await page.getByRole("button", { name: "Save Changes" }).click();
     await editMemberSave;
 
+    await page.getByText("You have unsaved local plan edits.", { exact: true }).waitFor({ state: "hidden" });
     await page.reload({ waitUntil: "domcontentloaded" });
     await page.getByRole("button", { name: "E2E Renamed Team" }).click();
     await page.getByText("E2E Helper", { exact: true }).waitFor();
@@ -413,6 +411,10 @@ describe("plan-scoped routing", async () => {
     await page.getByRole("button", { name: "Confirm Assignment" }).click();
     await saveAssignment;
     await page.getByText("Browser Guest", { exact: true }).waitFor();
+    await page.getByText("You have unsaved local plan edits.", { exact: true }).waitFor({ state: "hidden" });
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await page.getByRole("heading", { name: "Duty Assignments" }).waitFor();
+    await page.getByText("Browser Guest", { exact: true }).waitFor();
 
     await page.getByText("Wischer 1", { exact: true }).first().click();
     const assignmentDialog = page.getByRole("dialog", { name: "Assign Helper to Slot" });
@@ -424,6 +426,7 @@ describe("plan-scoped routing", async () => {
     await assignmentDialog.waitFor({ state: "hidden" });
     await page.getByText("Mustafa Gabler", { exact: true }).first().waitFor();
 
+    await page.getByText("You have unsaved local plan edits.", { exact: true }).waitFor({ state: "hidden" });
     await page.reload({ waitUntil: "domcontentloaded" });
     await page.getByRole("heading", { name: "Duty Assignments" }).waitFor();
     await page.getByText("Mustafa Gabler", { exact: true }).first().waitFor();

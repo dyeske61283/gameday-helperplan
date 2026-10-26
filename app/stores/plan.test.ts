@@ -1,5 +1,5 @@
 import { createPinia, setActivePinia } from "pinia";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { toRaw } from "vue";
 import legacyPlan from "../../test/fixtures/legacy-plan-v1.json";
 import { CURRENT_SCHEMA_VERSION, NewPlanMetadataSchema } from "../utils/plan-types";
@@ -25,7 +25,10 @@ vi.mock("@vueuse/core", () => ({
 describe("usePlanStore", () => {
   beforeEach(() => {
     setActivePinia(createPinia());
+    vi.useFakeTimers({ now: new Date("2026-10-25T00:00:00.000Z") });
   });
+
+  afterEach(() => vi.useRealTimers());
 
   it("validates the required new-plan metadata", () => {
     const invalidClub = NewPlanMetadataSchema.safeParse({ clubName: "", season: "2026/2027" });
@@ -79,9 +82,59 @@ describe("usePlanStore", () => {
     await expect(store.savePlan(draft)).resolves.toBe(true);
     expect(store.plan).not.toBeNull();
     expect(store.plan!.club.name).toBe("Edited");
+    expect(store.isDirty).toBe(false);
     await store.loadPlan("f530083d-8c74-4f10-931a-dd877ee7b52c", "test-key");
 
     expect(store.plan?.club.name).toBe("Edited");
+    vi.unstubAllGlobals();
+  });
+
+  it("marks local edits dirty and clears the state only after a successful save", async () => {
+    vi.stubGlobal("$fetch", vi.fn().mockResolvedValue({ revision: 1 }));
+    const store = usePlanStore();
+    store.createNewPlan("test-plan-id", "test-key", { clubName: "Club", season: "2026/2027" });
+    expect(store.isDirty).toBe(false);
+
+    store.plan!.club.name = "Edited locally";
+    expect(store.isDirty).toBe(true);
+    await expect(store.savePlan()).resolves.toBe(true);
+    expect(store.isDirty).toBe(false);
+    vi.unstubAllGlobals();
+  });
+
+  it("routes setup fields through a store action and can discard back to the saved baseline", () => {
+    const store = usePlanStore();
+    store.createNewPlan("test-plan-id", "test-key", { clubName: "Club", season: "2026/2027" });
+
+    store.updatePlanSetup({
+      clubName: "Edited Club",
+      season: "2027/2028",
+      contactEmail: "club@example.org",
+      homepage: "https://example.org",
+      roles: [{ id: "role-1", name: "Timekeeper", scope: "gameday", requiredSkillId: "esb" }],
+      locations: [{ id: "location-1", name: "Main Hall" }],
+    });
+
+    expect(store.isDirty).toBe(true);
+    expect(store.plan?.club.name).toBe("Edited Club");
+    expect(store.plan?.config.roles[0]?.requiredSkillId).toBe("esb");
+    store.discardLocalEdits();
+    expect(store.plan?.club.name).toBe("Club");
+    expect(store.isDirty).toBe(false);
+  });
+
+  it("clears dirty state when a store-owned field edit is reverted", async () => {
+    vi.stubGlobal("$fetch", vi.fn().mockResolvedValue({ revision: 1 }));
+    const store = usePlanStore();
+    store.createNewPlan("test-plan-id", "test-key");
+    const team = store.addTeam("Original")!;
+    await store.savePlan();
+
+    store.updateTeam(team.id, "Changed");
+    expect(store.isDirty).toBe(true);
+    store.updateTeam(team.id, "Original");
+
+    expect(store.isDirty).toBe(false);
     vi.unstubAllGlobals();
   });
 
@@ -104,7 +157,7 @@ describe("usePlanStore", () => {
     vi.unstubAllGlobals();
   });
 
-  it("does not publish an isolated edit when save fails", async () => {
+  it("preserves isolated local edits when save fails", async () => {
     vi.stubGlobal("$fetch", vi.fn().mockRejectedValue(new Error("storage unavailable")));
     const store = usePlanStore();
     store.createNewPlan("test-plan-id", "test-key", { clubName: "Original", season: "2026/2027" });
@@ -112,7 +165,8 @@ describe("usePlanStore", () => {
     draft.club.name = "Failed edit";
 
     await expect(store.savePlan(draft)).resolves.toBe(false);
-    expect(store.plan?.club.name).toBe("Original");
+    expect(store.plan?.club.name).toBe("Failed edit");
+    expect(store.isDirty).toBe(true);
     vi.unstubAllGlobals();
   });
 
@@ -127,7 +181,7 @@ describe("usePlanStore", () => {
     vi.unstubAllGlobals();
   });
 
-  it("defers newer SSE plans while an editor is dirty", async () => {
+  it("preserves same-field edits from SSE until the user keeps or reloads a version", async () => {
     let source: { onmessage?: (event: MessageEvent) => Promise<void>; close: () => void } | undefined;
     vi.stubGlobal("EventSource", class {
       constructor() {
@@ -136,7 +190,7 @@ describe("usePlanStore", () => {
     });
     const store = usePlanStore();
     store.createNewPlan("f530083d-8c74-4f10-931a-dd877ee7b52c", "test-key", { clubName: "Original", season: "2026/2027" });
-    store.setEditing(true);
+    store.plan!.club.name = "Local edit";
     store.watchPlan();
 
     const update = structuredClone(toRaw(store.plan!));
@@ -144,17 +198,170 @@ describe("usePlanStore", () => {
     update.club.name = "Remote edit";
     await source?.onmessage?.({ data: JSON.stringify({ blob: JSON.stringify(update), revision: 2 }) } as MessageEvent);
 
-    expect(store.plan?.club.name).toBe("Original");
+    expect(store.plan?.club.name).toBe("Local edit");
     expect(store.pendingUpdate?.club.name).toBe("Remote edit");
-    store.applyPendingUpdate();
-    expect(store.plan?.club.name).toBe("Remote edit");
+    expect(store.mergeConflicts).toContainEqual({ path: "club.name", base: "Original", local: "Local edit", remote: "Remote edit" });
+    await expect(store.savePlan()).resolves.toBe(false);
     let expectedRevision: number | undefined;
     vi.stubGlobal("$fetch", vi.fn(async (_url: string, options?: { body?: { expectedRevision: number } }) => {
       expectedRevision = options?.body?.expectedRevision;
       return { revision: 3 };
     }));
-    await store.savePlan();
+    await store.retryLocal();
     expect(expectedRevision).toBe(2);
+    vi.unstubAllGlobals();
+  });
+
+  it("reloads the pending remote version when the user discards local edits", async () => {
+    let source: { onmessage?: (event: MessageEvent) => Promise<void>; close: () => void } | undefined;
+    vi.stubGlobal("EventSource", class {
+      constructor() {
+        return source = { onmessage: undefined, close() {} };
+      }
+    });
+    const store = usePlanStore();
+    store.createNewPlan("f530083d-8c74-4f10-931a-dd877ee7b52c", "test-key", { clubName: "Original", season: "2026/2027" });
+    store.plan!.club.name = "Local edit";
+    store.watchPlan();
+    const update = structuredClone(toRaw(store.plan!));
+    update.rev = 2;
+    update.club.name = "Remote edit";
+    await source?.onmessage?.({ data: JSON.stringify({ blob: JSON.stringify(update), revision: 2 }) } as MessageEvent);
+
+    store.reloadRemote();
+
+    expect(store.plan?.club.name).toBe("Remote edit");
+    expect(store.isDirty).toBe(false);
+    expect(store.pendingUpdate).toBeNull();
+    store.stopWatching();
+    vi.unstubAllGlobals();
+  });
+
+  it("saves per-field conflict choices while keeping independent local edits", async () => {
+    let source: { onmessage?: (event: MessageEvent) => Promise<void>; close: () => void } | undefined;
+    let expectedRevision: number | undefined;
+    vi.stubGlobal("EventSource", class {
+      constructor() {
+        return source = { onmessage: undefined, close() {} };
+      }
+    });
+    vi.stubGlobal("$fetch", vi.fn(async (_url: string, options?: { method?: string; body?: { expectedRevision: number } }) => {
+      expectedRevision = options?.body?.expectedRevision;
+      return { revision: 3 };
+    }));
+    const store = usePlanStore();
+    store.createNewPlan("f530083d-8c74-4f10-931a-dd877ee7b52c", "test-key", { clubName: "Original", season: "2026/2027" });
+    store.plan!.club.name = "Local name";
+    store.plan!.season = "2027/2028";
+    store.watchPlan();
+    const remote = structuredClone(toRaw(store.plan!));
+    remote.rev = 3;
+    remote.club.name = "Remote name";
+    remote.season = "2028/2029";
+    await source?.onmessage?.({ data: JSON.stringify({ blob: JSON.stringify(remote), revision: 2 }) } as MessageEvent);
+
+    expect(store.mergeConflicts).toHaveLength(2);
+    await expect(store.retryWithChoices({ "club.name": "remote", "season": "local" })).resolves.toBe(true);
+
+    expect(store.plan?.club.name).toBe("Remote name");
+    expect(store.plan?.season).toBe("2027/2028");
+    expect(expectedRevision).toBe(2);
+    expect(store.isDirty).toBe(false);
+    store.stopWatching();
+    vi.unstubAllGlobals();
+  });
+
+  it("preserves both entity versions for delete-versus-edit choices", async () => {
+    let source: { onmessage?: (event: MessageEvent) => Promise<void>; close: () => void } | undefined;
+    vi.stubGlobal("EventSource", class {
+      constructor() {
+        return source = { onmessage: undefined, close() {} };
+      }
+    });
+    vi.stubGlobal("$fetch", vi.fn().mockResolvedValue({ revision: 3 }));
+    const store = usePlanStore();
+    store.createNewPlan("f530083d-8c74-4f10-931a-dd877ee7b52c", "test-key", { clubName: "Club", season: "2026/2027" });
+    const team = store.addTeam("Original team")!;
+    await store.savePlan();
+    const remote = structuredClone(toRaw(store.plan!));
+    remote.rev = 3;
+    remote.teams[team.id]!.name = "Remote edit";
+    store.deleteTeam(team.id);
+    store.watchPlan();
+
+    await source?.onmessage?.({ data: JSON.stringify({ blob: JSON.stringify(remote), revision: 2 }) } as MessageEvent);
+
+    expect(store.mergeConflicts).toContainEqual({
+      path: `teams.${team.id}`,
+      base: expect.objectContaining({ name: "Original team" }),
+      local: undefined,
+      remote: expect.objectContaining({ name: "Remote edit" }),
+    });
+    await expect(store.retryWithChoices({ [`teams.${team.id}`]: "remote" })).resolves.toBe(true);
+    expect(store.plan?.teams[team.id]?.name).toBe("Remote edit");
+    expect(store.isDirty).toBe(false);
+    store.stopWatching();
+    vi.unstubAllGlobals();
+  });
+
+  it("merges independent SSE edits and saves the merged plan at the remote revision", async () => {
+    let source: { onmessage?: (event: MessageEvent) => Promise<void>; close: () => void } | undefined;
+    let expectedRevision: number | undefined;
+    vi.stubGlobal("EventSource", class {
+      constructor() {
+        return source = { onmessage: undefined, close() {} };
+      }
+    });
+    vi.stubGlobal("$fetch", vi.fn(async (_url: string, options?: { method?: string; body?: { expectedRevision: number } }) => {
+      expectedRevision = options?.body?.expectedRevision;
+      return { revision: 3 };
+    }));
+    const store = usePlanStore();
+    store.createNewPlan("f530083d-8c74-4f10-931a-dd877ee7b52c", "test-key", { clubName: "Original", season: "2026/2027" });
+    store.plan!.season = "2027/2028";
+    store.watchPlan();
+    const update = structuredClone(toRaw(store.plan!));
+    update.rev = 2;
+    update.club.name = "Remote edit";
+
+    await source?.onmessage?.({ data: JSON.stringify({ blob: JSON.stringify(update), revision: 2 }) } as MessageEvent);
+
+    expect(store.plan?.club.name).toBe("Remote edit");
+    expect(store.plan?.season).toBe("2027/2028");
+    expect(store.mergeConflicts).toEqual([]);
+    expect(expectedRevision).toBe(2);
+    expect(store.isDirty).toBe(false);
+    store.stopWatching();
+    vi.unstubAllGlobals();
+  });
+
+  it("preserves local work after a CAS failure and retries against the refreshed revision", async () => {
+    const store = usePlanStore();
+    store.createNewPlan("f530083d-8c74-4f10-931a-dd877ee7b52c", "test-key", { clubName: "Original", season: "2026/2027" });
+    store.plan!.club.name = "Local edit";
+    const remote = structuredClone(toRaw(store.plan!));
+    remote.rev = 2;
+    remote.club.name = "Remote edit";
+    const expectedRevisions: number[] = [];
+    vi.stubGlobal("$fetch", vi.fn(async (_url: string, options?: { method?: string; body?: { blob: string; expectedRevision: number } }) => {
+      if (options?.method === "POST") {
+        expectedRevisions.push(options.body!.expectedRevision);
+        if (expectedRevisions.length === 1)
+          throw Object.assign(new Error("Stale revision"), { statusCode: 409 });
+        return { revision: 3 };
+      }
+      return { blob: JSON.stringify(remote), revision: 2 };
+    }));
+
+    await expect(store.savePlan()).resolves.toBe(false);
+
+    expect(store.plan?.club.name).toBe("Local edit");
+    expect(store.isDirty).toBe(true);
+    expect(store.mergeConflicts.map(conflict => conflict.path)).toEqual(["club.name"]);
+    expect(store.error).toBe("ui.savePlanConflict");
+    await expect(store.retryLocal()).resolves.toBe(true);
+    expect(expectedRevisions).toEqual([0, 2]);
+    expect(store.isDirty).toBe(false);
     vi.unstubAllGlobals();
   });
 

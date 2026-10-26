@@ -1,25 +1,21 @@
 <!-- Nuxt requires camelCase dynamic parameter names here. -->
 <!-- eslint-disable unicorn/filename-case -->
 <script setup lang="ts">
-import type { SeasonPlan } from "../../../utils/plan-types";
-import { toRaw } from "vue";
 import { usePlanStore } from "../../../stores/plan";
 import { copyToClipboard } from "../../../utils/clipboard";
 import { createPlanLink } from "../../../utils/plan-links";
+import { resolveUnsavedPlanChoice } from "../../../utils/unsaved-plan";
 
 const route = useRoute();
+const router = useRouter();
 const planStore = usePlanStore();
 const toast = useToast();
 const { t } = useI18n();
 usePlanInit();
 
-onMounted(() => planStore.setEditing(true));
-onUnmounted(() => planStore.setEditing(false));
-
 const planLink = computed(() => planStore.key ? `/plans/${route.params.planId}#key=${planStore.key}` : `/plans/${route.params.planId}${route.hash}`);
 const scheduleLink = computed(() => planLink.value);
 const shareUrl = computed(() => planStore.key ? createPlanLink(String(route.params.planId), planStore.key, `/plans/${route.params.planId}/setup`) : "");
-const draft = ref<SeasonPlan | null>(null);
 const clubName = ref("");
 const season = ref("");
 const contactEmail = ref("");
@@ -28,71 +24,107 @@ const rolesText = ref("");
 const locationsText = ref("");
 const newTeamName = ref("");
 const newMemberName = ref("");
-const isDirty = ref(false);
-const syncingDrafts = ref(false);
 const shareState = ref<"idle" | "copied" | "failed">("idle");
+const isReloadConfirmationOpen = ref(false);
+const dirtyPromptPurpose = ref<"reload" | "navigation">("reload");
+let finishNavigation: ((allow: boolean) => void) | undefined;
+let removeNavigationGuard: (() => void) | undefined;
 
 function syncDrafts() {
-  if (!planStore.plan || isDirty.value)
+  if (!planStore.plan)
     return;
-  syncingDrafts.value = true;
-  draft.value = structuredClone(toRaw(planStore.plan));
   clubName.value = planStore.plan.club.name;
   season.value = planStore.plan.season;
   contactEmail.value = planStore.plan.club.contactEmail;
   homepage.value = planStore.plan.club.homepage;
   rolesText.value = planStore.roles.map(role => `${role.name} | ${role.scope}`).join("\n");
   locationsText.value = planStore.locations.map(location => `${location.name}${location.link ? ` | ${location.link}` : ""}`).join("\n");
-  nextTick(() => syncingDrafts.value = false);
 }
 
 watch(() => planStore.plan, syncDrafts, { immediate: true });
-function markDirty() {
-  isDirty.value = true;
-  planStore.setEditing(true);
+
+onMounted(() => {
+  removeNavigationGuard = router.beforeEach((to, from) => {
+    if (!planStore.isDirty || !/^\/plans\/[^/]+\/setup$/.test(from.path))
+      return true;
+    dirtyPromptPurpose.value = "navigation";
+    isReloadConfirmationOpen.value = true;
+    return new Promise<boolean>(resolve => finishNavigation = resolve);
+  });
+});
+
+onBeforeUnmount(() => removeNavigationGuard?.());
+
+function syncFormToStore() {
+  if (!planStore.plan)
+    return;
+  const roles = rolesText.value.split("\n").map((line, index) => {
+    const [name, scope = planStore.roles[index]?.scope ?? "match"] = line.split("|").map(value => value.trim());
+    const previous = planStore.roles[index];
+    return { id: previous?.id ?? `role-${index + 1}`, name: name ?? "", scope: scope === "gameday" ? "gameday" as const : "match" as const, requiredSkillId: previous?.requiredSkillId ?? "" };
+  }).filter(role => Boolean(role.name));
+  const locations = locationsText.value.split("\n").map((line, index) => {
+    const [name, link] = line.split("|").map(value => value.trim());
+    return { id: planStore.locations[index]?.id ?? `location-${index + 1}`, name: name ?? "", ...(link ? { link } : {}) };
+  }).filter(location => Boolean(location.name));
+  planStore.updatePlanSetup({
+    clubName: clubName.value,
+    season: season.value,
+    contactEmail: contactEmail.value,
+    homepage: homepage.value,
+    roles,
+    locations,
+  });
 }
 
-const teams = computed(() => Object.values(draft.value?.teams ?? {}));
-const members = computed(() => Object.values(draft.value?.members ?? {}));
+function markDirty() {
+  syncFormToStore();
+}
+
+const teams = computed(() => planStore.teamsList);
+const members = computed(() => planStore.membersList);
+
+function updateTeamName(teamId: string, name: string) {
+  planStore.updateTeam(teamId, name);
+}
+
+function updateMemberName(memberId: string, name: string) {
+  planStore.updateMember(memberId, { name });
+}
+
+function updateMemberTeams(memberId: string, event: Event) {
+  const select = event.target as HTMLSelectElement;
+  planStore.updateMember(memberId, { teamIds: Array.from(select.selectedOptions, option => option.value) });
+}
 
 function addTeam() {
   const name = newTeamName.value.trim();
-  if (!name || !draft.value)
+  if (!name || !planStore.plan)
     return;
-  const id = `team-${crypto.randomUUID().slice(0, 8)}`;
-  draft.value.teams[id] = { id, name, isManual: true, updatedAt: new Date() };
+  planStore.addTeam(name);
   newTeamName.value = "";
-  markDirty();
 }
 
 function removeTeam(teamId: string) {
-  if (!draft.value)
-    return;
-  delete draft.value.teams[teamId];
-  Object.values(draft.value.members).forEach(member => member.teamIds = member.teamIds.filter(id => id !== teamId));
-  markDirty();
+  planStore.deleteTeam(teamId);
 }
 
 function addMember() {
   const name = newMemberName.value.trim();
-  if (!name || !draft.value)
+  if (!name || !planStore.plan)
     return;
-  const id = `member-${crypto.randomUUID().slice(0, 8)}`;
-  draft.value.members[id] = { id, name, teamIds: [], skillIds: [], isManual: true, updatedAt: new Date() };
+  planStore.addMember({ name });
   newMemberName.value = "";
-  markDirty();
 }
 
 function removeMember(memberId: string) {
-  if (draft.value)
-    delete draft.value.members[memberId];
-  markDirty();
+  planStore.deleteMember(memberId);
 }
 
 function validate() {
   if (!clubName.value.trim() || !season.value.trim())
     return "ui.checkPlanDetails";
-  if (!draft.value || Object.values(draft.value.teams).some(team => !team.name.trim()) || Object.values(draft.value.members).some(member => !member.name.trim()))
+  if (!planStore.plan || teams.value.some(team => !team.name.trim()) || members.value.some(member => !member.name.trim()))
     return "ui.teamMemberNamesRequired";
   if (contactEmail.value && (!contactEmail.value.includes("@") || !contactEmail.value.includes(".")))
     return "ui.validEmailRequired";
@@ -102,46 +134,61 @@ function validate() {
 }
 
 async function save() {
+  syncFormToStore();
   const validationError = validate();
-  if (validationError || !planStore.plan || !draft.value) {
+  if (validationError || !planStore.plan) {
     toast.add({ title: "ui.checkChanges", description: validationError || "ui.planUnavailable", color: "error" });
-    return;
+    return false;
   }
-  draft.value.club = { ...draft.value.club, name: clubName.value.trim(), contactEmail: contactEmail.value.trim(), homepage: homepage.value.trim(), lastUpdated: new Date() };
-  draft.value.season = season.value.trim();
-  draft.value.config.roles = rolesText.value.split("\n").map((line, index) => {
-    const [name, scope = planStore.roles[index]?.scope ?? "match"] = line.split("|").map(value => value.trim());
-    const previous = planStore.roles[index];
-    return { id: previous?.id ?? `role-${index + 1}`, name: name ?? "", scope: scope === "gameday" ? "gameday" as const : "match" as const, requiredSkillId: previous?.requiredSkillId ?? "" };
-  }).filter(role => Boolean(role.name));
-  draft.value.config.locations = locationsText.value.split("\n").map((line, index) => {
-    const [name, link] = line.split("|").map(value => value.trim());
-    return { id: planStore.locations[index]?.id ?? `location-${index + 1}`, name: name ?? "", ...(link ? { link } : {}) };
-  }).filter(location => Boolean(location.name));
-  Object.values(draft.value.teams).forEach((team) => {
-    team.name = team.name.trim();
-    team.updatedAt = new Date();
-  });
-  Object.values(draft.value.members).forEach((member) => {
-    member.name = member.name.trim();
-    member.updatedAt = new Date();
-  });
-  if (await planStore.savePlan(draft.value)) {
-    isDirty.value = false;
-    planStore.setEditing(false);
+  clubName.value = clubName.value.trim();
+  season.value = season.value.trim();
+  contactEmail.value = contactEmail.value.trim();
+  homepage.value = homepage.value.trim();
+  syncFormToStore();
+  teams.value.forEach(team => planStore.updateTeam(team.id, team.name.trim()));
+  members.value.forEach(member => planStore.updateMember(member.id, { name: member.name.trim() }));
+  if (!await planStore.savePlan()) {
+    const description = planStore.error?.startsWith("ui.") ? t(planStore.error) : planStore.error ?? t("ui.couldNotSavePlan");
+    toast.add({ title: t("ui.saveFailed"), description, color: "error" });
+    return false;
   }
-  else {
-    toast.add({ title: "ui.saveFailed", description: planStore.error || "ui.couldNotSavePlan", color: "error" });
-  }
+  return true;
 }
 
-async function reload() {
+async function reloadFromServer() {
   if (!planStore.plan || !planStore.key)
     return;
-  // Buffer SSE updates while the authoritative server reload replaces the draft.
-  planStore.setEditing(true);
-  isDirty.value = false;
   await planStore.loadPlan(planStore.plan.id, planStore.key);
+}
+
+function reload() {
+  if (planStore.isDirty) {
+    dirtyPromptPurpose.value = "reload";
+    isReloadConfirmationOpen.value = true;
+    return;
+  }
+  void reloadFromServer();
+}
+
+async function resolveReload(choice: "save" | "discard" | "stay") {
+  const purpose = dirtyPromptPurpose.value;
+  if (choice === "stay") {
+    isReloadConfirmationOpen.value = false;
+    finishNavigation?.(false);
+    finishNavigation = undefined;
+    return;
+  }
+  const canReload = await resolveUnsavedPlanChoice(choice, save, () => planStore.discardLocalEdits());
+  if (!canReload)
+    return;
+  isReloadConfirmationOpen.value = false;
+  if (purpose === "reload") {
+    await reloadFromServer();
+  }
+  else {
+    finishNavigation?.(true);
+    finishNavigation = undefined;
+  }
 }
 
 async function copyShareUrl() {
@@ -166,7 +213,7 @@ useHead({ title: t("ui.editPlan") });
         {{ $t("ui.planSetup.couldNotLoadPlan") }}
       </h1>
       <p class="text-error">
-        {{ planStore.error }}
+        {{ planStore.error.startsWith("ui.") ? $t(planStore.error) : planStore.error }}
       </p>
       <UButton :to="planLink">
         {{ $t("ui.planSetup.returnToPlan") }}
@@ -201,7 +248,7 @@ useHead({ title: t("ui.editPlan") });
         </div>
       </header>
       <div v-if="planStore.error" class="rounded-lg bg-error/10 p-4 text-error">
-        {{ planStore.error }}
+        {{ planStore.error.startsWith("ui.") ? $t(planStore.error) : planStore.error }}
       </div>
       <section class="space-y-4 rounded-xl border p-5">
         <h2 class="text-xl font-bold">
@@ -232,7 +279,7 @@ useHead({ title: t("ui.editPlan") });
           </UButton>
         </div>
         <div v-for="team in teams" :key="team.id" class="flex gap-2">
-          <UInput v-model="team.name" class="grow" @input="markDirty" /><UButton color="error" variant="ghost" @click="removeTeam(team.id)">
+          <UInput :model-value="team.name" class="grow" @update:model-value="name => updateTeamName(team.id, name)" /><UButton color="error" variant="ghost" @click="removeTeam(team.id)">
             {{ $t("ui.common.remove") }}
           </UButton>
         </div>
@@ -251,11 +298,11 @@ useHead({ title: t("ui.editPlan") });
         </div>
         <div v-for="member in members" :key="member.id" class="space-y-2 rounded-lg border p-3">
           <div class="flex gap-2">
-            <UInput v-model="member.name" class="grow" @input="markDirty" /><UButton color="error" variant="ghost" @click="removeMember(member.id)">
+            <UInput :model-value="member.name" class="grow" @update:model-value="name => updateMemberName(member.id, name)" /><UButton color="error" variant="ghost" @click="removeMember(member.id)">
               {{ $t("ui.common.remove") }}
             </UButton>
-          </div><select v-model="member.teamIds" multiple :aria-label="$t('ui.memberTeams')" class="w-full rounded-lg border bg-transparent p-2 text-sm" @change="markDirty">
-            <option v-for="team in teams" :key="team.id" :value="team.id">
+          </div><select multiple :aria-label="$t('ui.memberTeams')" class="w-full rounded-lg border bg-transparent p-2 text-sm" @change="updateMemberTeams(member.id, $event)">
+            <option v-for="team in teams" :key="team.id" :value="team.id" :selected="member.teamIds.includes(team.id)">
               {{ team.name }}
             </option>
           </select>
@@ -292,10 +339,28 @@ useHead({ title: t("ui.editPlan") });
         </p>
       </section>
       <footer class="flex items-center justify-between border-t pt-6">
-        <span class="text-sm text-on-surface-variant">{{ isDirty ? $t("ui.common.saveChanges") : $t("ui.saved") }}</span><UButton variant="outline" :loading="planStore.isLoading" @click="reload">
+        <span class="text-sm text-on-surface-variant">{{ planStore.isDirty ? $t("ui.common.saveChanges") : $t("ui.saved") }}</span><UButton variant="outline" :loading="planStore.isLoading" @click="reload">
           {{ $t("ui.planSetup.reloadFromServer") }}
         </UButton>
       </footer>
     </main>
+    <UModal v-model:open="isReloadConfirmationOpen" :title="$t('ui.unsavedPlanTitle')" :close="false" @update:open="open => !open && resolveReload('stay')">
+      <template #body>
+        <p>{{ $t(dirtyPromptPurpose === "reload" ? "ui.unsavedReloadMessage" : "ui.unsavedNavigationMessage") }}</p>
+      </template>
+      <template #footer>
+        <div role="group" :aria-label="$t('ui.unsavedPlanActions')" class="flex flex-wrap justify-end gap-2">
+          <UButton variant="outline" @click="resolveReload('stay')">
+            {{ $t("ui.stayOnPage") }}
+          </UButton>
+          <UButton color="error" variant="outline" @click="resolveReload('discard')">
+            {{ $t(dirtyPromptPurpose === "reload" ? "ui.discardAndReload" : "ui.discardAndLeave") }}
+          </UButton>
+          <UButton :loading="planStore.isLoading" @click="resolveReload('save')">
+            {{ $t(dirtyPromptPurpose === "reload" ? "ui.saveAndReload" : "ui.saveAndLeave") }}
+          </UButton>
+        </div>
+      </template>
+    </UModal>
   </UContainer>
 </template>
