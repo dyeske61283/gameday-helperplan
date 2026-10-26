@@ -13,6 +13,7 @@ const props = defineProps<{
   planId: string;
   planKey?: string | null;
 }>();
+const emit = defineEmits<{ createMatch: [] }>();
 const { t } = useI18n();
 
 const gamedayMatches = computed<Match[]>(() => {
@@ -98,15 +99,29 @@ function matchLink(matchId: string) {
           <span v-if="gameday.openingTime" class="ml-2">
             {{ t("dashboard.opens") }}: {{ gameday.openingTime }}
           </span>
+          <span v-if="gameday.closingTime" class="ml-2">
+            {{ t("dashboard.closes") }}: {{ gameday.closingTime }}
+          </span>
         </div>
+        <p v-if="gameday.notes" class="mt-2 text-sm text-on-surface-variant">
+          <span class="font-semibold">{{ t("ui.schedule.notes") }}:</span> {{ gameday.notes }}
+        </p>
       </div>
-      <UBadge variant="soft" color="primary" size="sm">
-        {{ gamedayMatches.length }} {{ gamedayMatches.length === 1 ? t("dashboard.match") : t("dashboard.matches") }}
-      </UBadge>
+      <div class="flex items-center gap-2">
+        <UBadge variant="soft" color="primary" size="sm">
+          {{ gamedayMatches.length }} {{ gamedayMatches.length === 1 ? t("dashboard.match") : t("dashboard.matches") }}
+        </UBadge>
+        <UButton size="xs" variant="outline" icon="i-lucide-plus" @click="emit('createMatch')">
+          {{ t("ui.schedule.createMatch") }}
+        </UButton>
+      </div>
     </div>
 
     <!-- Match Rows -->
     <div class="divide-y divide-neutral-100 dark:divide-neutral-800/60 p-4 space-y-4">
+      <p v-if="!gamedayMatches.length" class="text-sm text-on-surface-variant">
+        {{ t("ui.schedule.noMatchesYet") }}
+      </p>
       <div
         v-for="match in gamedayMatches"
         :key="match.id"

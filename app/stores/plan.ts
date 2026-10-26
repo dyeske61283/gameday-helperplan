@@ -1,9 +1,12 @@
 import type { AutoAssignOptions } from "../utils/helper-assignment";
 import type {
+  Gameday,
+  Match,
   Member,
   NewPlanMetadata,
   Role,
   SeasonPlan,
+  Slot,
   Team,
 } from "../utils/plan-types";
 import { useLocalStorage } from "@vueuse/core";
@@ -12,11 +15,21 @@ import { computed, ref, toRaw } from "vue";
 import examplePlan from "../../test/fixtures/plan-2025-2026.json";
 import { useDecryption, useEncryption } from "../composables/use-crypto";
 import { autoAssignMatchDuties, completeClosedAssignments, isMemberEligibleForSlot } from "../utils/helper-assignment";
-import { CURRENT_SCHEMA_VERSION, parseSeasonPlan } from "../utils/plan-types";
+import { CURRENT_SCHEMA_VERSION, GamedaySchema, parseSeasonPlan } from "../utils/plan-types";
 
 export const PLAN_RESUME_KEY = "gameday-plan-resume";
 const MEMBER_KEY = "gameday-selected-member";
 const _FRAGMENT_PREFIX = "key=";
+
+function createOpenSlots(plan: SeasonPlan, scope: Role["scope"], updatedAt: Date, roleIds?: string[]): Slot[] {
+  return plan.config.roles.filter(role => role.scope === scope && (!roleIds || roleIds.includes(role.id))).map(role => ({
+    id: `slot-${crypto.randomUUID().slice(0, 8)}`,
+    roleId: role.id,
+    assignedMemberId: null,
+    assignmentStatus: "OPEN",
+    updatedAt,
+  }));
+}
 
 export const usePlanStore = defineStore("plan", () => {
   const plan = ref<SeasonPlan | null>(null);
@@ -338,6 +351,72 @@ export const usePlanStore = defineStore("plan", () => {
     return savePlan();
   }
 
+  function createGameday(data: { date: string; locationId: string; openingTime?: string; closingTime?: string; notes?: string; roleIds?: string[] }, target = plan.value): Gameday {
+    if (!target)
+      throw new Error("ui.schedule.planUnavailable");
+    if (!GamedaySchema.shape.date.safeParse(data.date).success)
+      throw new Error("ui.schedule.dateRequired");
+    if (!target.config.locations.some(location => location.id === data.locationId))
+      throw new Error("ui.schedule.locationRequired");
+    const openingTime = data.openingTime || undefined;
+    const closingTime = data.closingTime || undefined;
+    if ((openingTime && !GamedaySchema.shape.openingTime.safeParse(openingTime).success) || (closingTime && !GamedaySchema.shape.closingTime.safeParse(closingTime).success))
+      throw new Error("ui.schedule.timeRequired");
+    if (data.roleIds?.some(id => !target.config.roles.some(role => role.id === id && role.scope === "gameday")))
+      throw new Error("ui.schedule.dutyRoleInvalid");
+
+    const now = new Date();
+    const id = `gameday-${crypto.randomUUID().slice(0, 8)}`;
+    const gameday: Gameday = {
+      id,
+      date: data.date,
+      locationId: data.locationId,
+      matchIds: [],
+      slots: createOpenSlots(target, "gameday", now, data.roleIds),
+      ...(openingTime ? { openingTime } : {}),
+      ...(closingTime ? { closingTime } : {}),
+      ...(data.notes?.trim() ? { notes: data.notes.trim() } : {}),
+      updatedAt: now,
+    };
+    target.gamedays[id] = gameday;
+    target.lastUpdated = now;
+    return gameday;
+  }
+
+  function createMatch(data: { gamedayId: string; time: string; homeTeamId: string; awayTeamName: string; helperTeamId?: string; roleIds?: string[] }, target = plan.value): Match {
+    if (!target)
+      throw new Error("ui.schedule.planUnavailable");
+    const gameday = target.gamedays[data.gamedayId];
+    if (!gameday)
+      throw new Error("ui.schedule.gamedayRequired");
+    if (!target.teams[data.homeTeamId])
+      throw new Error("ui.schedule.homeTeamRequired");
+    if (data.helperTeamId && !target.teams[data.helperTeamId])
+      throw new Error("ui.schedule.helperTeamRequired");
+    if (data.roleIds?.some(id => !target.config.roles.some(role => role.id === id && role.scope === "match")))
+      throw new Error("ui.schedule.dutyRoleInvalid");
+    const time = new Date(data.time);
+    if (!data.time || Number.isNaN(time.getTime()) || !data.awayTeamName.trim())
+      throw new Error("ui.schedule.matchDetailsRequired");
+
+    const now = new Date();
+    const id = `match-${crypto.randomUUID().slice(0, 8)}`;
+    const match: Match = {
+      id,
+      time,
+      homeTeamId: data.homeTeamId,
+      awayTeamName: data.awayTeamName.trim(),
+      ...(data.helperTeamId ? { helperTeamId: data.helperTeamId } : {}),
+      slots: createOpenSlots(target, "match", now, data.roleIds),
+      updatedAt: now,
+    };
+    target.matches[id] = match;
+    gameday.matchIds.push(id);
+    gameday.updatedAt = now;
+    target.lastUpdated = now;
+    return match;
+  }
+
   // --- Domain Methods: Teams ---
 
   function addTeam(name: string): Team | null {
@@ -566,6 +645,8 @@ export const usePlanStore = defineStore("plan", () => {
     applyPendingUpdate,
     savePlan,
     createNewPlan,
+    createGameday,
+    createMatch,
     addTeam,
     updateTeam,
     deleteTeam,

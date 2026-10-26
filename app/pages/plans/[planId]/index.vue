@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { Match } from "~/utils/plan-types";
+import { toRaw } from "vue";
 import { usePlanStore } from "~/stores/plan";
 import { buildCalendarLayout } from "~/utils/calendar-layout";
 import { copyToClipboard } from "~/utils/clipboard";
@@ -8,8 +9,25 @@ import { createPlanLink } from "~/utils/plan-links";
 
 const route = useRoute();
 const planStore = usePlanStore();
+const { t } = useI18n();
 const searchQuery = ref("");
 const viewMode = ref<"timeline" | "calendar">("timeline");
+const creatingGameday = ref(false);
+const gamedayDate = ref("");
+const gamedayLocationId = ref("");
+const gamedayOpeningTime = ref("");
+const gamedayClosingTime = ref("");
+const gamedayNotes = ref("");
+const gamedayRoleIds = ref<string[]>([]);
+const gamedayError = ref("");
+const creatingMatchFor = ref<string | null>(null);
+const matchGamedayId = ref("");
+const matchTime = ref("");
+const matchHomeTeamId = ref("");
+const matchAwayTeamName = ref("");
+const matchHelperTeamId = ref("");
+const matchRoleIds = ref<string[]>([]);
+const matchError = ref("");
 
 usePlanInit();
 
@@ -115,13 +133,110 @@ const totalAssignedSlots = computed(() => {
   }
   return count;
 });
+const hasScheduleEvents = computed(() => planStore.gamedaysList.length > 0 || totalMatchesCount.value > 0);
+const gamedayRoles = computed(() => planStore.roles.filter(role => role.scope === "gameday"));
+const matchRoles = computed(() => planStore.roles.filter(role => role.scope === "match"));
+
+function openGamedayForm() {
+  creatingGameday.value = true;
+  gamedayDate.value = "";
+  gamedayLocationId.value = planStore.locations[0]?.id ?? "";
+  gamedayOpeningTime.value = "";
+  gamedayClosingTime.value = "";
+  gamedayNotes.value = "";
+  gamedayRoleIds.value = gamedayRoles.value.map(role => role.id);
+  gamedayError.value = "";
+}
+
+function cancelGamedayForm() {
+  creatingGameday.value = false;
+  gamedayDate.value = "";
+  gamedayLocationId.value = "";
+  gamedayOpeningTime.value = "";
+  gamedayClosingTime.value = "";
+  gamedayNotes.value = "";
+  gamedayRoleIds.value = [];
+  gamedayError.value = "";
+}
+
+async function saveGameday() {
+  if (!planStore.plan)
+    return;
+  const draft = structuredClone(toRaw(planStore.plan));
+  gamedayError.value = "";
+  try {
+    planStore.createGameday({
+      date: gamedayDate.value,
+      locationId: gamedayLocationId.value,
+      openingTime: gamedayOpeningTime.value,
+      closingTime: gamedayClosingTime.value,
+      notes: gamedayNotes.value,
+      roleIds: gamedayRoleIds.value,
+    }, draft);
+    if (await planStore.savePlan(draft)) {
+      cancelGamedayForm();
+      return;
+    }
+    gamedayError.value = planStore.error || t("ui.schedule.saveFailed");
+  }
+  catch (error) {
+    gamedayError.value = error instanceof Error ? t(error.message) : t("ui.schedule.saveFailed");
+  }
+}
+
+function openMatchForm(gamedayId: string) {
+  creatingMatchFor.value = gamedayId;
+  matchGamedayId.value = gamedayId;
+  matchTime.value = "";
+  matchHomeTeamId.value = planStore.teamsList[0]?.id ?? "";
+  matchAwayTeamName.value = "";
+  matchHelperTeamId.value = "";
+  matchRoleIds.value = matchRoles.value.map(role => role.id);
+  matchError.value = "";
+}
+
+function cancelMatchForm() {
+  creatingMatchFor.value = null;
+  matchGamedayId.value = "";
+  matchTime.value = "";
+  matchHomeTeamId.value = "";
+  matchAwayTeamName.value = "";
+  matchHelperTeamId.value = "";
+  matchRoleIds.value = [];
+  matchError.value = "";
+}
+
+async function saveMatch() {
+  if (!planStore.plan)
+    return;
+  const draft = structuredClone(toRaw(planStore.plan));
+  matchError.value = "";
+  try {
+    planStore.createMatch({
+      gamedayId: matchGamedayId.value,
+      time: matchTime.value,
+      homeTeamId: matchHomeTeamId.value,
+      awayTeamName: matchAwayTeamName.value,
+      helperTeamId: matchHelperTeamId.value || undefined,
+      roleIds: matchRoleIds.value,
+    }, draft);
+    if (await planStore.savePlan(draft)) {
+      cancelMatchForm();
+      return;
+    }
+    matchError.value = planStore.error || t("ui.schedule.saveFailed");
+  }
+  catch (error) {
+    matchError.value = error instanceof Error ? t(error.message) : t("ui.schedule.saveFailed");
+  }
+}
 </script>
 
 <template>
-  <UContainer v-if="planStore.isLoading" class="py-16 text-center">
+  <UContainer v-if="planStore.isLoading && (!planStore.plan || planStore.plan.id !== planId)" class="py-16 text-center">
     {{ $t("ui.schedule.loadingPlan") }}
   </UContainer>
-  <UContainer v-else-if="planStore.error" class="py-16 text-center space-y-4">
+  <UContainer v-else-if="planStore.error && !planStore.plan" class="py-16 text-center space-y-4">
     <h1 class="text-2xl font-bold">
       {{ $t("ui.schedule.couldNotOpenThisPlan") }}
     </h1>
@@ -161,6 +276,9 @@ const totalAssignedSlots = computed(() => {
       </div>
 
       <div class="flex flex-wrap gap-3">
+        <UButton v-if="planStore.gamedaysList.length" icon="i-lucide-calendar-plus" variant="outline" class="rounded-full" @click="openGamedayForm">
+          {{ $t("ui.schedule.createGameday") }}
+        </UButton>
         <UButton
           :to="planLink('/assignments')"
           icon="i-lucide-id-card-lanyard"
@@ -188,6 +306,69 @@ const totalAssignedSlots = computed(() => {
       </div>
     </div>
 
+    <form v-if="creatingGameday" class="space-y-4 rounded-xl border p-5" @submit.prevent="saveGameday">
+      <h2 class="text-xl font-bold">
+        {{ $t("ui.schedule.createGameday") }}
+      </h2>
+      <div class="grid gap-4 sm:grid-cols-2">
+        <label class="space-y-1 text-sm font-medium">
+          <span>{{ $t("ui.schedule.date") }}</span>
+          <UInput v-model="gamedayDate" type="date" required />
+        </label>
+        <label class="space-y-1 text-sm font-medium">
+          <span>{{ $t("ui.schedule.location") }}</span>
+          <select v-model="gamedayLocationId" required class="w-full rounded-lg border bg-transparent p-2.5 text-sm">
+            <option value="" disabled>{{ $t("ui.schedule.selectLocation") }}</option>
+            <option v-for="location in planStore.locations" :key="location.id" :value="location.id">{{ location.name }}</option>
+          </select>
+        </label>
+        <label class="space-y-1 text-sm font-medium">
+          <span>{{ $t("ui.schedule.openingTime") }}</span>
+          <UInput v-model="gamedayOpeningTime" type="time" />
+        </label>
+        <label class="space-y-1 text-sm font-medium">
+          <span>{{ $t("ui.schedule.closingTime") }}</span>
+          <UInput v-model="gamedayClosingTime" type="time" />
+        </label>
+      </div>
+      <label class="block space-y-1 text-sm font-medium">
+        <span>{{ $t("ui.schedule.notes") }}</span>
+        <UTextarea v-model="gamedayNotes" class="w-full" />
+      </label>
+      <p v-if="!planStore.locations.length" class="text-sm text-on-surface-variant">
+        {{ $t("ui.schedule.addLocationFirst") }}
+        <NuxtLink :to="planLink('/setup')" class="underline">
+          {{ $t("ui.editPlan") }}
+        </NuxtLink>
+      </p>
+      <fieldset class="space-y-2">
+        <legend class="text-sm font-semibold">
+          {{ $t("ui.schedule.initialGamedayDuties") }}
+        </legend>
+        <p v-if="!gamedayRoles.length" class="text-sm text-on-surface-variant">
+          {{ $t("ui.schedule.noGamedayDutyRoles") }}
+        </p>
+        <label v-for="role in gamedayRoles" :key="role.id" class="flex items-center gap-2 text-sm">
+          <input v-model="gamedayRoleIds" type="checkbox" :value="role.id" class="accent-primary">
+          <span>{{ role.name }}</span>
+          <span v-if="role.requiredSkillId" class="text-xs text-on-surface-variant">
+            {{ $t("ui.schedule.capabilityRequired", { capability: role.requiredSkillId }) }}
+          </span>
+        </label>
+      </fieldset>
+      <p v-if="gamedayError" role="alert" class="text-sm text-error">
+        {{ gamedayError }}
+      </p>
+      <div class="flex gap-2">
+        <UButton type="submit" :loading="planStore.isLoading">
+          {{ $t("ui.schedule.createGameday") }}
+        </UButton>
+        <UButton type="button" variant="outline" :disabled="planStore.isLoading" @click="cancelGamedayForm">
+          {{ $t("ui.common.cancel") }}
+        </UButton>
+      </div>
+    </form>
+
     <section v-if="shareUrl" aria-labelledby="share-heading" class="space-y-3 rounded-xl border border-primary/30 p-5">
       <h2 id="share-heading" class="text-xl font-bold">
         {{ $t("ui.planSetup.shareThisPlan") }}
@@ -206,7 +387,7 @@ const totalAssignedSlots = computed(() => {
     </section>
 
     <!-- Quick Stats Bar -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+    <div v-if="hasScheduleEvents" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
       <div class="p-4 rounded-xl bg-surface-container-low border border-neutral-200 dark:border-neutral-800">
         <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
           {{ $t("ui.schedule.gamedays") }}
@@ -279,21 +460,90 @@ const totalAssignedSlots = computed(() => {
     </div>
 
     <div v-if="viewMode === 'timeline' && filteredGamedays.length > 0" class="space-y-6">
-      <GamedayCard
-        v-for="gameday in filteredGamedays"
-        :id="`gameday-${gameday.id}`"
-        :key="gameday.id"
-        tabindex="-1"
-        :gameday="gameday"
-        :filter-member-id="matchedMember?.id"
-        :location="planStore.locations.find(location => location.id === gameday.locationId)"
-        :matches="planStore.matches"
-        :roles="planStore.roles"
-        :teams="planStore.teams"
-        :members="planStore.members"
-        :plan-id="planId"
-        :plan-key="planStore.key"
-      />
+      <div v-for="gameday in filteredGamedays" :key="gameday.id" class="space-y-3">
+        <GamedayCard
+          :id="`gameday-${gameday.id}`"
+          tabindex="-1"
+          :gameday="gameday"
+          :filter-member-id="matchedMember?.id"
+          :location="planStore.locations.find(location => location.id === gameday.locationId)"
+          :matches="planStore.matches"
+          :roles="planStore.roles"
+          :teams="planStore.teams"
+          :members="planStore.members"
+          :plan-id="planId"
+          :plan-key="planStore.key"
+          @create-match="openMatchForm(gameday.id)"
+        />
+        <form v-if="creatingMatchFor === gameday.id" class="space-y-4 rounded-xl border p-5" @submit.prevent="saveMatch">
+          <h3 class="text-lg font-bold">
+            {{ $t("ui.schedule.createMatch") }}
+          </h3>
+          <div class="grid gap-4 sm:grid-cols-3">
+            <label class="space-y-1 text-sm font-medium">
+              <span>{{ $t("ui.schedule.parentGameday") }}</span>
+              <select v-model="matchGamedayId" required class="w-full rounded-lg border bg-transparent p-2.5 text-sm">
+                <option value="" disabled>{{ $t("ui.schedule.selectGameday") }}</option>
+                <option v-for="parent in planStore.gamedaysList" :key="parent.id" :value="parent.id">{{ parent.date }}</option>
+              </select>
+            </label>
+            <label class="space-y-1 text-sm font-medium">
+              <span>{{ $t("ui.schedule.kickoff") }}</span>
+              <UInput v-model="matchTime" type="datetime-local" required />
+            </label>
+            <label class="space-y-1 text-sm font-medium">
+              <span>{{ $t("ui.schedule.homeTeam") }}</span>
+              <select v-model="matchHomeTeamId" required class="w-full rounded-lg border bg-transparent p-2.5 text-sm">
+                <option value="" disabled>{{ $t("ui.schedule.selectHomeTeam") }}</option>
+                <option v-for="team in planStore.teamsList" :key="team.id" :value="team.id">{{ team.name }}</option>
+              </select>
+            </label>
+            <label class="space-y-1 text-sm font-medium">
+              <span>{{ $t("ui.schedule.awayTeam") }}</span>
+              <UInput v-model="matchAwayTeamName" required />
+            </label>
+            <label class="space-y-1 text-sm font-medium">
+              <span>{{ $t("ui.schedule.helperTeam") }}</span>
+              <select v-model="matchHelperTeamId" class="w-full rounded-lg border bg-transparent p-2.5 text-sm">
+                <option value="">{{ $t("ui.schedule.noHelperTeam") }}</option>
+                <option v-for="team in planStore.teamsList" :key="team.id" :value="team.id">{{ team.name }}</option>
+              </select>
+            </label>
+          </div>
+          <p v-if="!planStore.teamsList.length" class="text-sm text-on-surface-variant">
+            {{ $t("ui.schedule.addTeamFirst") }}
+            <NuxtLink :to="planLink('/setup')" class="underline">
+              {{ $t("ui.editPlan") }}
+            </NuxtLink>
+          </p>
+          <fieldset class="space-y-2">
+            <legend class="text-sm font-semibold">
+              {{ $t("ui.schedule.defaultMatchDuties") }}
+            </legend>
+            <p v-if="!matchRoles.length" class="text-sm text-on-surface-variant">
+              {{ $t("ui.schedule.noMatchDutyRoles") }}
+            </p>
+            <label v-for="role in matchRoles" :key="role.id" class="flex items-center gap-2 text-sm">
+              <input v-model="matchRoleIds" type="checkbox" :value="role.id" class="accent-primary">
+              <span>{{ role.name }}</span>
+              <span v-if="role.requiredSkillId" class="text-xs text-on-surface-variant">
+                {{ $t("ui.schedule.capabilityRequired", { capability: role.requiredSkillId }) }}
+              </span>
+            </label>
+          </fieldset>
+          <p v-if="matchError" role="alert" class="text-sm text-error">
+            {{ matchError }}
+          </p>
+          <div class="flex gap-2">
+            <UButton type="submit" :loading="planStore.isLoading">
+              {{ $t("ui.schedule.createMatch") }}
+            </UButton>
+            <UButton type="button" variant="outline" :disabled="planStore.isLoading" @click="cancelMatchForm">
+              {{ $t("ui.common.cancel") }}
+            </UButton>
+          </div>
+        </form>
+      </div>
     </div>
 
     <div v-else-if="viewMode === 'calendar' && (calendarLayout.months.length || calendarLayout.invalid.length)" class="space-y-6">
@@ -330,15 +580,16 @@ const totalAssignedSlots = computed(() => {
       <h3 class="text-lg font-bold text-on-surface">
         {{ $t("ui.schedule.noGamedaysFound") }}
       </h3>
-      <p class="text-sm text-neutral-500 mt-1 max-w-sm mx-auto">
+      <p v-if="!planStore.gamedaysList.length && !searchQuery.trim()" class="text-sm text-neutral-500 mt-1 max-w-sm mx-auto">
+        {{ $t("ui.schedule.emptySchedule") }}
+      </p>
+      <p v-else class="text-sm text-neutral-500 mt-1 max-w-sm mx-auto">
         {{ $t("ui.schedule.noMatchesOrDutyAssignmentsMatchYourCurrentSearchQuery") }}
       </p>
-      <UButton
-        class="mt-4"
-        variant="ghost"
-        color="primary"
-        @click="searchQuery = ''"
-      >
+      <UButton v-if="!planStore.gamedaysList.length && !searchQuery.trim()" class="mt-4" @click="openGamedayForm">
+        {{ $t("ui.schedule.createGameday") }}
+      </UButton>
+      <UButton v-else class="mt-4" variant="ghost" color="primary" @click="searchQuery = ''">
         {{ $t("ui.common.clearFilters") }}
       </UButton>
     </div>
