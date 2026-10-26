@@ -13,6 +13,7 @@ export type AutoAssignOptions = {
    * Default: true
    */
   excludeConflicts?: boolean;
+  now?: Date;
 };
 
 export type AutoAssignResult = {
@@ -28,6 +29,26 @@ export function isMemberEligibleForSlot(plan: SeasonPlan, slot: Slot, memberId: 
   if (!member)
     return false;
   return !requiredSkillId || member.skillIds.includes(requiredSkillId);
+}
+
+export function claimDuty(plan: SeasonPlan, matchId: string, slotId: string, memberId: string, now = new Date()): void {
+  const match = plan.matches[matchId];
+  const slot = match?.slots.find(candidate => candidate.id === slotId);
+  if (!match || !slot)
+    throw new Error("Match or duty slot not found");
+  if (!plan.members[memberId])
+    throw new Error("Select a member before claiming a duty");
+  if (slot.assignmentStatus !== "OPEN" || slot.assignedMemberId || slot.customHelperName)
+    throw new Error("This duty has already been claimed");
+  if (!isMemberEligibleForSlot(plan, slot, memberId))
+    throw new Error("This member does not have the required capability");
+
+  slot.assignedMemberId = memberId;
+  slot.assignmentStatus = "ASSIGNED";
+  slot.customHelperName = null;
+  slot.updatedAt = now;
+  match.updatedAt = now;
+  plan.lastUpdated = now;
 }
 
 export function completeClosedAssignments(plan: SeasonPlan, now = new Date()): number {
@@ -114,6 +135,7 @@ export function autoAssignMatchDuties(
   const {
     balanceDutyCounts = true,
     excludeConflicts = true,
+    now = new Date(),
   } = options;
 
   const dutyCounts = getMemberDutyCounts(plan);
@@ -216,7 +238,7 @@ export function autoAssignMatchDuties(
       slot.assignedMemberId = chosen.id;
       slot.customHelperName = null;
       slot.assignmentStatus = "ASSIGNED";
-      slot.updatedAt = new Date();
+      slot.updatedAt = now;
       assignedInMatch.add(chosen.id);
       dutyCounts.set(chosen.id, (dutyCounts.get(chosen.id) || 0) + 1);
       assignedCount++;
@@ -226,7 +248,6 @@ export function autoAssignMatchDuties(
     }
   }
 
-  const now = new Date();
   match.updatedAt = now;
   plan.lastUpdated = now;
 

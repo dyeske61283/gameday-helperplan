@@ -11,7 +11,7 @@ import { defineStore, skipHydrate } from "pinia";
 import { computed, ref, toRaw } from "vue";
 import examplePlan from "../../test/fixtures/plan-2025-2026.json";
 import { useDecryption, useEncryption } from "../composables/use-crypto";
-import { autoAssignMatchDuties, completeClosedAssignments, isMemberEligibleForSlot } from "../utils/helper-assignment";
+import { autoAssignMatchDuties, claimDuty, completeClosedAssignments, isMemberEligibleForSlot } from "../utils/helper-assignment";
 import { CURRENT_SCHEMA_VERSION, parseSeasonPlan } from "../utils/plan-types";
 
 export const PLAN_RESUME_KEY = "gameday-plan-resume";
@@ -461,26 +461,11 @@ export const usePlanStore = defineStore("plan", () => {
   function claimSlot(matchId: string, slotId: string, memberId = selectedMemberId.value) {
     if (!plan.value)
       throw new Error("Plan is unavailable");
-    const match = plan.value.matches[matchId];
-    const member = memberId ? plan.value.members[memberId] : undefined;
-    const slot = match?.slots.find(candidate => candidate.id === slotId);
-    if (!match || !slot)
-      throw new Error("Match or duty slot not found");
-    if (!member)
-      throw new Error("Select a member before claiming a duty");
-    if (slot.assignmentStatus !== "OPEN" || slot.assignedMemberId || slot.customHelperName)
-      throw new Error("This duty has already been claimed");
-    if (!isMemberEligibleForSlot(plan.value, slot, member.id))
-      throw new Error("This member does not have the required capability");
 
     const now = new Date();
-    slot.assignedMemberId = member.id;
-    slot.assignmentStatus = "ASSIGNED";
-    slot.customHelperName = null;
-    slot.updatedAt = now;
-    match.updatedAt = now;
-    plan.value.lastUpdated = now;
-    selectedMemberId.value = member.id;
+    const claimantId = memberId ?? "";
+    claimDuty(plan.value, matchId, slotId, claimantId, now);
+    selectedMemberId.value = claimantId;
   }
 
   function clearMatchSlots(matchId: string) {
